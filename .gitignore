@@ -8,5 +8,6 @@ npm-debug.log
 mochawesome-reports/
 node_modules/
 .idea/
+data/
 .yarnclean
 coverage/
