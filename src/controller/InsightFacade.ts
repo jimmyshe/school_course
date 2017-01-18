@@ -12,7 +12,13 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     addDataset(id: string, content: string): Promise<InsightResponse> {
-        return null;
+        return new Promise((fulfill,reject)=>{
+            let response:InsightResponse = null;
+            response = {code: 400, body: {error: 'Message not provided'}};
+
+
+            fulfill(response);
+        })
     }
 
     removeDataset(id: string): Promise<InsightResponse> {
