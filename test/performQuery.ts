@@ -9,12 +9,12 @@ import {InsightResponse} from "../src/controller/IInsightFacade";
 import {fail} from "assert";
 
 
-describe("addDataSet", function () {
+describe("performQuery", function () {
 
     let insight:Insight = null
 
 
-    let testQury_simple = {
+    let testQuery_simple = {
         "WHERE":{
             "GT":{
                 "courses_avg":97
@@ -29,6 +29,8 @@ describe("addDataSet", function () {
             "FORM":"TABLE"
         }
     }
+
+    let testQuery_notObject = [1,2];
 
 
     function sanityCheck(response: InsightResponse) {
@@ -51,25 +53,26 @@ describe("addDataSet", function () {
 
 
     it("test of test", function () {
-        insight.performQuery(testQury_simple)
+        insight.performQuery(testQuery_notObject)
             .then((respons:InsightResponse)=>{
                 sanityCheck(respons);
                 expect(respons.code).to.equal(200);
             })
-            .catch((err:InsightResponse)=>{
-                expect.fail();
+            .catch(function (err:InsightResponse){
+                expect.fail(); //todo
             })
     });
 
 
     it("If the query invalid, it will return code 400", function () {
-        insight.performQuery(testQury_simple)
+        insight.performQuery(testQuery_notObject)
             .then((respons:InsightResponse)=>{
                 sanityCheck(respons);
-                expect(respons.code).equal(400)
+                expect.fail();
             })
             .catch((err:InsightResponse)=>{
                 sanityCheck(err);
+                expect.fail();    //todo
                 expect(err.code).to.equal(400);
                 expect(err.body).to.equal("the query is not even a object");
             })

@@ -4,7 +4,7 @@
 import {IInsightFacade, InsightResponse, QueryRequest} from "./IInsightFacade";
 
 import Log from "../Util";
-import isObject = require("core-js/fn/object/is-object");
+
 
 export default class InsightFacade implements IInsightFacade {
 
@@ -61,13 +61,13 @@ export default class InsightFacade implements IInsightFacade {
      *
      */
 
-    isValidQuery(query:QueryRequest):InsightResponse{
+    isValidQuery(query:any):InsightResponse{
 
 
         let ret = {code:199,body:{}}
 
 
-        if(!isObject(query)){
+        if(query['WHERE']==null){
             ret.code = 400;
             ret.body = {"error":"the query is not even a object"}
             return ret;
