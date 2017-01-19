@@ -10,7 +10,7 @@ import {InsightResponse} from "../src/controller/IInsightFacade";
 
 describe("addDataSet", function () {
 
-    let insight:Insight = null
+    let insight:Insight = null;
 
     function sanityCheck(response: InsightResponse) {
         expect(response).to.have.property('code');
@@ -32,13 +32,14 @@ describe("addDataSet", function () {
 
 
     it("test of test", function () {
-        insight.addDataset("weqwe","wqrqw")
+        return insight.addDataset("weqwe","wqrqw")
             .then((respons:InsightResponse)=>{
                 sanityCheck(respons);
-                expect(respons.code).to.equal(200);
+                expect.fail();
             })
             .catch((err)=>{
-                expect.fail();
+                sanityCheck(err);
+                expect(err.code).to.equal(400);
             })
     });
 

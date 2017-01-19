@@ -6,7 +6,6 @@ import Insight from "../src/controller/InsightFacade";
 import {expect} from 'chai';
 import Log from "../src/Util";
 import {InsightResponse} from "../src/controller/IInsightFacade";
-import {fail} from "assert";
 
 
 describe("performQuery", function () {
@@ -53,30 +52,27 @@ describe("performQuery", function () {
 
 
     it("test of test", function () {
-        insight.performQuery(testQuery_notObject)
+        return insight.performQuery(testQuery_simple)
             .then((respons:InsightResponse)=>{
                 sanityCheck(respons);
                 expect(respons.code).to.equal(200);
             })
-            .catch(function (err:InsightResponse){
-                expect.fail(); //todo
+            .catch( (err:InsightResponse)=>{
+                expect.fail();
             })
     });
 
 
     it("If the query invalid, it will return code 400", function () {
-        insight.performQuery(testQuery_notObject)
+        return insight.performQuery(testQuery_notObject)
             .then((respons:InsightResponse)=>{
                 sanityCheck(respons);
                 expect.fail();
             })
             .catch((err:InsightResponse)=>{
                 sanityCheck(err);
-                expect.fail();    //todo
                 expect(err.code).to.equal(400);
-                expect(err.body).to.equal("the query is not even a object");
+                expect(err.body).to.deep.equal({"error": "the query is not have 'WHERE'"});
             })
     });
-
-
 });

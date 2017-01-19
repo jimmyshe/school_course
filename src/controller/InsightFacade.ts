@@ -17,8 +17,7 @@ export default class InsightFacade implements IInsightFacade {
             let response:InsightResponse = null;
             response = {code: 400, body: {error: 'Message not provided'}};
             // meaningless implementation just for testing
-
-            fulfill(response);
+            reject(response);
         })
     }
 
@@ -28,7 +27,7 @@ export default class InsightFacade implements IInsightFacade {
             response = {code: 400, body: {error: 'Message not provided'}};
             // meaningless implementation just for testing
 
-            fulfill(response);
+            reject(response);
         })
     }
 
@@ -69,7 +68,7 @@ export default class InsightFacade implements IInsightFacade {
 
         if(query['WHERE']==null){
             ret.code = 400;
-            ret.body = {"error":"the query is not even a object"}
+            ret.body = {"error":"the query is not have 'WHERE'"}
             return ret;
         }
 
