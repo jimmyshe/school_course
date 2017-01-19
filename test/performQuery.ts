@@ -61,8 +61,7 @@ describe("performQuery", function () {
                 expect.fail();
             })
     });
-
-
+    
     it("If the query invalid, it will return code 400", function () {
         return insight.performQuery(testQuery_notObject)
             .then((respons:InsightResponse)=>{
