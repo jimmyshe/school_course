@@ -23,5 +23,7 @@ export interface Section {
 
     sectionNum : string;
 
+    source : string;
+
 
 }
