@@ -2,11 +2,15 @@
  * This is the main programmatic entry point for the project.
  */
 import {IInsightFacade, InsightResponse, QueryRequest} from "./IInsightFacade";
+import {Section} from "./CourseInformation";
 
 import Log from "../Util";
 
 
 export default class InsightFacade implements IInsightFacade {
+
+    courseInformation: Section[];
+
 
     constructor() {
         Log.trace('InsightFacadeImpl::init()');
