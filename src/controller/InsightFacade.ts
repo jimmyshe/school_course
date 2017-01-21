@@ -3,17 +3,18 @@
  */
 import {IInsightFacade, InsightResponse, QueryRequest} from "./IInsightFacade";
 import {Section} from "./CourseInformation";
-
+import QH from "./queryHelper.ts"
 import Log from "../Util";
 
 
 export default class InsightFacade implements IInsightFacade {
 
-    courseInformation: Section[];
+    courseInformation: Section[];  // it will be a private variable later
 
 
     constructor() {
         Log.trace('InsightFacadeImpl::init()');
+        courseInformation = null;
     }
 
     addDataset(id: string, content: string): Promise<InsightResponse> {
@@ -37,46 +38,23 @@ export default class InsightFacade implements IInsightFacade {
 
     performQuery(query: QueryRequest): Promise <InsightResponse> {
         return new Promise((fulfill,reject)=>{
+            
             let response:InsightResponse = null;
-
-            response = this.isValidQuery(query);
-
+            response = QH.isValidQuery(query);   // validate the request query
             if (response.code == 400){
                 reject(response);
             }else {
 
-                response.code = 200;
+                let selected: boolean[] = 
 
+
+
+
+                response.code = 200;
                 fulfill(response);
             }
         })
     }
 
-    /*
-     *  This is a helper function to check a QueryRequest
-     *
-     *  @param query  The query to be performed. This is the same as the body of the POST message.
-     *  @return Promise <InsightResponse>
-     *      Return codes:
-     *
-     *      199: the query is valid. no missing info.
-     *      400: the query miss some info . The return body will be {"error": "my text"} about what is missing.
-     *
-     */
 
-    isValidQuery(query:any):InsightResponse{
-
-
-        let ret = {code:199,body:{}}
-
-
-        if(query['WHERE']==null){
-            ret.code = 400;
-            ret.body = {"error":"the query is not have 'WHERE'"}
-            return ret;
-        }
-
-        // if the query is valid.
-        return ret;
-    }
 }
