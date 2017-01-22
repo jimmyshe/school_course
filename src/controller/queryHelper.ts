@@ -45,6 +45,21 @@ export default class QH {
                                     'IS'?:{}
                                     'NOT'?:{}):boolean[]{
                                         
+                                        
+       if (filer['LT']!=null){
+           let comparsion_key:string = filer['LT'].key;
+           let comparsion_value:number = filer['LT'].key;
+           let ret:boolean[] = [];
+           
+           for(let i of courseInformation){
+               
+           }
+       }                              
+                                        
+                                        
+                                        
+                                        
+                                        
         if(filer['NOT']!=null){
             let ret:boolean[] = filterOut(courseInformation,filer['NOT']);
             for(let i of ret){
@@ -52,6 +67,9 @@ export default class QH {
             }
             return ret;
         }
+        
+        
+        
         
         
     }
