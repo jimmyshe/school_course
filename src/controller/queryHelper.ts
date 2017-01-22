@@ -51,8 +51,13 @@ export default class QH {
            let comparsion_value:number = filer['LT'].key;
            let ret:boolean[] = [];
            
-           for(let i of courseInformation){
-               
+           for(let i = 0;i<courseInformation.length;i++){
+                if(courseInformation[i][comparsion_key]<comparsion_value){
+                    ret.push(true);
+                }
+                else{
+                    ret.push(false);
+                }
            }
        }                              
                                         
