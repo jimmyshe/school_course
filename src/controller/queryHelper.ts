@@ -37,20 +37,25 @@ export default class QH {
     
     
     public static filterOut(courseInformation:Section[],
-                            filer:{'AND'?:[]},
-                                    'OR'?:[]
-                                    'LT'?:{}
+                            filter:{'AND'?:[{}],
+                                    'OR'?:[{}]
+                                    'LT'?:{sting:number}
                                     'GT'?:{}
                                     'EQ'?:{}
                                     'IS'?:{}
-                                    'NOT'?:{}):boolean[]{
+                                    'NOT'?:{}}):boolean[]{
                                         
                                         
-       if (filer['LT']!=null){
-           let comparsion_key:string = filer['LT'].key;
-           let comparsion_value:number = filer['LT'].key;
+       if (filter['LT']!=null){
+           let comparsion_class = filter['LT'];
+           let comparsion_key:string =  Object.keys(comparsion_class)[0];
+           let comparsion_value_raw:number = comparsion_class[comparsion_key];
            let ret:boolean[] = [];
+
+
            
+
+
            for(let i = 0;i<courseInformation.length;i++){
                 if(courseInformation[i][comparsion_key]<comparsion_value){
                     ret.push(true);

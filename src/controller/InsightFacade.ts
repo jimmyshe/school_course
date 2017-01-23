@@ -45,9 +45,18 @@ export default class InsightFacade implements IInsightFacade {
                 reject(response);
             }else {
 
-                let selected: boolean[] = 
+                let selected:boolean[] = QH.filterOut(this.courseInformation,query["WHERE"]);
+
+                let body_pre = [];
+                for(let i = 0;i<this.courseInformation.length;i++){
+                    if(selected[i]){
+                        body_pre.push(this.courseInformation[i]);
+                    }
+                }
 
 
+
+                response.body = body_pre; // todo There are more work to be done.
 
 
                 response.code = 200;
