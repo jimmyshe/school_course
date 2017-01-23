@@ -3,21 +3,21 @@
  */
 export interface Section {
 
-    courseID : string;
+    courses_id : string;
 
-    average : number;
+    courses_avg : number;
 
-    instructor? : string;
+    courses_instructor? : string;
 
-    department : string;
+    courses_dept : string;
 
-    title : string;
+    courses_title : string;
 
-    pass : number;
+    courses_pass : number;
 
-    fail : number;
+    courses_fail : number;
 
-    audit : number;
+    courses_audit : number;
 
     year : string;
 
