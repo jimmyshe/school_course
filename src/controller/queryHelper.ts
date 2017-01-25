@@ -1,6 +1,7 @@
 import {IInsightFacade, InsightResponse, QueryRequest} from "./IInsightFacade";
 import {Section} from "./CourseInformation";
 import Log from "../Util";
+import {error} from "util";
 
 export default class QH {
        /*
@@ -39,48 +40,45 @@ export default class QH {
     public static filterOut(courseInformation:Section[],
                             filter:{'AND'?:[{}],
                                     'OR'?:[{}]
-                                    'LT'?:{sting:number}
+                                    'LT'?:{}
                                     'GT'?:{}
                                     'EQ'?:{}
                                     'IS'?:{}
                                     'NOT'?:{}}):boolean[]{
-                                        
-                                        
-       if (filter['LT']!=null){
-           let comparsion_class = filter['LT'];
-           let comparsion_key:string =  Object.keys(comparsion_class)[0];
-           let comparsion_value_raw:number = comparsion_class[comparsion_key];
-           let ret:boolean[] = [];
 
+        if (filter['LT']!=null){
+           let comparision_class:any = filter['LT'];
 
-           
-
-
-           for(let i = 0;i<courseInformation.length;i++){
-                if(courseInformation[i][comparsion_key]<comparsion_value){
-                    ret.push(true);
-                }
-                else{
-                    ret.push(false);
-                }
+           if(Object.keys(comparision_class).length!=1){
+               throw new Error("more than one comparision key in filter")
            }
-       }                              
-                                        
-                                        
-                                        
-                                        
-                                        
-        if(filer['NOT']!=null){
-            let ret:boolean[] = filterOut(courseInformation,filer['NOT']);
+
+           let comparision_key:string =  Object.keys(comparision_class)[0];
+           let comparision_value:number = comparision_class[comparision_key];
+
+           let ret:boolean[] = [];
+           let len = courseInformation.length;
+           for(let i = 0;i<len;i++){
+               if((courseInformation[i] as any)[comparision_key]==null){
+                   throw new Error("Can't find comparision_key in the data set");
+               }else {
+                   if ((courseInformation[i] as any)[comparision_key] < comparision_value) {
+                       ret.push(true);
+                   }
+                   else {
+                       ret.push(false);
+                   }
+               }
+           }
+           return ret;
+        }
+
+        if(filter['NOT']!=null){
+            let ret:boolean[] = QH.filterOut(courseInformation,filter['NOT']);
             for(let i of ret){
                 i = !i;
             }
             return ret;
         }
-        
-        
-        
-        
-        
     }
 }

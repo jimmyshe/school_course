@@ -3,7 +3,7 @@
  */
 import {IInsightFacade, InsightResponse, QueryRequest} from "./IInsightFacade";
 import {Section} from "./CourseInformation";
-import QH from "./queryHelper.ts"
+import QH from "./queryHelper";
 import Log from "../Util";
 
 
@@ -14,7 +14,7 @@ export default class InsightFacade implements IInsightFacade {
 
     constructor() {
         Log.trace('InsightFacadeImpl::init()');
-        courseInformation = null;
+        this.courseInformation = null;
     }
 
     addDataset(id: string, content: string): Promise<InsightResponse> {
@@ -45,17 +45,29 @@ export default class InsightFacade implements IInsightFacade {
                 reject(response);
             }else {
 
-                let selected:boolean[] = QH.filterOut(this.courseInformation,query["WHERE"]);
+                let selected: boolean[] = null;
+
+
+                try {
+                    let selected: boolean[] = QH.filterOut(this.courseInformation,query["WHERE"]);
+                }
+                catch (e){
+                    response.code = 424;
+                    response.body = {"missing": e.message};
+                    reject(response)
+                }
+
+
 
                 let body_pre = [];
-                for(let i = 0;i<this.courseInformation.length;i++){
+                let len = this.courseInformation.length;
+                for(let i = 0;i<len;i++){
                     if(selected[i]){
                         body_pre.push(this.courseInformation[i]);
                     }
                 }
 
-
-
+                len = body_pre.length;
                 response.body = body_pre; // todo There are more work to be done.
 
 

@@ -29,7 +29,7 @@ describe("performQuery", function () {
         }
     }
 
-    let testQuery_notObject = [1,2];
+
 
 
     function sanityCheck(response: InsightResponse) {
@@ -62,16 +62,5 @@ describe("performQuery", function () {
             })
     });
     
-    it("If the query invalid, it will return code 400", function () {
-        return insight.performQuery(testQuery_notObject)
-            .then((respons:InsightResponse)=>{
-                sanityCheck(respons);
-                expect.fail();
-            })
-            .catch((err:InsightResponse)=>{
-                sanityCheck(err);
-                expect(err.code).to.equal(400);
-                expect(err.body).to.deep.equal({"error": "the query is not have 'WHERE'"});
-            })
-    });
+
 });
