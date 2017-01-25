@@ -14,33 +14,33 @@ describe("QH helper test", function () {
 
     let testData:Section[] = [
         {
-        courses_id : "t1",
-        courses_avg : 5,
-        courses_dept : "cs",
-        courses_title : "string",
-        courses_pass : 2,
-        courses_fail : 3,
-        courses_audit : 1,
-        year : "",
-        sectionNum : "string",
-        source : "string",},
+            courses_id : "t1",
+            courses_avg : 5,
+            courses_dept : "cs",
+            courses_title : "string",
+            courses_pass : 1,
+            courses_fail : 3,
+            courses_audit : 1,
+            year : "",
+            sectionNum : "string",
+            source : "string",},
         {
-        courses_id : "t2",
-        courses_avg : 4,
-        courses_dept : "cs",
-        courses_title : "string",
-        courses_pass : 2,
-        courses_fail : 3,
-        courses_audit : 1,
-        year : "",
-        sectionNum : "string",
-        source : "string",},
+            courses_id : "t2",
+            courses_avg : 4,
+            courses_dept : "cs",
+            courses_title : "string",
+            courses_pass : 2,
+            courses_fail : 3,
+            courses_audit : 1,
+            year : "",
+            sectionNum : "string",
+            source : "string",},
         {
             courses_id : "t3",
             courses_avg : 3,
             courses_dept : "cs",
             courses_title : "string",
-            courses_pass : 2,
+            courses_pass : 3,
             courses_fail : 3,
             courses_audit : 1,
             year : "",
@@ -64,9 +64,10 @@ describe("QH helper test", function () {
     });
 
 
-    it("test filte out LT case", function () {
+    it("test filter out LT case", function () {
        let ret = QH.filterOut(testData,{'LT':{courses_avg:4}})
-        expect(ret).to.deep.equal([false,false,true])
+        expect(ret).to.deep.equal([false,false,true]);
+        Log.test("filtered out LT case");
     });
 
 
