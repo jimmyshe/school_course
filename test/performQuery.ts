@@ -50,17 +50,17 @@ describe("performQuery", function () {
         insight = null;
     });
 
-
-    it("test of test", function () {
-        return insight.performQuery(testQuery_simple)
-            .then((respons:InsightResponse)=>{
-                sanityCheck(respons);
-                expect(respons.code).to.equal(200);
-            })
-            .catch( (err:InsightResponse)=>{
-                expect.fail();
-            })
-    });
-    
+    //
+    // it("test of test", function () {
+    //     return insight.performQuery(testQuery_simple)
+    //         .then((respons:InsightResponse)=>{
+    //             sanityCheck(respons);
+    //             expect(respons.code).to.equal(200);
+    //         })
+    //         .catch( (err:InsightResponse)=>{
+    //             expect.fail();
+    //         })
+    // });
+    //
 
 });
