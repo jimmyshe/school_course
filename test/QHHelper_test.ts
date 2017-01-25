@@ -7,9 +7,6 @@ import QH from "../src/controller/queryHelper";
 import {expect} from 'chai';
 import Log from "../src/Util";
 
-
-
-
 describe("QH helper test", function () {
 
     let testData:Section[] = [
@@ -21,6 +18,7 @@ describe("QH helper test", function () {
             courses_pass : 1,
             courses_fail : 3,
             courses_audit : 1,
+            courses_uuid:"0",
             year : "",
             sectionNum : "string",
             source : "string",},
@@ -32,17 +30,19 @@ describe("QH helper test", function () {
             courses_pass : 2,
             courses_fail : 3,
             courses_audit : 1,
+            courses_uuid:"1",
             year : "",
             sectionNum : "string",
             source : "string",},
         {
             courses_id : "t3",
             courses_avg : 3,
-            courses_dept : "cs",
+            courses_dept : "art",
             courses_title : "string",
             courses_pass : 3,
             courses_fail : 3,
             courses_audit : 1,
+            courses_uuid:"2",
             year : "",
             sectionNum : "string",
             source : "string",}]
@@ -70,5 +70,34 @@ describe("QH helper test", function () {
         Log.test("filtered out LT case");
     });
 
+    it("test filter out GT case", function () {
+        let ret = QH.filterOut(testData,{'GT':{courses_avg:4}})
+        expect(ret).to.deep.equal([true,false,false]);
+        Log.test("filtered out LT case");
+    });
+
+    it("test filter out EQ case", function () {
+        let ret = QH.filterOut(testData,{'EQ':{courses_avg:4}})
+        expect(ret).to.deep.equal([false,true,false]);
+        Log.test("filtered out LT case");
+    });
+
+    it("test filter out IS case", function () {
+        let ret = QH.filterOut(testData,{'IS':{courses_dept : "cs"}})
+        expect(ret).to.deep.equal([true,true,false]);
+        Log.test("filtered out LT case");
+    });
+
+    it("test filter out NOT case", function () {
+        let ret = QH.filterOut(testData,{'NOT':{'IS':{courses_dept : "cs"}}})
+        expect(ret).to.deep.equal([false,false,true]);
+        Log.test("filtered out LT case");
+    });
+
+    it("test filter out AND case", function () {
+        let ret = QH.filterOut(testData,{'AND':[{'IS':{courses_dept : "cs"}},{'NOT':{'IS':{courses_dept : "cs"}}}]})
+        expect(ret).to.deep.equal([false,false,false]);
+        Log.test("filtered out LT case");
+    });
 
 });

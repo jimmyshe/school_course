@@ -19,6 +19,8 @@ export interface Section {
 
     courses_audit : number;
 
+    courses_uuid: string;
+
     year : string;
 
     sectionNum : string;

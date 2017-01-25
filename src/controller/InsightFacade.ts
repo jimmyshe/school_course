@@ -40,21 +40,25 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise((fulfill,reject)=>{
             
             let response:InsightResponse = null;
-            response = QH.isValidQuery(query);   // validate the request query
+            response = QH.isValidQuery(query);   // validate the request query main on the parts other than the filter, since I handle it in filter out function
             if (response.code == 400){
                 reject(response);
             }else {
-
                 let selected: boolean[] = null;
 
-
                 try {
-                    let selected: boolean[] = QH.filterOut(this.courseInformation,query["WHERE"]);
+                    selected = QH.filterOut(this.courseInformation,query["WHERE"]);
                 }
                 catch (e){
-                    response.code = 424;
-                    response.body = {"missing": e.message};
-                    reject(response)
+
+                    if(e.message=="the filter is not valid"){
+                        response.code = 400;
+                        response.body = {"error":e.message}
+                    }else {
+                        response.code = 424;
+                        response.body = {"missing": e.message};
+                        reject(response)
+                    }
                 }
 
 
