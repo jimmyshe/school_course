@@ -38,19 +38,16 @@ export default class InsightFacade implements IInsightFacade {
 
     performQuery(query: QueryRequest): Promise <InsightResponse> {
         return new Promise((fulfill,reject)=>{
-            
             let response:InsightResponse = null;
             response = QH.isValidQuery(query);   // validate the request query main on the parts other than the filter, since I handle it in filter out function
             if (response.code == 400){
                 reject(response);
             }else {
                 let selected: boolean[] = null;
-
                 try {
                     selected = QH.filterOut(this.courseInformation,query["WHERE"]);
                 }
                 catch (e){
-
                     if(e.message=="the filter is not valid"){
                         response.code = 400;
                         response.body = {"error":e.message}
@@ -72,10 +69,29 @@ export default class InsightFacade implements IInsightFacade {
                 }
 
                 len = body_pre.length;
-                response.body = body_pre; // todo There are more work to be done.
+                // These are all sections selected
+
+                let order_key=query.OPTIONS.ORDER;  // sort the body_pre if it is necessary
+                if (order_key){
+                    body_pre = Array.sort(body_pre,(n1:Section,n2:Section)=>{
+
+                        if((n1 as any)[order_key] > (n2 as any)[order_key]){
+                            return 1;
+                        }else if((n1 as any)[order_key] == (n2 as any)[order_key]){
+                            return 0;
+                        }else {
+                            return -1;
+                        }
+                    })
+                }
+
+
+                let result:{}[]=null;
+
 
 
                 response.code = 200;
+                response.body = {render:query.OPTIONS.FORM,'result':result}
                 fulfill(response);
             }
         })

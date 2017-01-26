@@ -18,22 +18,24 @@ export default class QH {
      *
      */
 
-     public static isValidQuery(query:any):InsightResponse{
+     public static isValidQuery(query:QueryRequest):InsightResponse{
 
 
         let ret = {code:199,body:{}}
 
 
-        if(query['WHERE']==null){
-            ret.code = 400;
-            ret.body = {"error":"the query is not have 'WHERE'"}
-            return ret;
-        }
+        // The interface defination should do the right job. If it is not the case, I can write more at here.
 
-        // if the query is valid.
-        
-        
-        //todo 
+         if(query.OPTIONS.ORDER!=null){
+            let order_key:string = query.OPTIONS.ORDER;
+
+            if(!(order_key=="courses_avg"||order_key=="courses_pass"||order_key=="courses_fail"||order_key=="courses_audit")) {
+                ret.code = 400;
+                ret.body = {"error": "the option of order has an invalid key"}
+            }
+         }
+
+
         return ret;
     }
     
@@ -73,7 +75,7 @@ export default class QH {
             let len = courseInformation.length;
             for (let i = 0; i < len; i++) {
                 if ((courseInformation[i] as any)[comparision_key] == null) {
-                    throw new Error("Can't find " + comparision_key + " in the data set");
+                    throw new Error("Can't find " + comparision_key + " in at " + courseInformation[i].courses_uuid);
                 } else {
 
                     if(!isNumber((courseInformation[i] as any)[comparision_key])){
@@ -183,4 +185,8 @@ export default class QH {
 
         throw new Error("the filter is not valid");  // the filter is not any of the for types
     }
+
+
+
+
 }
