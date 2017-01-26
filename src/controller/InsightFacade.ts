@@ -5,6 +5,7 @@ import {IInsightFacade, InsightResponse, QueryRequest} from "./IInsightFacade";
 import {Section} from "./CourseInformation";
 import QH from "./queryHelper";
 import Log from "../Util";
+import {queryParser} from "restify";
 
 
 export default class InsightFacade implements IInsightFacade {
@@ -48,14 +49,12 @@ export default class InsightFacade implements IInsightFacade {
                     selected = QH.filterOut(this.courseInformation,query["WHERE"]);
                 }
                 catch (e){
-                    if(e.message=="the filter is not valid"){
-                        response.code = 400;
-                        response.body = {"error":e.message}
-                    }else {
-                        response.code = 424;
-                        response.body = {"missing": e.message};
-                        reject(response)
+                    try {
+                        response = JSON.parse(e.message);
+                    }catch (e){
+                        Log.info("aaa")
                     }
+                    reject(response);
                 }
 
 
@@ -69,11 +68,11 @@ export default class InsightFacade implements IInsightFacade {
                 }
 
                 len = body_pre.length;
-                // These are all sections selected
+                //These are all sections selected
 
                 let order_key=query.OPTIONS.ORDER;  // sort the body_pre if it is necessary
-                if (order_key){
-                    body_pre = Array.sort(body_pre,(n1:Section,n2:Section)=>{
+                if (order_key!=null){
+                     body_pre.sort((n1,n2)=>{
 
                         if((n1 as any)[order_key] > (n2 as any)[order_key]){
                             return 1;
@@ -82,20 +81,26 @@ export default class InsightFacade implements IInsightFacade {
                         }else {
                             return -1;
                         }
-                    })
+                    });
+
                 }
 
 
-                let result:{}[]=null;
+                let results:{}[]=[];
 
+                for(let i =0;i<body_pre.length;i++){
+                    let element:any={};
+                    for(let j=query.OPTIONS.COLUMNS.length-1;j>=0;j--){
+                        element[query.OPTIONS.COLUMNS[j]]=(body_pre[i] as any)[query.OPTIONS.COLUMNS[j]];
+                    }
+                    results.push(element);
+                }
 
 
                 response.code = 200;
-                response.body = {render:query.OPTIONS.FORM,'result':result}
+                response.body = {'render':query.OPTIONS.FORM,'result':results}
                 fulfill(response);
             }
         })
     }
-
-
 }
