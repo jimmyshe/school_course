@@ -48,6 +48,9 @@ describe("QH helper test", function () {
             source : "string",}]
 
     before(function () {
+        Log.info("This is the test for QH helpers");
+        Log.warn("HI");
+        Log.error("error test")
         Log.test('Before: ' + (<any>this).test.parent.title);
     });
 
@@ -99,5 +102,46 @@ describe("QH helper test", function () {
         expect(ret).to.deep.equal([false,false,false]);
         Log.test("filtered out LT case");
     });
+
+    it("test filter out OR case", function () {
+        let ret = QH.filterOut(testData,{'OR':[{'IS':{courses_dept : "cs"}},{'NOT':{'IS':{courses_dept : "cs"}}}]})
+        expect(ret).to.deep.equal([true,true,true]);
+        Log.test("filtered out LT case");
+    });
+
+// test invalid filter
+
+    it("test filter with invalid operation", function () {
+        try {
+            let ret = QH.filterOut(testData, {
+                'OHNO': [{'IS': {courses_dept: "cs"}}, {'NOT': {'IS': {courses_dept: "cs"}}}]
+
+            });
+            expect.fail();
+
+        }catch (e){
+            expect(JSON.parse(e.message)).to.deep.equal({"code":400,"body":{"error":"the filter is not valid,since there is no valid operation"}});
+        }
+
+    });
+
+
+
+
+    it("test filter with multiple operations at the same level", function () {
+        try {
+            let ret = QH.filterOut(testData, {
+                'AND': [{'IS': {courses_dept: "cs"}}, {'NOT': {'IS': {courses_dept: "cs"}}}],
+                'NOT': {}  // the extra one
+            });
+            expect.fail();
+
+        }catch (e){
+            expect(JSON.parse(e.message)).to.deep.equal({"code":400,"body":{"error":"the filter is not valid,since it has more than 1 comparision at the same time"}});
+        }
+
+    });
+
+
 
 });

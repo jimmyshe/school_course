@@ -37,7 +37,7 @@ describe("addDataSet", function () {
                 sanityCheck(respons);
                 expect.fail();
             })
-            .catch((err)=>{
+            .catch((err:InsightResponse)=>{
                 sanityCheck(err);
                 expect(err.code).to.equal(400);
             })

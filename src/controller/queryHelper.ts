@@ -32,26 +32,66 @@ export default class QH {
             if(!(order_key=="courses_avg"||order_key=="courses_pass"||order_key=="courses_fail"||order_key=="courses_audit")) {
                 ret.code = 400;
                 ret.body = {"error": "the option of order has an invalid key"}
+                return ret;
             }
          }
 
 
+         if (query.OPTIONS.FORM!=null&&query.OPTIONS.FORM!="TABLE"){
+
+             ret.code = 400;
+             ret.body = {"error": "the option of view has an invalid key"}
+             return ret;
+         }
+
+
+
+         for(let j=query.OPTIONS.COLUMNS.length-1;j>=0;j--){
+             if (!QH.isValidDateKey( query.OPTIONS.COLUMNS[j])){
+                 ret.code = 400;
+                 ret.body = {"error": "the option of columns has an invalid key"}
+                 return ret;
+             }
+         }
+
+
+
         return ret;
+    }
+
+    public static isValidDateKey(key:string):boolean{
+
+
+         let valid_keys = ["courses_id","courses_avg","courses_instructor","courses_dept","courses_title","courses_pass","courses_fail","courses_audit","courses_uuid"]
+
+
+         for(let valid_key of valid_keys){
+             if (valid_key == key){
+                 return true;
+             }
+         }
+         return false;
     }
     
     
     
+    // public static filterOut(courseInformation:Section[],
+    //                         filter:{'AND'?:[{}]
+    //                                 'OR'?:[{}]
+    //                                 'LT'?:{}
+    //                                 'GT'?:{}
+    //                                 'EQ'?:{}
+    //                                 'IS'?:{}
+    //                                 'NOT'?:{}}):boolean[]{
+// I did not use the type check built_in
+
+
+
     public static filterOut(courseInformation:Section[],
-                            filter:{'AND'?:[{}],
-                                    'OR'?:[{}]
-                                    'LT'?:{}
-                                    'GT'?:{}
-                                    'EQ'?:{}
-                                    'IS'?:{}
-                                    'NOT'?:{}}):boolean[]{
+                            filter:any):boolean[]{
 
         if(Object.keys(filter).length!=1){
-            throw new Error('the filter is not valid');
+            throw new Error('{"code":400,"body":{"error":"the filter is not valid,since it has more than 1 comparision at the same time"}}');
         }
 
         let filter_key = Object.keys(filter)[0];
@@ -60,14 +100,14 @@ export default class QH {
 
             let comparision_class: any = filter[filter_key];
             if (Object.keys(comparision_class).length != 1) {
-                throw new Error("the filter is not valid");
+                throw new Error('{"code":400,"body":{"error":"the filter is not valid,since it has more than 1 comparision_key at the same time"}}');
             }
 
             let comparision_key: string = Object.keys(comparision_class)[0];
             let comparision_value = comparision_class[comparision_key];
 
             if(!isNumber(comparision_value)){
-                throw new Error("the filter is not valid");
+                throw new Error('{"code":400,"body":{"error":"the filter is not valid,since comparision valuse is not a number"}}');
             }
 
 
@@ -75,11 +115,11 @@ export default class QH {
             let len = courseInformation.length;
             for (let i = 0; i < len; i++) {
                 if ((courseInformation[i] as any)[comparision_key] == null) {
-                    throw new Error("Can't find " + comparision_key + " in at " + courseInformation[i].courses_uuid);
+                    throw new Error('{"code":424,"body":{"missing":"'+ courseInformation[i].courses_uuid+'"}}');
                 } else {
 
                     if(!isNumber((courseInformation[i] as any)[comparision_key])){
-                        throw new Error("the filter is not valid");
+                        throw new Error('{"code":400,"body":{"error":"the filter is not valid,since its comparision key doesn\'t reffer to a number"}}');
                     }
 
                     switch (filter_key){
@@ -117,25 +157,25 @@ export default class QH {
 
             let comparision_class: any = filter[filter_key];
             if (Object.keys(comparision_class).length != 1) {
-                throw new Error("the filter is not valid");
+                throw new Error('{"code":400,"body":{"error":"the filter is not valid,since it has more than 1 comparision at the same time"}}');
             }
 
             let comparision_key: string = Object.keys(comparision_class)[0];
             let comparision_value = comparision_class[comparision_key];
 
             if(!isString(comparision_value)){
-                throw new Error("the filter is not valid");
+                throw new Error('{"code":400,"body":{"error":"the filter is not valid,since the comparision value is not a string"}}');
             }
 
             let ret: boolean[] = [];
             let len = courseInformation.length;
             for (let i = 0; i < len; i++) {
                 if ((courseInformation[i] as any)[comparision_key] == null) {
-                    throw new Error("Can't find " + comparision_key + " in the data set");
+                    throw new Error('{"code":424,"body":{"missing":"'+ courseInformation[i].courses_uuid+'"}}');
                 } else {
 
                     if(!isString((courseInformation[i] as any)[comparision_key])){
-                        throw new Error("the filter is not valid");
+                        throw new Error('{"code":400,"body":{"error":"the filter is not valid,since the comparision key does not refer to a string"}}');
                     }
 
                     if ((courseInformation[i] as any)[comparision_key] == comparision_value) {
@@ -153,7 +193,7 @@ export default class QH {
         if(filter_key=='AND'||filter_key=='OR'){
             let logicfilters: {}[] = filter[filter_key];
             if (logicfilters.length < 2) {
-                throw new Error("the filter is not valid");
+                throw new Error('{"code":400,"body":{"error":"the filter is not valid,since there are less than two filter in logic"}}');
             }
 
             let pre_ret:boolean[] = QH.filterOut(courseInformation,logicfilters[0]);
@@ -175,7 +215,7 @@ export default class QH {
             return pre_ret;
         }   // This is the case for logic
 
-        if(filter_key='NOT'){
+        if(filter_key=='NOT'){
             let ret:boolean[] = QH.filterOut(courseInformation,filter['NOT']);
             for(let i =0;i<ret.length;i++){
                 ret[i]=!ret[i];
@@ -183,10 +223,7 @@ export default class QH {
             return ret;
         }                     // this is the case for negation
 
-        throw new Error("the filter is not valid");  // the filter is not any of the for types
+        throw new Error('{"code":400,"body":{"error":"the filter is not valid,since there is no valid operation"}}');  // (optional)the filter is not any of the for types but it will not be there due to the interface definition
     }
-
-
-
 
 }
