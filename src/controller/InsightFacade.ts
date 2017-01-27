@@ -8,34 +8,163 @@ import Log from "../Util";
 import {queryParser} from "restify";
 
 
+"use strict";
+import {cpus} from "os";
+
+let fs = require("fs");
+let JSZip = require("jszip");
+
 export default class InsightFacade implements IInsightFacade {
 
-    courseInformation: Section[];  // it will be a private variable later
+    private dataSets: any;
+
+     courseInformation: any[] = [] ;
+
+    private infoID: string[] = [];
 
 
     constructor() {
         Log.trace('InsightFacadeImpl::init()');
-        this.courseInformation = null;
     }
 
     addDataset(id: string, content: string): Promise<InsightResponse> {
-        return new Promise((fulfill,reject)=>{
-            let response:InsightResponse = null;
-            response = {code: 400, body: {error: 'Message not provided'}};
-            // meaningless implementation just for testing
-            reject(response);
-        })
+
+        let that = this;
+
+        return new Promise((fulfill, reject) => {
+
+            // console.log('run here1');
+
+            if ((id == null) || (content == null)) {
+                let response = {code: 400, body: {error: 'Message not provided'}};
+                // meaningless implementation just for testing
+                reject(response);
+            }
+
+            fs.readFile(id, function (err: any, data: any) {
+
+                that.infoID.push(id);
+
+                // console.log('run here2');
+
+                if (err) {
+                    // console.log(err.message);
+                    let response = {code: 400, body: {error: 'Message not provided'}};
+                    // meaningless implementation just for testing
+                    reject(response);
+                }
+
+                let myZip = new JSZip;
+
+                myZip.loadAsync(data, {base64: true}).then(function (zip: JSZip) {
+
+                    //console.log('run here3');
+                    let processList = <any>[];
+
+                    zip.forEach(function (relativePath: any, file: any) {
+
+                        // var a1 = relativePath.split('/');
+                        // var filename = a1[a1.length-1];
+                        // console.log(filename);
+                        if (!file.dir) {
+                            let course_promise = file.async("string");
+                            processList.push(course_promise);
+                        }
+                    });
+
+                    //console.log(processList);
+
+                    Promise.all(processList).then(function (courseList) {
+
+                        //console.log(courseList);
+
+                        for (let jsonObj_str of courseList) {
+                            try {
+                                //console.log(courseObj);
+                                that.parseCourse(id, (jsonObj_str as string));
+                            }
+                            catch (err) {
+                                let response1: InsightResponse = {code: 400, body: {error: "Message not provided"}};
+                                reject(response1);
+                            }
+
+                        }
+
+                        let response2: InsightResponse = {code: 204, body: {}};
+                        //that.save(id, that.courseInformation);
+                        fulfill(response2);
+
+                    });
+
+
+                })
+            })
+        });
     }
 
     removeDataset(id: string): Promise<InsightResponse> {
-        return new Promise((fulfill,reject)=>{
-            let response:InsightResponse = null;
-            response = {code: 400, body: {error: 'Message not provided'}};
-            // meaningless implementation just for testing
+        return new Promise((fulfill, reject) => {
 
-            reject(response);
+            try {
+
+                var response: InsightResponse;
+                fs.statSync("./data" + id + ".json");
+                fs.unlinkSync("./data" + id + ".json");
+                response = {code: 204, body: {}};
+                fulfill(response);
+
+            } catch (err) {
+
+                var response: InsightResponse
+                response = {code: 400, body: {error: 'Message not provided'}};
+                reject(response);
+            }
+
         })
     }
+
+    public parseCourse(id: string, courseObj_s :string) {
+
+        let courseObj = JSON.parse(courseObj_s);
+        for (let key of  Object.keys(courseObj)) {
+            if (key === "result") {
+
+                let infoList = courseObj[key];
+
+                for (let i = 0; i < infoList.length; i++) {
+
+                    let section : any = {};
+
+                    section.courses_dept = infoList[i].Subject;
+                    section.courses_id = infoList[i].Course;
+                    section.courses_avg = infoList[i].Avg;
+                    section.courses_instructor = infoList[i].Professor;
+                    section.courses_title = infoList[i].Title;
+                    section.courses_pass = infoList[i].Pass;
+                    section.courses_fail = infoList[i].Fail;
+                    section.courses_audit = infoList[i].Audit;
+                    section.courses_uuid = infoList[i].id.toString;
+
+
+                    if (section.courses_dept != null && typeof section.courses_dept != 'undefined' &&
+                        section.courses_id != null && typeof section.courses_id != 'undefined' &&
+                        section.courses_avg != null && typeof section.courses_avg != 'undefined' &&
+                        section.courses_instructor != null && typeof section.courses_instructor != 'undefined' &&
+                        section.courses_title != null && typeof section.courses_title != 'undefined' &&
+                        section.courses_pass != null && typeof section.courses_title != 'undefined' &&
+                        section.courses_fail != null && typeof section.courses_fail != 'undefined' &&
+                        section.courses_audit != null && typeof section.courses_audit != 'undefined' &&
+                        section.courses_uuid != null && typeof section.courses_uuid != 'undefined') {
+
+                        this.courseInformation.push(section);
+                    }
+                }
+
+
+            }
+        }
+    }
+
 
     performQuery(query: QueryRequest): Promise <InsightResponse> {
         return new Promise((fulfill,reject)=>{
