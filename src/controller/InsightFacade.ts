@@ -3,8 +3,9 @@
  */
 import {IInsightFacade, InsightResponse, QueryRequest} from "./IInsightFacade";
 import {Section} from "./CourseInformation";
-
+import QH from "./queryHelper";
 import Log from "../Util";
+import {queryParser} from "restify";
 
 
 "use strict";
@@ -101,69 +102,6 @@ export default class InsightFacade implements IInsightFacade {
         });
     }
 
-    public parseCourse(id: string, courseObj_s :string) {
-
-        let courseObj = JSON.parse(courseObj_s);
-        for (let key of  Object.keys(courseObj)) {
-            if (key === "result") {
-
-                let infoList = courseObj[key];
-
-                for (let i = 0; i < infoList.length; i++) {
-
-                    let section : any = {};
-
-                    section.course_dept = infoList[i].Subject;
-                    section.course_id = infoList[i].Course;
-                    section.course_avg = infoList[i].Avg;
-                    section.course_instructor = infoList[i].Professor;
-                    section.course_title = infoList[i].Title;
-                    section.course_pass = infoList[i].Pass;
-                    section.course_fail = infoList[i].Fail;
-                    section.course_audit = infoList[i].Audit;
-                    section.course_uuid = infoList[i].id.toString;
-
-
-                    if (section.course_dept != null && typeof section.course_dept != 'undefined' &&
-                        section.course_id != null && typeof section.course_id != 'undefined' &&
-                        section.course_avg != null && typeof section.course_avg != 'undefined' &&
-                        section.course_instructor != null && typeof section.course_instructor != 'undefined' &&
-                        section.course_title != null && typeof section.course_title != 'undefined' &&
-                        section.course_pass != null && typeof section.course_title != 'undefined' &&
-                        section.course_fail != null && typeof section.course_fail != 'undefined' &&
-                        section.course_audit != null && typeof section.course_audit != 'undefined' &&
-                        section.course_uuid != null && typeof section.course_uuid != 'undefined') {
-
-                        this.courseInformation.push(section);
-                    }
-                }
-
-
-            }
-        }
-    }
-
-    public save(id: string, data: any) {
-
-        this.dataSets[id] = data;
-
-        var dataToSave = JSON.stringify(data);
-
-        try {
-
-            fs.statSync('./data');
-
-        } catch (err) {
-
-            fs.mkdir('./data');
-        }
-
-        fs.writeFileSync('./data' + id + '.json', dataToSave);
-
-
-    }
-
-
     removeDataset(id: string): Promise<InsightResponse> {
         return new Promise((fulfill, reject) => {
 
@@ -186,47 +124,69 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     performQuery(query: QueryRequest): Promise <InsightResponse> {
-        return new Promise((fulfill, reject) => {
-            let response: InsightResponse = null;
-
-            response = this.isValidQuery(query);
-
-            if (response.code == 400) {
+        return new Promise((fulfill,reject)=>{
+            let response:InsightResponse = null;
+            response = QH.isValidQuery(query);   // validate the request query main on the parts other than the filter, since I handle it in filter out function
+            if (response.code == 400){
                 reject(response);
-            } else {
+            }else {
+                let selected: boolean[] = null;
+                try {
+                    selected = QH.filterOut(this.courseInformation,query["WHERE"]);
+                }
+                catch (e){
+                    try {
+                        response = JSON.parse(e.message);
+                    }catch (e){
+                        Log.info("aaa")
+                    }
+                    reject(response);
+                }
+
+
+
+                let body_pre = [];
+                let len = this.courseInformation.length;
+                for(let i = 0;i<len;i++){
+                    if(selected[i]){
+                        body_pre.push(this.courseInformation[i]);
+                    }
+                }
+
+                len = body_pre.length;
+                //These are all sections selected
+
+                let order_key=query.OPTIONS.ORDER;  // sort the body_pre if it is necessary
+                if (order_key!=null){
+                     body_pre.sort((n1,n2)=>{
+
+                        if((n1 as any)[order_key] > (n2 as any)[order_key]){
+                            return 1;
+                        }else if((n1 as any)[order_key] == (n2 as any)[order_key]){
+                            return 0;
+                        }else {
+                            return -1;
+                        }
+                    });
+
+                }
+
+
+                let results:{}[]=[];
+
+                for(let i =0;i<body_pre.length;i++){
+                    let element:any={};
+                    for(let j=query.OPTIONS.COLUMNS.length-1;j>=0;j--){
+                        element[query.OPTIONS.COLUMNS[j]]=(body_pre[i] as any)[query.OPTIONS.COLUMNS[j]];
+                    }
+                    results.push(element);
+                }
+
 
                 response.code = 200;
-
+                response.body = {'render':query.OPTIONS.FORM,'result':results}
                 fulfill(response);
             }
         })
-    }
-
-    /*
-     *  This is a helper function to check a QueryRequest
-     *
-     *  @param query  The query to be performed. This is the same as the body of the POST message.
-     *  @return Promise <InsightResponse>
-     *      Return codes:
-     *
-     *      199: the query is valid. no missing info.
-     *      400: the query miss some info . The return body will be {"error": "my text"} about what is missing.
-     *
-     */
-
-    isValidQuery(query: any): InsightResponse {
-
-
-        let ret = {code: 199, body: {}}
-
-
-        if (query['WHERE'] == null) {
-            ret.code = 400;
-            ret.body = {"error": "the query is not have 'WHERE'"}
-            return ret;
-        }
-
-        // if the query is valid.
-        return ret;
     }
 }
