@@ -18,7 +18,7 @@ export default class InsightFacade implements IInsightFacade {
 
     private dataSets: any;
 
-    private courseInformation: any[] = [] ;
+     courseInformation: any[] = [] ;
 
     private infoID: string[] = [];
 
@@ -58,7 +58,7 @@ export default class InsightFacade implements IInsightFacade {
 
                 myZip.loadAsync(data, {base64: true}).then(function (zip: JSZip) {
 
-                    console.log('run here3');
+                    //console.log('run here3');
                     let processList = <any>[];
 
                     zip.forEach(function (relativePath: any, file: any) {
@@ -76,7 +76,7 @@ export default class InsightFacade implements IInsightFacade {
 
                     Promise.all(processList).then(function (courseList) {
 
-                        console.log(courseList);
+                        //console.log(courseList);
 
                         for (let jsonObj_str of courseList) {
                             try {
@@ -122,6 +122,49 @@ export default class InsightFacade implements IInsightFacade {
 
         })
     }
+
+    public parseCourse(id: string, courseObj_s :string) {
+
+        let courseObj = JSON.parse(courseObj_s);
+        for (let key of  Object.keys(courseObj)) {
+            if (key === "result") {
+
+                let infoList = courseObj[key];
+
+                for (let i = 0; i < infoList.length; i++) {
+
+                    let section : any = {};
+
+                    section.courses_dept = infoList[i].Subject;
+                    section.courses_id = infoList[i].Course;
+                    section.courses_avg = infoList[i].Avg;
+                    section.courses_instructor = infoList[i].Professor;
+                    section.courses_title = infoList[i].Title;
+                    section.courses_pass = infoList[i].Pass;
+                    section.courses_fail = infoList[i].Fail;
+                    section.courses_audit = infoList[i].Audit;
+                    section.courses_uuid = infoList[i].id.toString;
+
+
+                    if (section.courses_dept != null && typeof section.courses_dept != 'undefined' &&
+                        section.courses_id != null && typeof section.courses_id != 'undefined' &&
+                        section.courses_avg != null && typeof section.courses_avg != 'undefined' &&
+                        section.courses_instructor != null && typeof section.courses_instructor != 'undefined' &&
+                        section.courses_title != null && typeof section.courses_title != 'undefined' &&
+                        section.courses_pass != null && typeof section.courses_title != 'undefined' &&
+                        section.courses_fail != null && typeof section.courses_fail != 'undefined' &&
+                        section.courses_audit != null && typeof section.courses_audit != 'undefined' &&
+                        section.courses_uuid != null && typeof section.courses_uuid != 'undefined') {
+
+                        this.courseInformation.push(section);
+                    }
+                }
+
+
+            }
+        }
+    }
+
 
     performQuery(query: QueryRequest): Promise <InsightResponse> {
         return new Promise((fulfill,reject)=>{
