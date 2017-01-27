@@ -53,11 +53,10 @@ describe("addDataSet", function () {
         return insight.addDataset('courses.zip',courseContent)
             .then((response:InsightResponse)=>{
                 sanityCheck(response);
-                expect.fail();
             })
             .catch((err)=>{
-                sanityCheck(err);
-                expect(err.code).to.equal(400);
+
+                expect.fail();
             })
     });
 });

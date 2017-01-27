@@ -8,9 +8,10 @@ import Log from "../Util";
 
 
 "use strict";
+import {cpus} from "os";
 
-var fs = require("fs");
-var JSZip = require("jszip");
+let fs = require("fs");
+let JSZip = require("jszip");
 
 export default class InsightFacade implements IInsightFacade {
 
@@ -52,12 +53,12 @@ export default class InsightFacade implements IInsightFacade {
                     reject(response);
                 }
 
-                var myZip = new JSZip;
+                let myZip = new JSZip;
 
                 myZip.loadAsync(data, {base64: true}).then(function (zip: JSZip) {
 
                     console.log('run here3');
-                    var processList = <any>[];
+                    let processList = <any>[];
 
                     zip.forEach(function (relativePath: any, file: any) {
 
@@ -65,50 +66,52 @@ export default class InsightFacade implements IInsightFacade {
                         // var filename = a1[a1.length-1];
                         // console.log(filename);
                         if (!file.dir) {
-                            var course_promise = file.async("string");
+                            let course_promise = file.async("string");
                             processList.push(course_promise);
                         }
                     });
 
-                    console.log(processList);
+                    //console.log(processList);
 
                     Promise.all(processList).then(function (courseList) {
 
                         console.log(courseList);
 
-                        for (var jsonObj in courseList) {
+                        for (let jsonObj_str of courseList) {
                             try {
-                                var courseObj = JSON.parse(jsonObj);
                                 //console.log(courseObj);
+                                that.parseCourse(id, (jsonObj_str as string));
                             }
                             catch (err) {
-                                var response1: InsightResponse = {code: 400, body: {error: "Message not provided"}};
+                                let response1: InsightResponse = {code: 400, body: {error: "Message not provided"}};
                                 reject(response1);
                             }
-                            this.parseCourse(id, courseObj);
+
                         }
 
-                        var response2: InsightResponse = {code: 204, body: {}};
+                        let response2: InsightResponse = {code: 204, body: {}};
+                        //that.save(id, that.courseInformation);
                         fulfill(response2);
 
                     });
 
-                    that.save(id, that.courseInformation);
+
                 })
             })
         });
     }
 
-    public parseCourse(id: string, courseObj : any) {
+    public parseCourse(id: string, courseObj_s :string) {
 
-        for (var key in courseObj) {
+        let courseObj = JSON.parse(courseObj_s);
+        for (let key of  Object.keys(courseObj)) {
             if (key === "result") {
 
-                var infoList = courseObj[key];
+                let infoList = courseObj[key];
 
-                for (var i = 0; i < infoList.length; i++) {
+                for (let i = 0; i < infoList.length; i++) {
 
-                    var section : any = {};
+                    let section : any = {};
 
                     section.course_dept = infoList[i].Subject;
                     section.course_id = infoList[i].Course;
@@ -119,20 +122,23 @@ export default class InsightFacade implements IInsightFacade {
                     section.course_fail = infoList[i].Fail;
                     section.course_audit = infoList[i].Audit;
                     section.course_uuid = infoList[i].id.toString;
+
+
+                    if (section.course_dept != null && typeof section.course_dept != 'undefined' &&
+                        section.course_id != null && typeof section.course_id != 'undefined' &&
+                        section.course_avg != null && typeof section.course_avg != 'undefined' &&
+                        section.course_instructor != null && typeof section.course_instructor != 'undefined' &&
+                        section.course_title != null && typeof section.course_title != 'undefined' &&
+                        section.course_pass != null && typeof section.course_title != 'undefined' &&
+                        section.course_fail != null && typeof section.course_fail != 'undefined' &&
+                        section.course_audit != null && typeof section.course_audit != 'undefined' &&
+                        section.course_uuid != null && typeof section.course_uuid != 'undefined') {
+
+                        this.courseInformation.push(section);
+                    }
                 }
 
-                if (section.course_dept != null && typeof section.course_dept != 'undefined' &&
-                    section.course_id != null && typeof section.course_id != 'undefined' &&
-                    section.course_avg != null && typeof section.course_avg != 'undefined' &&
-                    section.course_instructor != null && typeof section.course_instructor != 'undefined' &&
-                    section.course_title != null && typeof section.course_title != 'undefined' &&
-                    section.course_pass != null && typeof section.course_title != 'undefined' &&
-                    section.course_fail != null && typeof section.course_fail != 'undefined' &&
-                    section.course_audit != null && typeof section.course_audit != 'undefined' &&
-                    section.course_uuid != null && typeof section.course_uuid != 'undefined') {
 
-                    this.courseInformation.push(section);
-                }
             }
         }
     }
