@@ -53,6 +53,7 @@ export default class InsightFacade implements IInsightFacade {
             fs.statSync("./data/" + id + ".json");
             isadded = true;
             this.removeCourses(id);
+            fs.unlinkSync("./data/" + id + ".json");
 
 
         }
@@ -207,6 +208,7 @@ export default class InsightFacade implements IInsightFacade {
             if (key === "result") {
 
                 let infoList = courseObj[key];
+
 
                 for (let i = 0; i < infoList.length; i++) {
 
