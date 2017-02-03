@@ -28,19 +28,48 @@ export default class InsightFacade implements IInsightFacade {
 
     addDataset(id: string, content: string): Promise<InsightResponse> {
 
-        let that = this;
-
         return new Promise((fulfill, reject) => {
 
-            // console.log('run here1');
+            let that = this;
 
             if ((id == null) || (content == null)) {
+
                 let response = {code: 400, body: {error: 'Message not provided'}};
                 // meaningless implementation just for testing
                 reject(response);
             }
 
-            fs.readFile(id, function (err: any, data: any) {
+            var hasBeenAdded = 0;
+
+            try{
+
+                fs.statSync("./data/" + id + ".json");
+
+                hasBeenAdded = 1;
+
+                that.removeCourses(id);
+
+                that.addCourseInformation(id, content);
+
+                let response = {code: 201, body: {}};
+
+                fulfill(response);
+
+
+            } catch(err) {
+
+                that.addCourseInformation(id, content);
+
+                let response = {code: 204, body : {}};
+
+                fulfill(response);
+
+            }
+
+            // console.log('run here1');
+
+
+            /*fs.readFile(id, function (err: any, data: any) {
 
                 that.infoID.push(id);
 
@@ -90,15 +119,77 @@ export default class InsightFacade implements IInsightFacade {
                         }
 
                         let response2: InsightResponse = {code: 204, body: {}};
-                        //that.save(id, that.courseInformation);
+                        that.save(id, that.courseInformation);
                         fulfill(response2);
 
                     });
-
-
                 })
-            })
+            })*/
+
+            /*if (hasBeenAdded) {
+
+                let response = {code: 201, body: {}};
+
+                fulfill(response);
+
+            } else {
+
+                let response = {code: 204, body: {}};
+
+                fulfill(response);
+            }*/
         });
+    }
+
+    public addCourseInformation(id:string, content:string) {
+
+        let that = this;
+
+        fs.readFile(id, function (err: any, data: any) {
+
+            that.infoID.push(id);
+
+            // console.log('run here2');
+
+            let myZip = new JSZip;
+
+            myZip.loadAsync(data, {base64: true}).then(function (zip: JSZip) {
+
+                console.log('run here3');
+                let processList = <any>[];
+
+                zip.forEach(function (relativePath: any, file: any) {
+
+                    // var a1 = relativePath.split('/');
+                    // var filename = a1[a1.length-1];
+                    // console.log(filename);
+                    if (!file.dir) {
+                        let course_promise = file.async("string");
+                        processList.push(course_promise);
+                    }
+                });
+
+                //console.log(processList);
+
+                Promise.all(processList).then(function (courseList) {
+
+                    //console.log(courseList);
+
+                    for (let jsonObj_str of courseList) {
+                        try {
+                            //console.log(courseObj);
+                            that.parseCourse(id, (jsonObj_str as string));
+                        }
+                        catch (err) {
+
+                        }
+
+                    }
+                    that.save(id, that.courseInformation);
+
+                });
+            })
+        })
     }
 
     public parseCourse(id: string, courseObj_s :string) {
@@ -122,6 +213,7 @@ export default class InsightFacade implements IInsightFacade {
                     section.course_fail = infoList[i].Fail;
                     section.course_audit = infoList[i].Audit;
                     section.course_uuid = infoList[i].id.toString;
+                    section.source = id;
 
 
                     if (section.course_dept != null && typeof section.course_dept != 'undefined' &&
@@ -143,9 +235,26 @@ export default class InsightFacade implements IInsightFacade {
         }
     }
 
+    public removeCourses(id:string) {
+
+        console.log('run there!!!');
+
+        let that = this;
+
+        for (let i = 0; i < that.courseInformation.length; i++) {
+
+            if (that.courseInformation[i].source === id) {
+
+                that.courseInformation.splice(i,1);
+            }
+
+        }
+
+    }
+
     public save(id: string, data: any) {
 
-        this.dataSets[id] = data;
+        //this.dataSets[id] = data;
 
         var dataToSave = JSON.stringify(data);
 
@@ -158,7 +267,7 @@ export default class InsightFacade implements IInsightFacade {
             fs.mkdir('./data');
         }
 
-        fs.writeFileSync('./data' + id + '.json', dataToSave);
+        fs.writeFileSync('./data/' + id + '.json', dataToSave);
 
 
     }
@@ -170,8 +279,8 @@ export default class InsightFacade implements IInsightFacade {
             try {
 
                 var response: InsightResponse;
-                fs.statSync("./data" + id + ".json");
-                fs.unlinkSync("./data" + id + ".json");
+                fs.statSync("./data/" + id + ".json");
+                fs.unlinkSync("./data/" + id + ".json");
                 response = {code: 204, body: {}};
                 fulfill(response);
 

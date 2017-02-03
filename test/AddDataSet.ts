@@ -59,4 +59,14 @@ describe("addDataSet", function () {
                 expect.fail();
             })
     });
+
+    it("test2", function () {
+        return insight.removeDataset('courses.zip')
+            .then((response:InsightResponse)=>{
+            sanityCheck(response);
+            })
+            .catch((err)=>{
+            expect.fail();
+            })
+    });
 });
