@@ -121,6 +121,9 @@ describe("performQuery_2", function () {
 
     it("test of a simple case form disk", function () {
         insight = new Insight();
+        let s = insight.courseInformation.length;
+
+        Log.test(s.toString());
         return insight.performQuery(testQuery_simple)
             .then((respons:InsightResponse)=>{
                 sanityCheck(respons);

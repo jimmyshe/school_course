@@ -34,7 +34,7 @@ describe("addDataSet", function () {
 
     afterEach(function () {
         Log.test('AfterTest: ' + (<any>this).currentTest.title);
-        insight = null;
+        //insight = null;
     });
 
 
@@ -51,7 +51,12 @@ describe("addDataSet", function () {
     // });
 
     it("test1", function () {
-        fs.unlinkSync("./data/courses.zip.json")
+        try {
+            fs.unlinkSync("./data/courses.zip.json")
+        }catch (e){
+            Log.info("It is ok, the file does not exist.")
+        }
+        insight = new Insight;
         return insight.addDataset('courses.zip',courseContent)
             .then((response:InsightResponse)=>{
                 sanityCheck(response);
