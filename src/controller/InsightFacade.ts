@@ -25,6 +25,8 @@ export default class InsightFacade implements IInsightFacade {
 
     constructor() {
 
+
+
         try {
 
             let filenames = fs.readdirSync("./data/");
@@ -74,57 +76,76 @@ export default class InsightFacade implements IInsightFacade {
 
 
 
-
-            let myZip = new JSZip;
-           //let data = JSZip.base64.decode(content);
+            let myzip = new JSZip();
 
 
 
-                //console.log('run here3');
-            let processList = <any>[];
 
-            myZip.forEach(function (relativePath: any, file: any) {
+            let p = myzip.loadAsync(content,{base64:true})
 
-                        // var a1 = relativePath.split('/');
-                        // var filename = a1[a1.length-1];
-                        // console.log(filename);
-                        if (!file.dir) {
-                            let course_promise = file.async("string");
-                            processList.push(course_promise);
+
+            p
+                .then(function (zip:any) {
+
+
+
+                let processList = <any>[];
+
+                zip.forEach(function (relativePath: any, file: any) {
+
+                    // var a1 = relativePath.split('/');
+                    // var filename = a1[a1.length-1];
+                    // console.log(filename);
+                    if (!file.dir) {
+                        let course_promise = file.async("string");
+                        processList.push(course_promise);
+                    }
+                });
+
+                //console.log(processList);
+
+                Promise.all(processList)
+                    .then(function (courseList) {
+
+                    //console.log(courseList);
+
+                    for (let jsonObj_str of courseList) {
+                        try {
+                            //console.log(courseObj);
+                            that.parseCourse(id, (jsonObj_str as string));
                         }
-                    });
-
-                    //console.log(processList);
-
-            Promise.all(processList).then(function (courseList) {
-
-                        //console.log(courseList);
-
-                        for (let jsonObj_str of courseList) {
-                            try {
-                                //console.log(courseObj);
-                                that.parseCourse(id, (jsonObj_str as string));
-                            }
-                            catch (err) {
-                                let response1: InsightResponse = {code: 400, body: {error: "Message not provided"}};
-                                reject(response1);
-                            }
-
-                        }
-
-
-
-
-                        let response2: InsightResponse = {code: 204, body: {}};
-
-                        if (isadded){
-                            response2.code = 201;
+                        catch (err) {
+                            let response1: InsightResponse = {code: 400, body: {error: "Message not provided"}};
+                            reject(response1);
                         }
 
-                        that.save(id, that.courseInformation);
-                        fulfill(response2);
+                    }
 
-                    });
+                    let response2: InsightResponse = {code: 204, body: {}};
+
+                    if (isadded){
+                        response2.code = 201;
+                    }
+
+                    that.save(id, that.courseInformation);
+                    fulfill(response2);
+
+                })
+                    .catch(function (e) {
+                    Log.error("con not unzip")
+                    let response = {code: 400, body: {error: 'Message not provided'}};
+                    reject(response);
+                });
+
+            })
+                .catch(function (e:any) {
+
+                Log.error(e.message);
+                Log.error("con not unzip")
+                let response = {code: 400, body: {error: 'Message not provided'}};
+                reject(response);
+
+            })
 
         });
 
@@ -132,11 +153,11 @@ export default class InsightFacade implements IInsightFacade {
 
     removeCourses(id:string) {
 
-        console.log('run there!!!');
+        //console.log('run there!!!');
 
         let that = this;
 
-        for (let i = 0; i < that.courseInformation.length; i++) {
+        for (let i = that.courseInformation.length-1; i >=0; i--) {
 
             if (that.courseInformation[i].source === id) {
 
@@ -144,6 +165,11 @@ export default class InsightFacade implements IInsightFacade {
             }
 
         }
+
+
+
+
+
 
     }
 
@@ -153,7 +179,7 @@ export default class InsightFacade implements IInsightFacade {
 
 
         let data_selected = [];
-        for(let i = 0;i<length;i++){
+        for(let i = 0;i<this.courseInformation.length;i++){
             if(data[i].source===id){
                 data_selected.push(data[i]);
             }
@@ -197,7 +223,7 @@ export default class InsightFacade implements IInsightFacade {
         })
     }
 
-     parseCourse(id: string, courseObj_s :string) {
+    parseCourse(id: string, courseObj_s :string) {
 
         let courseObj = JSON.parse(courseObj_s);
         for (let key of  Object.keys(courseObj)) {
