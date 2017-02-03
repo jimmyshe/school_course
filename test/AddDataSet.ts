@@ -23,6 +23,7 @@ describe("addDataSet", function () {
     }
 
 
+
     beforeEach(function () {
         Log.test('BeforeTest: ' + (<any>this).currentTest.title);
         insight = new Insight();
@@ -50,13 +51,42 @@ describe("addDataSet", function () {
     // });
 
     it("test1", function () {
+        fs.unlinkSync("./data/courses.zip.json")
         return insight.addDataset('courses.zip',courseContent)
             .then((response:InsightResponse)=>{
                 sanityCheck(response);
+                expect(response.code).equal(204);
             })
             .catch((err)=>{
 
                 expect.fail();
             })
     });
+
+    it("test1_1", function () {
+        return insight.addDataset('courses.zip',courseContent)
+            .then((response:InsightResponse)=>{
+                sanityCheck(response);
+                expect(response.code).equal(201);
+            })
+            .catch((err)=>{
+
+                expect.fail();
+            })
+    });
+
+
+
+
+    it("test2", function () {
+        return insight.removeDataset('courses.zip')
+            .then((response:InsightResponse)=>{
+                sanityCheck(response);
+            })
+            .catch((err)=>{
+                expect.fail();
+            })
+    });
+
+
 });
