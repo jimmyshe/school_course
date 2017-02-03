@@ -47,7 +47,6 @@ export default class InsightFacade implements IInsightFacade {
 
         let that = this;
         let isadded:boolean;
-
         try{
 
             fs.statSync("./data/" + id + ".json");
@@ -70,31 +69,21 @@ export default class InsightFacade implements IInsightFacade {
 
             if ((id == null) || (content == null)) {
                 let response = {code: 400, body: {error: 'Message not provided'}};
-                // meaningless implementation just for testing
                 reject(response);
             }
 
-            fs.readFile(id, function (err: any, data: any) {
 
-                that.infoID.push(id);
 
-                // console.log('run here2');
 
-                if (err) {
-                    // console.log(err.message);
-                    let response = {code: 400, body: {error: 'Message not provided'}};
-                    // meaningless implementation just for testing
-                    reject(response);
-                }
+            let myZip = new JSZip;
+           //let data = JSZip.base64.decode(content);
 
-                let myZip = new JSZip;
 
-                myZip.loadAsync(data, {base64: true}).then( (zip: JSZip)=> {
 
-                    //console.log('run here3');
-                    let processList = <any>[];
+                //console.log('run here3');
+            let processList = <any>[];
 
-                    zip.forEach(function (relativePath: any, file: any) {
+            myZip.forEach(function (relativePath: any, file: any) {
 
                         // var a1 = relativePath.split('/');
                         // var filename = a1[a1.length-1];
@@ -107,7 +96,7 @@ export default class InsightFacade implements IInsightFacade {
 
                     //console.log(processList);
 
-                    Promise.all(processList).then(function (courseList) {
+            Promise.all(processList).then(function (courseList) {
 
                         //console.log(courseList);
 
@@ -137,10 +126,8 @@ export default class InsightFacade implements IInsightFacade {
 
                     });
 
+        });
 
-                })
-            })
-        }); // 蜜汁bug
     }
 
     removeCourses(id:string) {
@@ -164,7 +151,16 @@ export default class InsightFacade implements IInsightFacade {
 
         //this.dataSets[id] = data;
 
-        var dataToSave = JSON.stringify(data);
+
+        let data_selected = [];
+        for(let i = 0;i<length;i++){
+            if(data[i].source===id){
+                data_selected.push(data[i]);
+            }
+        }
+
+
+        var dataToSave = JSON.stringify(data_selected);
 
         try {
 
@@ -201,7 +197,7 @@ export default class InsightFacade implements IInsightFacade {
         })
     }
 
-    public parseCourse(id: string, courseObj_s :string) {
+     parseCourse(id: string, courseObj_s :string) {
 
         let courseObj = JSON.parse(courseObj_s);
         for (let key of  Object.keys(courseObj)) {
@@ -223,6 +219,7 @@ export default class InsightFacade implements IInsightFacade {
                     section.courses_fail = infoList[i].Fail;
                     section.courses_audit = infoList[i].Audit;
                     section.courses_uuid = infoList[i].id.toString;
+                    section.source = id;
 
 
                     if (section.courses_dept != null && typeof section.courses_dept != 'undefined' &&
