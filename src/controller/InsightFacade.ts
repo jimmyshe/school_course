@@ -24,12 +24,44 @@ export default class InsightFacade implements IInsightFacade {
 
 
     constructor() {
+
+        try {
+
+            let filenames = fs.readdirSync("./data/");
+
+            for(let i=0; i<filenames.length;i++) {
+                let file_str =  fs.readFileSync("./data/"+filenames[i],'utf-8');
+                let file = JSON.parse(file_str);
+                this.courseInformation = this.courseInformation.concat(file);
+            }
+        }
+        catch (e){
+
+            Log.error(e.message);
+        }
+
         Log.trace('InsightFacadeImpl::init()');
     }
 
     addDataset(id: string, content: string): Promise<InsightResponse> {
 
         let that = this;
+        let isadded:boolean;
+
+        try{
+
+            fs.statSync("./data/" + id + ".json");
+            isadded = true;
+            this.removeCourses(id);
+
+
+        }
+        catch (e){
+            //do nothing;
+            isadded = false;
+        }
+
+
 
         return new Promise((fulfill, reject) => {
 
@@ -56,7 +88,7 @@ export default class InsightFacade implements IInsightFacade {
 
                 let myZip = new JSZip;
 
-                myZip.loadAsync(data, {base64: true}).then(function (zip: JSZip) {
+                myZip.loadAsync(data, {base64: true}).then( (zip: JSZip)=> {
 
                     //console.log('run here3');
                     let processList = <any>[];
@@ -90,8 +122,16 @@ export default class InsightFacade implements IInsightFacade {
 
                         }
 
+
+
+
                         let response2: InsightResponse = {code: 204, body: {}};
-                        //that.save(id, that.courseInformation);
+
+                        if (isadded){
+                            response2.code = 201;
+                        }
+
+                        that.save(id, that.courseInformation);
                         fulfill(response2);
 
                     });
@@ -99,17 +139,54 @@ export default class InsightFacade implements IInsightFacade {
 
                 })
             })
-        });
+        }); // 蜜汁bug
+    }
+
+    removeCourses(id:string) {
+
+        console.log('run there!!!');
+
+        let that = this;
+
+        for (let i = 0; i < that.courseInformation.length; i++) {
+
+            if (that.courseInformation[i].source === id) {
+
+                that.courseInformation.splice(i,1);
+            }
+
+        }
+
+    }
+
+    save (id: string, data: any) {
+
+        //this.dataSets[id] = data;
+
+        var dataToSave = JSON.stringify(data);
+
+        try {
+
+            fs.statSync('./data');
+
+        } catch (err) {
+
+            fs.mkdir('./data');
+        }
+
+        fs.writeFileSync('./data/' + id + '.json', dataToSave);
+
     }
 
     removeDataset(id: string): Promise<InsightResponse> {
+        let that = this;
         return new Promise((fulfill, reject) => {
-
             try {
 
                 var response: InsightResponse;
-                fs.statSync("./data" + id + ".json");
-                fs.unlinkSync("./data" + id + ".json");
+                fs.statSync("./data/" + id + ".json");
+                fs.unlinkSync("./data/" + id + ".json");
+                that.removeCourses(id);
                 response = {code: 204, body: {}};
                 fulfill(response);
 
@@ -133,7 +210,7 @@ export default class InsightFacade implements IInsightFacade {
 
                 for (let i = 0; i < infoList.length; i++) {
 
-                    let section : any = {};
+                    let section : any={};
 
                     section.courses_dept = infoList[i].Subject;
                     section.courses_id = infoList[i].Course;
@@ -159,12 +236,9 @@ export default class InsightFacade implements IInsightFacade {
                         this.courseInformation.push(section);
                     }
                 }
-
-
             }
         }
     }
-
 
     performQuery(query: QueryRequest): Promise <InsightResponse> {
         return new Promise((fulfill,reject)=>{
