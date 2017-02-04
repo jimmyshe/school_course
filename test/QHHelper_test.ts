@@ -109,6 +109,14 @@ describe("QH helper test", function () {
         Log.test("filtered out LT case");
     });
 
+
+    it("test filter out double NOT case", function () {
+        let ret = QH.filterOut(testData,{'NOT':{'NOT':{'IS':{courses_dept : "cs"}}}})
+        expect(ret).to.deep.equal([true,true,false]);
+        Log.test("filtered out LT case");
+    });
+
+
 // test invalid filter
 
     it("test filter with invalid operation", function () {
