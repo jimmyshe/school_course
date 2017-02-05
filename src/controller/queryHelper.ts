@@ -194,9 +194,19 @@ export default class QH {
         }                       // this is the case of SCOMPARISON
 
         if(filter_key=='AND'||filter_key=='OR'){
-            let logicfilters: {}[] = filter[filter_key];
-            if (logicfilters.length < 2) {
-                throw new Error('{"code":400,"body":{"error":"the filter is not valid,since there are less than two filter in logic"}}');
+
+            let logicfilters: {}[];
+            try {
+                logicfilters = filter[filter_key];
+            }
+            catch (e){
+                Log.error(e.message);
+                throw new Error('{"code":400,"body":{"error":"Invalid query: AND should contain an array"}}');
+            }
+
+
+            if (logicfilters.length < 1) {
+                throw new Error('{"code":400,"body":{"error":"the filter is not valid,since there are less than one filter in' + filter_key +'"}}');
             }
 
             let pre_ret:boolean[] = QH.filterOut(courseInformation,logicfilters[0]);
