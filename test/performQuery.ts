@@ -308,6 +308,61 @@ describe("performQuery", function () {
     });
 
 
+    let testQuery_simple_invalid_5 = { // wrong format
+
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER":"courses_avg",
+            "FORM":"TABLE"
+        }
+    };
+    it("an invalid simple query_5", function () {
+        return insight.performQuery(testQuery_simple_invalid_5)
+            .then((respons:InsightResponse)=>{
+                Log.test("Should not be there");
+                expect.fail();
+            })
+            .catch( (err:InsightResponse)=>{
+
+                expect(err).to.deep.equal({
+                    "code": 400,
+                    "body": {
+                        "error": "the query format is wrong"
+                    }
+                });
+            })
+    });
+
+
+    let testQuery_simple_invalid_6 = {
+        "WHERE":{
+            "GT":{
+                "courses_avg":0
+            }
+        },
+        "OPTIONS":{
+            "COLUMNS":{},
+            "ORDER":"courses_avg",
+            "FORM":"TABLE"
+        }
+    };
+    it("an invalid simple query_5", function () {
+        return insight.performQuery(testQuery_simple_invalid_6)
+            .then((respons:InsightResponse)=>{
+                Log.test("Should not be there");
+                expect.fail();
+            })
+            .catch( (err:InsightResponse)=>{
+
+                expect(err).to.deep.equal({
+                    "code": 400,
+                    "body": {"error": "the option of columns has a wrong format"}
+                });
+            })
+    });
 
 
 

@@ -265,10 +265,15 @@ export default class InsightFacade implements IInsightFacade {
         }
     }
 
-    performQuery(query: QueryRequest): Promise <InsightResponse> {
+    performQuery(query: any): Promise <InsightResponse> {
         return new Promise((fulfill,reject)=>{
             let response:InsightResponse = null;
-            response = QH.isValidQuery(query);   // validate the request query main on the parts other than the filter, since I handle it in filter out function
+            try {
+                response = QH.isValidQuery(query);   // validate the request query main on the parts other than the filter, since I handle it in filter out function
+            }
+            catch (e){
+                Log.error(e);
+            }
             if (response.code == 400){
                 reject(response);
             }else {
