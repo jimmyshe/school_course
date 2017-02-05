@@ -27,40 +27,6 @@ describe("performQuery_2", function () {
     };
 
 
-    let testQuery_complex = {
-        "WHERE":{
-            "OR":[
-                {
-                    "AND":[
-                        {
-                            "GT":{
-                                "courses_avg":90
-                            }
-                        },
-                        {
-                            "IS":{
-                                "courses_dept":"adhe"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "EQ":{
-                        "courses_avg":95
-                    }
-                }
-            ]
-        },
-        "OPTIONS":{
-            "COLUMNS":[
-                "courses_dept",
-                "courses_id",
-                "courses_avg"
-            ],
-            "ORDER":"courses_avg",
-            "FORM":"TABLE"
-        }
-    };
 
 
     function sanityCheck(response: InsightResponse) {
@@ -218,6 +184,40 @@ describe("performQuery_2", function () {
     });
 
 
+    let testQuery_complex = {
+        "WHERE":{
+            "OR":[
+                {
+                    "AND":[
+                        {
+                            "GT":{
+                                "courses_avg":90
+                            }
+                        },
+                        {
+                            "IS":{
+                                "courses_dept":"adhe"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "EQ":{
+                        "courses_avg":95
+                    }
+                }
+            ]
+        },
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ],
+            "ORDER":"courses_avg",
+            "FORM":"TABLE"
+        }
+    };
     it("test of a complex case", function () {
         return insight.performQuery(testQuery_complex)
             .then((respons:InsightResponse)=>{
@@ -286,6 +286,111 @@ describe("performQuery_2", function () {
             })
     });
 
+    let testQuery_complex_doubleNegation = {
+        "WHERE":{
+            "NOT": {
+                "NOT": {
+                    "OR": [
+                        {
+                            "AND": [
+                                {
+                                    "GT": {
+                                        "courses_avg": 90
+                                    }
+                                },
+                                {
+                                    "IS": {
+                                        "courses_dept": "adhe"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "EQ": {
+                                "courses_avg": 95
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ],
+            "ORDER":"courses_avg",
+            "FORM":"TABLE"
+        }
+    };
+    it("test of a complex case_doubleNegation", function () {
+        return insight.performQuery(testQuery_complex_doubleNegation)
+            .then((respons:InsightResponse)=>{
+                sanityCheck(respons);
+                expect(respons.body).to.deep.equal({ render: 'TABLE',
+                    result:
+                        [ { courses_dept: 'adhe', courses_id: '329', courses_avg: 90.02 },
+                            { courses_dept: 'adhe', courses_id: '412', courses_avg: 90.16 },
+                            { courses_dept: 'adhe', courses_id: '330', courses_avg: 90.17 },
+                            { courses_dept: 'adhe', courses_id: '412', courses_avg: 90.18 },
+                            { courses_dept: 'adhe', courses_id: '330', courses_avg: 90.5 },
+                            { courses_dept: 'adhe', courses_id: '330', courses_avg: 90.72 },
+                            { courses_dept: 'adhe', courses_id: '329', courses_avg: 90.82 },
+                            { courses_dept: 'adhe', courses_id: '330', courses_avg: 90.85 },
+                            { courses_dept: 'adhe', courses_id: '330', courses_avg: 91.29 },
+                            { courses_dept: 'adhe', courses_id: '330', courses_avg: 91.33 },
+                            { courses_dept: 'adhe', courses_id: '330', courses_avg: 91.33 },
+                            { courses_dept: 'adhe', courses_id: '330', courses_avg: 91.48 },
+                            { courses_dept: 'adhe', courses_id: '329', courses_avg: 92.54 },
+                            { courses_dept: 'adhe', courses_id: '329', courses_avg: 93.33 },
+                            { courses_dept: 'rhsc', courses_id: '501', courses_avg: 95 },
+                            { courses_dept: 'bmeg', courses_id: '597', courses_avg: 95 },
+                            { courses_dept: 'bmeg', courses_id: '597', courses_avg: 95 },
+                            { courses_dept: 'cnps', courses_id: '535', courses_avg: 95 },
+                            { courses_dept: 'cnps', courses_id: '535', courses_avg: 95 },
+                            { courses_dept: 'cpsc', courses_id: '589', courses_avg: 95 },
+                            { courses_dept: 'cpsc', courses_id: '589', courses_avg: 95 },
+                            { courses_dept: 'crwr', courses_id: '599', courses_avg: 95 },
+                            { courses_dept: 'crwr', courses_id: '599', courses_avg: 95 },
+                            { courses_dept: 'crwr', courses_id: '599', courses_avg: 95 },
+                            { courses_dept: 'crwr', courses_id: '599', courses_avg: 95 },
+                            { courses_dept: 'crwr', courses_id: '599', courses_avg: 95 },
+                            { courses_dept: 'crwr', courses_id: '599', courses_avg: 95 },
+                            { courses_dept: 'crwr', courses_id: '599', courses_avg: 95 },
+                            { courses_dept: 'sowk', courses_id: '570', courses_avg: 95 },
+                            { courses_dept: 'econ', courses_id: '516', courses_avg: 95 },
+                            { courses_dept: 'edcp', courses_id: '473', courses_avg: 95 },
+                            { courses_dept: 'edcp', courses_id: '473', courses_avg: 95 },
+                            { courses_dept: 'epse', courses_id: '606', courses_avg: 95 },
+                            { courses_dept: 'epse', courses_id: '682', courses_avg: 95 },
+                            { courses_dept: 'epse', courses_id: '682', courses_avg: 95 },
+                            { courses_dept: 'kin', courses_id: '499', courses_avg: 95 },
+                            { courses_dept: 'kin', courses_id: '500', courses_avg: 95 },
+                            { courses_dept: 'kin', courses_id: '500', courses_avg: 95 },
+                            { courses_dept: 'math', courses_id: '532', courses_avg: 95 },
+                            { courses_dept: 'math', courses_id: '532', courses_avg: 95 },
+                            { courses_dept: 'mtrl', courses_id: '564', courses_avg: 95 },
+                            { courses_dept: 'mtrl', courses_id: '564', courses_avg: 95 },
+                            { courses_dept: 'mtrl', courses_id: '599', courses_avg: 95 },
+                            { courses_dept: 'musc', courses_id: '553', courses_avg: 95 },
+                            { courses_dept: 'musc', courses_id: '553', courses_avg: 95 },
+                            { courses_dept: 'musc', courses_id: '553', courses_avg: 95 },
+                            { courses_dept: 'musc', courses_id: '553', courses_avg: 95 },
+                            { courses_dept: 'musc', courses_id: '553', courses_avg: 95 },
+                            { courses_dept: 'musc', courses_id: '553', courses_avg: 95 },
+                            { courses_dept: 'nurs', courses_id: '424', courses_avg: 95 },
+                            { courses_dept: 'nurs', courses_id: '424', courses_avg: 95 },
+                            { courses_dept: 'obst', courses_id: '549', courses_avg: 95 },
+                            { courses_dept: 'psyc', courses_id: '501', courses_avg: 95 },
+                            { courses_dept: 'psyc', courses_id: '501', courses_avg: 95 },
+                            { courses_dept: 'econ', courses_id: '516', courses_avg: 95 },
+                            { courses_dept: 'adhe', courses_id: '329', courses_avg: 96.11 } ] })})
+            .catch( (err:InsightResponse)=>{
+                Log.test('Error: query request not success ');
+                expect.fail();
+            })
+    });
 
 
     let testQuery_instructor_name = {
@@ -305,8 +410,6 @@ describe("performQuery_2", function () {
             "FORM":"TABLE"
         }
     };
-
-
     it("test using instructor names", function () {
         return insight.performQuery(testQuery_instructor_name)
             .then((respons:InsightResponse)=>{
@@ -383,8 +486,7 @@ describe("performQuery_2", function () {
             "FORM":"TABLE"
         }
     };
-
-    it("test using instructor names", function () {
+    it("test using auditor", function () {
         return insight.performQuery(testQuery_auditor)
             .then((respons:InsightResponse)=>{
                 sanityCheck(respons);

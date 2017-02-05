@@ -237,14 +237,6 @@ describe("performQuery", function () {
 
 
 
-
-
-
-
-
-
-
-
     it("an invalid simple query_1", function () {
         return insight.performQuery(testQuery_simple_invalid_1)
             .then((respons:InsightResponse)=>{
@@ -314,5 +306,9 @@ describe("performQuery", function () {
                 });
             })
     });
+
+
+
+
 
 });
