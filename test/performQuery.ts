@@ -27,7 +27,7 @@ describe("performQuery", function () {
             "ORDER":"courses_avg",
             "FORM":"TABLE"
         }
-    }
+    };
 
     let testQuery_simple_invalid_1 = {
         "WHERE":{
@@ -43,7 +43,8 @@ describe("performQuery", function () {
             "ORDER":"courses_avg",
             "FORM":"TABLE"
         }
-    }
+    };
+
     let testQuery_simple_invalid_2 = {
         "WHERE":{
             "GT":{
@@ -55,10 +56,10 @@ describe("performQuery", function () {
                 "courses_dept",
                 "courses_avg"
             ],
-            "ORDER":"courses_dept", // invalid
+            "ORDER":"courses_id", // invalid   It can not order by some key that is not requested.
             "FORM":"TABLE"
         }
-    }
+    };
 
     let testQuery_simple_invalid_3 = {
         "WHERE":{
@@ -74,7 +75,7 @@ describe("performQuery", function () {
             "ORDER":"courses_avg",
             "FORM":"TABLE"
         }
-    }
+    };
 
     let testQuery_simple_invalid_4 = {
         "WHERE":{
@@ -90,7 +91,7 @@ describe("performQuery", function () {
             "ORDER":"courses_avg",
             "FORM":"BOOK"
         }
-    }
+    };
 
 
 
@@ -182,6 +183,64 @@ describe("performQuery", function () {
                 expect.fail();
             })
     });
+
+
+
+    let testQuery_simple_1 = {
+        "WHERE":{
+            "GT":{
+                "courses_avg":0
+            }
+        },
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER":"courses_dept",
+            "FORM":"TABLE"
+        }
+    };
+
+    it("test of a simple case_1", function () {
+        return insight.performQuery(testQuery_simple_1)
+            .then((respons:InsightResponse)=>{
+                sanityCheck(respons);
+                expect(respons).to.deep.equal({
+                    "code": 200,
+                    "body": {
+                        "render": "TABLE",
+                        "result": [
+                            {
+                                "courses_avg": 3,
+                                "courses_dept": "art"
+                            },
+                            {
+                                "courses_avg": 5,
+                                "courses_dept": "cs"
+                            },
+                            {
+                                "courses_avg": 4,
+                                "courses_dept": "cs"
+                            }
+                        ]
+                    }
+                });
+
+            })
+            .catch( (err:InsightResponse)=>{
+                Log.test('Error: query request not success ');
+                expect.fail();
+            })
+    });
+
+
+
+
+
+
+
+
 
 
 

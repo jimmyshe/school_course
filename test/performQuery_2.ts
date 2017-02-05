@@ -288,4 +288,134 @@ describe("performQuery_2", function () {
 
 
 
+    let testQuery_instructor_name = {
+        "WHERE":{
+            "IS":{
+                "courses_instructor":"brew, nancy"
+            }
+        },
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_dept",
+                "courses_id",
+                "courses_instructor",
+                "courses_avg"
+            ],
+            "ORDER":"courses_instructor",
+            "FORM":"TABLE"
+        }
+    };
+
+
+    it("test using instructor names", function () {
+        return insight.performQuery(testQuery_instructor_name)
+            .then((respons:InsightResponse)=>{
+                sanityCheck(respons);
+                expect(respons.body).to.deep.equal(
+                    {
+                            "render": "TABLE",
+                            "result": [
+                                {
+                                    "courses_avg": 98.71,
+                                    "courses_instructor": "brew, nancy",
+                                    "courses_id": "509",
+                                    "courses_dept": "nurs"
+                                },
+                                {
+                                    "courses_avg": 95.43,
+                                    "courses_instructor": "brew, nancy",
+                                    "courses_id": "509",
+                                    "courses_dept": "nurs"
+                                },
+                                {
+                                    "courses_avg": 89.43,
+                                    "courses_instructor": "brew, nancy",
+                                    "courses_id": "570",
+                                    "courses_dept": "nurs"
+                                },
+                                {
+                                    "courses_avg": 88.57,
+                                    "courses_instructor": "brew, nancy",
+                                    "courses_id": "570",
+                                    "courses_dept": "nurs"
+                                },
+                                {
+                                    "courses_avg": 94.47,
+                                    "courses_instructor": "brew, nancy",
+                                    "courses_id": "591",
+                                    "courses_dept": "nurs"
+                                },
+                                {
+                                    "courses_avg": 91.5,
+                                    "courses_instructor": "brew, nancy",
+                                    "courses_id": "591",
+                                    "courses_dept": "nurs"
+                                },
+                                {
+                                    "courses_avg": 97.33,
+                                    "courses_instructor": "brew, nancy",
+                                    "courses_id": "591",
+                                    "courses_dept": "nurs"
+                                }
+                            ]
+
+                    }
+                            )})
+            .catch( (err:InsightResponse)=>{
+                Log.test('Error: query request not success ');
+                expect.fail();
+            })
+    });
+
+
+    let testQuery_auditor = {
+        "WHERE":{
+            "GT":{
+                "courses_audit":20
+            }
+        },
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER":"courses_avg",
+            "FORM":"TABLE"
+        }
+    };
+
+    it("test using instructor names", function () {
+        return insight.performQuery(testQuery_auditor)
+            .then((respons:InsightResponse)=>{
+                sanityCheck(respons);
+                expect(respons).to.deep.equal(
+                    {
+                        "code": 200,
+                        "body": {
+                            "render": "TABLE",
+                            "result": [
+                                {
+                                    "courses_avg": 86.89,
+                                    "courses_dept": "rhsc"
+                                },
+                                {
+                                    "courses_avg": 88.79,
+                                    "courses_dept": "rhsc"
+                                },
+                                {
+                                    "courses_avg": 90.53,
+                                    "courses_dept": "cpsc"
+                                }
+                            ]
+                        }
+                    }
+                )})
+            .catch( (err:InsightResponse)=>{
+                Log.test('Error: query request not success ');
+                expect.fail();
+            })
+    });
+
+
+
 });

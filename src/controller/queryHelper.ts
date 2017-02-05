@@ -26,16 +26,6 @@ export default class QH {
 
         // The interface defination should do the right job. If it is not the case, I can write more at here.
 
-         if(query.OPTIONS.ORDER!=null){
-            let order_key:string = query.OPTIONS.ORDER;
-
-            if(!(order_key=="courses_avg"||order_key=="courses_pass"||order_key=="courses_fail"||order_key=="courses_audit")) {
-                ret.code = 400;
-                ret.body = {"error": "the option of order has an invalid key"}
-                return ret;
-            }
-         }
-
 
          if (query.OPTIONS.FORM!=null&&query.OPTIONS.FORM!="TABLE"){
 
@@ -55,8 +45,21 @@ export default class QH {
          }
 
 
+         if(query.OPTIONS.ORDER!=null){
+             let order_key:string = query.OPTIONS.ORDER;
+             let opt_colimns:string[] = query.OPTIONS.COLUMNS;
 
-        return ret;
+             if(!opt_colimns.includes(order_key)) {
+                 ret.code = 400;
+                 ret.body = {"error": "the option of order has an invalid key"}
+                 return ret;
+             }
+         }
+
+
+
+
+         return ret;
     }
 
     public static isValidDateKey(key:string):boolean{
@@ -119,7 +122,7 @@ export default class QH {
                 } else {
 
                     if(!isNumber((courseInformation[i] as any)[comparision_key])){
-                        throw new Error('{"code":400,"body":{"error":"the filter is not valid,since its comparision key doesn\'t reffer to a number"}}');
+                        throw new Error('{"code":400,"body":{"error":"the filter is not valid,since its comparision key doesn\'t refer to a number"}}');
                     }
 
                     switch (filter_key){
