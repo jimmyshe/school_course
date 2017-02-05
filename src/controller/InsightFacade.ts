@@ -280,7 +280,7 @@ export default class InsightFacade implements IInsightFacade {
                     try {
                         response = JSON.parse(e.message);
                     }catch (e){
-                        Log.info("aaa")
+                        Log.error("Should not be here, internal error");
                     }
                     reject(response);
                 }
@@ -294,7 +294,6 @@ export default class InsightFacade implements IInsightFacade {
                         body_pre.push(this.courseInformation[i]);
                     }
                 }
-
                 len = body_pre.length;
                 //These are all sections selected
 
