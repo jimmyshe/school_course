@@ -519,5 +519,53 @@ describe("performQuery_2", function () {
     });
 
 
+    let testQuery_title = {
+        "WHERE":{
+
+            "AND":[
+                {"IS":{"courses_title":"curric issu"}},
+                {"GT":{"courses_avg":95}}
+            ]
+        },
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_title",
+                "courses_avg"
+            ],
+            "ORDER":"courses_avg",
+            "FORM":"TABLE"
+        }
+    };
+
+    it("test using title", function () {
+        return insight.performQuery(testQuery_title)
+            .then((respons:InsightResponse)=>{
+                sanityCheck(respons);
+                expect(respons).to.deep.equal(
+                    {
+                        "code": 200,
+                        "body": {
+                            "render": "TABLE",
+                            "result": [
+                                {
+                                    "courses_avg": 95.33,
+                                    "courses_title": "curric issu"
+                                },
+                                {
+                                    "courses_avg": 95.63,
+                                    "courses_title": "curric issu"
+                                }
+                            ]
+                        }
+                    }
+                )})
+            .catch( (err:InsightResponse)=>{
+                Log.test('Error: query request not success ');
+                expect.fail();
+            })
+    });
+
+
+
 
 });
