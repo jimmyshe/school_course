@@ -4,6 +4,7 @@ import Log from "../Util";
 import {error} from "util";
 import {isNumber} from "util";
 import {isString} from "util";
+import {isArray} from "util";
 
 export default class QH {
        /*
@@ -18,21 +19,35 @@ export default class QH {
      *
      */
 
-     public static isValidQuery(query:QueryRequest):InsightResponse{
+     public static isValidQuery(query:any):InsightResponse{
 
 
-        let ret = {code:199,body:{}}
+         let ret = {code:199,body:{}}
+         // The interface defination should do the right job. If it is not the case, I can write more at here.
+         // It might not be the case. I have to wrrite it manually.
+
+         if(query.OPTIONS==null||query.WHERE==null){
+             ret.code = 400;
+             ret.body = {"error": "the query format is wrong"};
+             return ret;
+         }
 
 
-        // The interface defination should do the right job. If it is not the case, I can write more at here.
-
-
-         if (query.OPTIONS.FORM!=null&&query.OPTIONS.FORM!="TABLE"){
+         if ((query.OPTIONS.FORM==null)||(query.OPTIONS.FORM!="TABLE")){
 
              ret.code = 400;
              ret.body = {"error": "the option of view has an invalid key"}
              return ret;
          }
+
+         if ((query.OPTIONS.COLUMNS==null)||!isArray(query.OPTIONS.COLUMNS)){
+
+             ret.code = 400;
+             ret.body = {"error": "the option of columns has a wrong format"}
+             return ret;
+         }
+
+
 
 
 
