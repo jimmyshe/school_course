@@ -65,4 +65,15 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
+    it("test the server", function () {
+        let server = new Server(8888);
+        return server.start().then(function () {
+
+
+
+            server.stop();
+        })
+    });
+
+
 });
