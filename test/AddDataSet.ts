@@ -15,6 +15,8 @@ describe("addDataSet", function () {
     let insight : Insight = null;
 
     let courseContent : string = null;
+    
+    let voidContent : string = null;
 
     function sanityCheck(response: InsightResponse) {
         expect(response).to.have.property('code');
@@ -28,6 +30,7 @@ describe("addDataSet", function () {
         Log.test('BeforeTest: ' + (<any>this).currentTest.title);
         insight = new Insight();
         courseContent = new Buffer(fs.readFileSync('./courses.zip')).toString('base64');
+        voidContent = new Buffer(fs.readFileSync('./no_real_data.zip')).toString('base64');
         // console.log(courseContent);
     });
 
@@ -103,6 +106,30 @@ describe("addDataSet", function () {
             })
             .catch((err)=>{
                 expect.fail();
+            })
+    });
+    
+    it("test3", function () {
+        return insight.addDataset('no_real_data.zip',"")
+            .then((response:InsightResponse)=>{
+                sanityCheck(response);
+                expect.fail();
+            })
+            .catch((err)=>{
+                expect(err.code).equal(400);
+
+            })
+    });
+
+    it("test4", function () {
+        return insight.removeDataset("1.zip")
+            .then((response:InsightResponse)=>{
+                sanityCheck(response);
+                expect.fail();
+            })
+            .catch((err)=>{
+                expect(err.code).equal(400);
+
             })
     });
 
