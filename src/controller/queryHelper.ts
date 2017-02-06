@@ -124,6 +124,7 @@ export default class QH {
             let comparision_key: string = Object.keys(comparision_class)[0];
             let comparision_value = comparision_class[comparision_key];
 
+
             if(!isNumber(comparision_value)){
                 throw new Error('{"code":400,"body":{"error":"the filter is not valid,since comparision valuse is not a number"}}');
             }
@@ -181,6 +182,7 @@ export default class QH {
             let comparision_key: string = Object.keys(comparision_class)[0];
             let comparision_value = comparision_class[comparision_key];
 
+
             if(!isString(comparision_value)){
                 throw new Error('{"code":400,"body":{"error":"the filter is not valid,since the comparision value is not a string"}}');
             }
@@ -196,12 +198,12 @@ export default class QH {
                         throw new Error('{"code":400,"body":{"error":"the filter is not valid,since the comparision key does not refer to a string"}}');
                     }
 
-                    if ((courseInformation[i] as any)[comparision_key] == comparision_value) {
-                        ret.push(true);
-                    }
-                    else {
-                        ret.push(false);
-                    }
+
+                    //function to handle RegExpression
+                    // *key* = contains key
+                    // key*  = starts with key
+                    // *key  = ends with key
+                    ret.push(QH.simple_regx_equal(comparision_value,(courseInformation[i] as any)[comparision_key]));
                 }
             }
             return ret;
@@ -254,4 +256,33 @@ export default class QH {
         throw new Error('{"code":400,"body":{"error":"the filter is not valid,since there is no valid operation"}}');  // (optional)the filter is not any of the for types but it will not be there due to the interface definition
     }
 
+//This is a simplified version of Regx checker with only three cases
+    // *key* = contains key
+    // key*  = starts with key
+    // *key  = ends with key
+
+    public static simple_regx_equal(key:string,str:string):boolean{
+         if((key.charAt(0)!="*")&&(key.charAt(key.length-1)!="*")){  //should be exactly the same
+             return key == str;
+         }
+        if((key.charAt(0)=="*")&&(key.charAt(key.length-1)=="*")){  // *key* = contains key
+            key = key.substring(1,key.length-1);
+
+            return str.indexOf(key) != -1;
+
+        }
+        if((key.charAt(0)!="*")&&(key.charAt(key.length-1)=="*")){  // key*  = starts with key
+            key = key.substring(0,key.length-1);
+
+            return str.indexOf(key) == 0;
+
+        }
+        if((key.charAt(0)=="*")&&(key.charAt(key.length-1)!="*")){  // *key  = ends with key
+            key = key.substring(1);
+
+            return str.indexOf(key) == str.length-key.length;
+
+        }
+
+    }
 }

@@ -150,6 +150,36 @@ describe("QH helper test", function () {
 
     });
 
+    it("test simple rex checker1",function () {
+        let key = "*A*"
+        let str = "asfdasfAsd"
+        expect(QH.simple_regx_equal(key,str)).equal(true);
+    })
+
+    it("test simple rex checker2",function () {
+        let key = "A"
+        let str = "asfdasfAsd"
+        expect(QH.simple_regx_equal(key,str)).equal(false);
+    })
+
+    it("test simple rex checker3",function () {
+        let key = "*A"
+        let str = "asfdasfA"
+        expect(QH.simple_regx_equal(key,str)).equal(true);
+    })
+
+    it("test simple rex checker4",function () {
+        let key = "A*"
+        let str = "asfdasfA"
+        expect(QH.simple_regx_equal(key,str)).equal(false);
+    })
+
+    it("test simple rex checker4",function () {
+        let key = "A*"
+        let str = "Aasfdasf"
+        expect(QH.simple_regx_equal(key,str)).equal(true);
+    })
+
 
 
 });
