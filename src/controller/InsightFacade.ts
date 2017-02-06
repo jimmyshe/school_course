@@ -39,7 +39,7 @@ export default class InsightFacade implements IInsightFacade {
                 this.courseInformation = this.courseInformation.concat(file);
             }
 
- 
+
         }
         catch (e){
 
