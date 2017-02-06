@@ -12,12 +12,13 @@ export interface InsightResponse {
 export interface QueryRequest {
     // you can define your own structure that complies with the EBNF here
 
-     "WHERE":{}
-     "OPTIONS":{
-        "COLUMNS":string[]
-        "ORDER"?:string
-        "FORM"?:string
-    }
+    // I think that I have to check the type manually to return the right error code.
+    //  "WHERE":{}
+    //  "OPTIONS":{
+    //     "COLUMNS":string[]
+    //     "ORDER"?:string
+    //     "FORM"?:string
+    // }
 
 }
 
