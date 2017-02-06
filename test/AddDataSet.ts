@@ -80,6 +80,19 @@ describe("addDataSet", function () {
             })
     });
 
+    it("test1_2", function () {
+        return insight.addDataset('cous.zip',"")
+            .then((response:InsightResponse)=>{
+                sanityCheck(response);
+                expect.fail();
+            })
+            .catch((err)=>{
+                expect(err.code).equal(400);
+
+            })
+    });
+
+    
 
 
 
