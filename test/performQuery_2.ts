@@ -604,7 +604,6 @@ describe("performQuery_2", function () {
             "FORM":"TABLE"
         }
     }
-
     it("test using partial str", function () {
         return insight.performQuery(testQuery_partial_str)
             .then((respons:InsightResponse)=>{
@@ -800,4 +799,68 @@ describe("performQuery_2", function () {
             })
     });
 
+
+    let testQuery_parial_inOneDept ={
+        "WHERE":{
+            "AND":[
+                {"IS":{
+                    "courses_dept":"*psc"
+                }},
+                {"IS":{
+                    "courses_instructor":"woodham*"
+                }}
+            ]
+        },
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_dept",
+                "courses_instructor"
+            ],
+            "ORDER":"courses_instructor",
+            "FORM":"TABLE"
+        }
+    };
+    it("test using partial str with and str", function () {
+        return insight.performQuery(testQuery_parial_inOneDept)
+            .then((respons:InsightResponse)=>{
+                sanityCheck(respons);
+                expect(respons).to.deep.equal(
+                    {
+                        "code": 200,
+                        "body": {
+                            "render": "TABLE",
+                            "result": [
+                                {
+                                    "courses_instructor": "woodham, robert",
+                                    "courses_dept": "cpsc"
+                                },
+                                {
+                                    "courses_instructor": "woodham, robert",
+                                    "courses_dept": "cpsc"
+                                },
+                                {
+                                    "courses_instructor": "woodham, robert",
+                                    "courses_dept": "cpsc"
+                                },
+                                {
+                                    "courses_instructor": "woodham, robert",
+                                    "courses_dept": "cpsc"
+                                },
+                                {
+                                    "courses_instructor": "woodham, robert",
+                                    "courses_dept": "cpsc"
+                                },
+                                {
+                                    "courses_instructor": "woodham, robert",
+                                    "courses_dept": "cpsc"
+                                }
+                            ]
+                        }
+                    }
+                )})
+            .catch( (err:InsightResponse)=>{
+                Log.test('Error: query request not success ');
+                expect.fail();
+            })
+    });
 });
