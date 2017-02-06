@@ -128,7 +128,7 @@ describe("addDataSet", function () {
                 expect.fail();
             })
             .catch((err)=>{
-                expect(err.code).equal(400);
+                expect(err.code).equal(404);
 
             })
     });
