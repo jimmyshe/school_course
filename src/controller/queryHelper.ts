@@ -4,6 +4,7 @@ import Log from "../Util";
 import {error} from "util";
 import {isNumber} from "util";
 import {isString} from "util";
+import {isArray} from "util";
 
 export default class QH {
        /*
@@ -18,31 +19,35 @@ export default class QH {
      *
      */
 
-     public static isValidQuery(query:QueryRequest):InsightResponse{
+     public static isValidQuery(query:any):InsightResponse{
 
 
-        let ret = {code:199,body:{}}
+         let ret = {code:199,body:{}}
+         // The interface defination should do the right job. If it is not the case, I can write more at here.
+         // It might not be the case. I have to wrrite it manually.
 
-
-        // The interface defination should do the right job. If it is not the case, I can write more at here.
-
-         if(query.OPTIONS.ORDER!=null){
-            let order_key:string = query.OPTIONS.ORDER;
-
-            if(!(order_key=="courses_avg"||order_key=="courses_pass"||order_key=="courses_fail"||order_key=="courses_audit")) {
-                ret.code = 400;
-                ret.body = {"error": "the option of order has an invalid key"}
-                return ret;
-            }
+         if(query.OPTIONS==null||query.WHERE==null){
+             ret.code = 400;
+             ret.body = {"error": "the query format is wrong"};
+             return ret;
          }
 
 
-         if (query.OPTIONS.FORM!=null&&query.OPTIONS.FORM!="TABLE"){
+         if ((query.OPTIONS.FORM==null)||(query.OPTIONS.FORM!="TABLE")){
 
              ret.code = 400;
              ret.body = {"error": "the option of view has an invalid key"}
              return ret;
          }
+
+         if ((query.OPTIONS.COLUMNS==null)||!isArray(query.OPTIONS.COLUMNS)){
+
+             ret.code = 400;
+             ret.body = {"error": "the option of columns has a wrong format"}
+             return ret;
+         }
+
+
 
 
 
@@ -55,11 +60,24 @@ export default class QH {
          }
 
 
+         if(query.OPTIONS.ORDER!=null){
+             let order_key:string = query.OPTIONS.ORDER;
+             let opt_colimns:string[] = query.OPTIONS.COLUMNS;
 
-        return ret;
+             if(!opt_colimns.includes(order_key)) {
+                 ret.code = 400;
+                 ret.body = {"error": "the option of order has an invalid key"}
+                 return ret;
+             }
+         }
+
+
+
+
+         return ret;
     }
 
-    public static isValidDateKey(key:string):boolean{
+    public static isValidDateKey(key:any):boolean{
 
 
          let valid_keys = ["courses_id","courses_avg","courses_instructor","courses_dept","courses_title","courses_pass","courses_fail","courses_audit","courses_uuid"]
@@ -106,6 +124,7 @@ export default class QH {
             let comparision_key: string = Object.keys(comparision_class)[0];
             let comparision_value = comparision_class[comparision_key];
 
+
             if(!isNumber(comparision_value)){
                 throw new Error('{"code":400,"body":{"error":"the filter is not valid,since comparision valuse is not a number"}}');
             }
@@ -119,7 +138,7 @@ export default class QH {
                 } else {
 
                     if(!isNumber((courseInformation[i] as any)[comparision_key])){
-                        throw new Error('{"code":400,"body":{"error":"the filter is not valid,since its comparision key doesn\'t reffer to a number"}}');
+                        throw new Error('{"code":400,"body":{"error":"the filter is not valid,since its comparision key doesn\'t refer to a number"}}');
                     }
 
                     switch (filter_key){
@@ -163,6 +182,7 @@ export default class QH {
             let comparision_key: string = Object.keys(comparision_class)[0];
             let comparision_value = comparision_class[comparision_key];
 
+
             if(!isString(comparision_value)){
                 throw new Error('{"code":400,"body":{"error":"the filter is not valid,since the comparision value is not a string"}}');
             }
@@ -178,12 +198,12 @@ export default class QH {
                         throw new Error('{"code":400,"body":{"error":"the filter is not valid,since the comparision key does not refer to a string"}}');
                     }
 
-                    if ((courseInformation[i] as any)[comparision_key] == comparision_value) {
-                        ret.push(true);
-                    }
-                    else {
-                        ret.push(false);
-                    }
+
+                    //function to handle RegExpression
+                    // *key* = contains key
+                    // key*  = starts with key
+                    // *key  = ends with key
+                    ret.push(QH.simple_regx_equal(comparision_value,(courseInformation[i] as any)[comparision_key]));
                 }
             }
             return ret;
@@ -191,9 +211,19 @@ export default class QH {
         }                       // this is the case of SCOMPARISON
 
         if(filter_key=='AND'||filter_key=='OR'){
-            let logicfilters: {}[] = filter[filter_key];
-            if (logicfilters.length < 2) {
-                throw new Error('{"code":400,"body":{"error":"the filter is not valid,since there are less than two filter in logic"}}');
+
+            let logicfilters: {}[];
+            try {
+                logicfilters = filter[filter_key];
+            }
+            catch (e){
+                Log.error(e.message);
+                throw new Error('{"code":400,"body":{"error":"Invalid query: AND should contain an array"}}');
+            }
+
+
+            if (logicfilters.length < 1) {
+                throw new Error('{"code":400,"body":{"error":"the filter is not valid,since there are less than one filter in' + filter_key +'"}}');
             }
 
             let pre_ret:boolean[] = QH.filterOut(courseInformation,logicfilters[0]);
@@ -226,4 +256,33 @@ export default class QH {
         throw new Error('{"code":400,"body":{"error":"the filter is not valid,since there is no valid operation"}}');  // (optional)the filter is not any of the for types but it will not be there due to the interface definition
     }
 
+//This is a simplified version of Regx checker with only three cases
+    // *key* = contains key
+    // key*  = starts with key
+    // *key  = ends with key
+
+    public static simple_regx_equal(key:string,str:string):boolean{
+         if((key.charAt(0)!="*")&&(key.charAt(key.length-1)!="*")){  //should be exactly the same
+             return key == str;
+         }
+        if((key.charAt(0)=="*")&&(key.charAt(key.length-1)=="*")){  // *key* = contains key
+            key = key.substring(1,key.length-1);
+
+            return str.indexOf(key) != -1;
+
+        }
+        if((key.charAt(0)!="*")&&(key.charAt(key.length-1)=="*")){  // key*  = starts with key
+            key = key.substring(0,key.length-1);
+
+            return str.indexOf(key) == 0;
+
+        }
+        if((key.charAt(0)=="*")&&(key.charAt(key.length-1)!="*")){  // *key  = ends with key
+            key = key.substring(1);
+
+            return str.indexOf(key) == str.length-key.length;
+
+        }
+
+    }
 }

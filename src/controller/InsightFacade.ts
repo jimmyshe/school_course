@@ -275,10 +275,13 @@ export default class InsightFacade implements IInsightFacade {
         }
     }
 
-    performQuery(query: QueryRequest): Promise <InsightResponse> {
+    performQuery(query: any): Promise <InsightResponse> {
         return new Promise((fulfill,reject)=>{
             let response:InsightResponse = null;
+
             response = QH.isValidQuery(query);   // validate the request query main on the parts other than the filter, since I handle it in filter out function
+
+
             if (response.code == 400){
                 reject(response);
             }else {
@@ -290,7 +293,7 @@ export default class InsightFacade implements IInsightFacade {
                     try {
                         response = JSON.parse(e.message);
                     }catch (e){
-                        Log.info("aaa")
+                        Log.error("Should not be here, internal error");
                     }
                     reject(response);
                 }
@@ -304,7 +307,6 @@ export default class InsightFacade implements IInsightFacade {
                         body_pre.push(this.courseInformation[i]);
                     }
                 }
-
                 len = body_pre.length;
                 //These are all sections selected
 
