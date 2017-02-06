@@ -1,3 +1,9 @@
+Test Coverage: 
+
+Test Summary: 94%
+
+Line Coverage: 91%
+
 For this project, my main contribution is mainly the addDataset part and the removeDataSet part, 
 including the helper functions that are related to them. In addition to these, 
 I worked with my partner together to finish the debugging phase.
@@ -18,3 +24,4 @@ During this project, I think we worked well in the connection part of our projec
 data before the project. We designed our datastructe together so we did not encounter huge problems when we were connecting our parts
 However, I think I should view more posts on piazza about some details about the project because the cache part really got me stucked
 for quite a while.
+TTE
