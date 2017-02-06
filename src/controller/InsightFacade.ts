@@ -16,13 +16,13 @@ let JSZip = require("jszip");
 
 export default class InsightFacade implements IInsightFacade {
 
-    private dataSets: any;
+    //private dataSets: any;
 
     courseInformation: any[] = [] ;
 
-    private infoID: string[] = [];
+   // private infoID: string[] = [];
 
-    length: number;
+
 
 
     constructor() {
@@ -39,7 +39,7 @@ export default class InsightFacade implements IInsightFacade {
                 this.courseInformation = this.courseInformation.concat(file);
             }
 
-            this.length = this.courseInformation.length;
+ 
         }
         catch (e){
 
@@ -112,6 +112,7 @@ export default class InsightFacade implements IInsightFacade {
                         .then(function (courseList) {
 
                             //console.log(courseList);
+                            let info_length = that.courseInformation.length;
 
                             for (let jsonObj_str of courseList) {
                                 try {
@@ -125,7 +126,7 @@ export default class InsightFacade implements IInsightFacade {
 
                             }
 
-                            if (that.courseInformation.length === that.length) {
+                            if ((that.courseInformation.length === info_length)&&!isadded) {
 
                                 let response3: InsightResponse = {code: 400, body: {"error" : "Message not provided"}};
                                 reject(response3);
