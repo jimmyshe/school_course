@@ -22,6 +22,8 @@ export default class InsightFacade implements IInsightFacade {
 
     private infoID: string[] = [];
 
+    length: number;
+
 
     constructor() {
 
@@ -36,6 +38,8 @@ export default class InsightFacade implements IInsightFacade {
                 let file = JSON.parse(file_str);
                 this.courseInformation = this.courseInformation.concat(file);
             }
+
+            this.length = this.courseInformation.length;
         }
         catch (e){
 
@@ -119,6 +123,12 @@ export default class InsightFacade implements IInsightFacade {
                                     reject(response1);
                                 }
 
+                            }
+
+                            if (that.courseInformation.length === that.length) {
+
+                                let response3: InsightResponse = {code: 400, body: {"error" : "Message not provided"}};
+                                reject(response3);
                             }
 
                             let response2: InsightResponse = {code: 204, body: {}};
