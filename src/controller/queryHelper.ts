@@ -124,6 +124,9 @@ export default class QH {
             let comparision_key: string = Object.keys(comparision_class)[0];
             let comparision_value = comparision_class[comparision_key];
 
+            if(!QH.isValidDateKey(comparision_key)){
+                throw new Error('{"code":400,"body":{"error":"the filter is not valid,since comparision key is not a valid key"}}');
+            }
 
             if(!isNumber(comparision_value)){
                 throw new Error('{"code":400,"body":{"error":"the filter is not valid,since comparision valuse is not a number"}}');
@@ -180,6 +183,12 @@ export default class QH {
             }
 
             let comparision_key: string = Object.keys(comparision_class)[0];
+
+            if(!QH.isValidDateKey(comparision_key)){
+                throw new Error('{"code":400,"body":{"error":"the filter is not valid,since comparision key is not a valid key"}}');
+            }
+
+
             let comparision_value = comparision_class[comparision_key];
 
 
