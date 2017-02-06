@@ -349,7 +349,7 @@ describe("performQuery", function () {
             "FORM":"TABLE"
         }
     };
-    it("an invalid simple query_5", function () {
+    it("an invalid simple query_6", function () {
         return insight.performQuery(testQuery_simple_invalid_6)
             .then((respons:InsightResponse)=>{
                 Log.test("Should not be there");
@@ -365,5 +365,69 @@ describe("performQuery", function () {
     });
 
 
+
+    let testQuery_simple_invalid_7 = {
+        "WHERE":{
+            "GT":{
+                "courses_ag":0
+            }
+        },
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER":"courses_avg",
+            "FORM":"TABLE"
+        }
+    };
+    it("an invalid simple query_7", function () {
+        return insight.performQuery(testQuery_simple_invalid_7)
+            .then((respons:InsightResponse)=>{
+                Log.test("Should not be there");
+                expect.fail();
+            })
+            .catch( (err:InsightResponse)=>{
+
+                expect(err).to.deep.equal(
+                    {"code":400,
+                        "body":
+                            {"error":"the filter is not valid,since comparision key is not a valid key"}}
+                    );
+            })
+    });
+
+
+
+    let testQuery_simple_invalid_8 = {
+        "WHERE":{
+            "IS":{
+                "courses_ag":"0"
+            }
+        },
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER":"courses_avg",
+            "FORM":"TABLE"
+        }
+    };
+    it("an invalid simple query_8", function () {
+        return insight.performQuery(testQuery_simple_invalid_8)
+            .then((respons:InsightResponse)=>{
+                Log.test("Should not be there");
+                expect.fail();
+            })
+            .catch( (err:InsightResponse)=>{
+
+                expect(err).to.deep.equal(
+                    {"code":400,
+                        "body":
+                            {"error":"the filter is not valid,since comparision key is not a valid key"}}
+                );
+            })
+    });
 
 });
