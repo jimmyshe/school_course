@@ -110,7 +110,7 @@ describe("addDataSet", function () {
     });
     
     it("test3", function () {
-        return insight.addDataset('no_real_data.zip',"")
+        return insight.addDataset('no_real_data.zip',voidContent)
             .then((response:InsightResponse)=>{
                 sanityCheck(response);
                 expect.fail();
