@@ -41,7 +41,7 @@ describe("performQuery_2", function () {
         insight = new Insight();
 
         let courseContent = new Buffer(fs.readFileSync('./courses.zip')).toString('base64');
-        return insight.addDataset('courses.zip',courseContent)
+        return insight.addDataset('courses',courseContent)
 
     });
 
