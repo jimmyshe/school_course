@@ -222,7 +222,7 @@ export default class InsightFacade implements IInsightFacade {
                     section.courses_pass = infoList[i].Pass;
                     section.courses_fail = infoList[i].Fail;
                     section.courses_audit = infoList[i].Audit;
-                    section.courses_uuid = infoList[i].id.toString;
+                    section.courses_uuid = String(infoList[i].id);
                     section.source = id;
 
 
