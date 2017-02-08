@@ -24,8 +24,6 @@ describe("addDataSet", function () {
         expect(response.code).to.be.a('number');
     }
 
-
-
     beforeEach(function () {
         Log.test('BeforeTest: ' + (<any>this).currentTest.title);
         insight = new Insight();
@@ -34,12 +32,10 @@ describe("addDataSet", function () {
         // console.log(courseContent);
     });
 
-
     afterEach(function () {
         Log.test('AfterTest: ' + (<any>this).currentTest.title);
         //insight = null;
     });
-
 
     // it("test of test", function () {
     //     return insight.addDataset("weqwe","wqrqw")
@@ -55,12 +51,12 @@ describe("addDataSet", function () {
 
     it("test1", function () {
         try {
-            fs.unlinkSync("./data/courses.zip.json")
+            fs.unlinkSync("./data/courses.json")
         }catch (e){
             Log.info("It is ok, the file does not exist.")
         }
         insight = new Insight;
-        return insight.addDataset('courses.zip',courseContent)
+        return insight.addDataset('courses',courseContent)
             .then((response:InsightResponse)=>{
                 sanityCheck(response);
                 expect(response.code).equal(204);
@@ -72,7 +68,7 @@ describe("addDataSet", function () {
     });
 
     it("test1_1", function () {
-        return insight.addDataset('courses.zip',courseContent)
+        return insight.addDataset('courses',courseContent)
             .then((response:InsightResponse)=>{
                 sanityCheck(response);
                 expect(response.code).equal(201);
@@ -84,7 +80,7 @@ describe("addDataSet", function () {
     });
 
     it("test1_2", function () {
-        return insight.addDataset('cous.zip',"")
+        return insight.addDataset('cous.zip',"") //invalid ID
             .then((response:InsightResponse)=>{
                 sanityCheck(response);
                 expect.fail();
@@ -100,7 +96,7 @@ describe("addDataSet", function () {
 
 
     it("test2", function () {
-        return insight.removeDataset('courses.zip')
+        return insight.removeDataset('courses')
             .then((response:InsightResponse)=>{
                 sanityCheck(response);
             })
@@ -133,7 +129,17 @@ describe("addDataSet", function () {
             })
     });
 
+    it("test5", function () {
+        return insight.addDataset("courses","")
+            .then((response:InsightResponse)=>{
+                sanityCheck(response);
+                expect.fail();
+            })
+            .catch((err)=>{
+                expect(err.code).equal(400);
 
+            })
+    });
 
 
 
