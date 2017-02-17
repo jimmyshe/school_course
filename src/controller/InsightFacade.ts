@@ -93,7 +93,7 @@ export default class InsightFacade implements IInsightFacade {
                         if ((!file.dir) && (fileName[0] != ".")){
                             //console.log(fileName);
 
-                            if (fileName === "index.htm") {
+                            if (fileName === "index.html") {
                                 let building_promise = file.async("string").then(function (content: any) {
 
                                     let buildingNameList: any[] = [];
