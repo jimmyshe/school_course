@@ -17,6 +17,7 @@ let http = require('http');
 
 export default class InsightFacade implements IInsightFacade {
 
+    //private dataSets: any;
 
     courseInformation: any[] = [] ;
 
@@ -34,7 +35,12 @@ export default class InsightFacade implements IInsightFacade {
             for(let i=0; i<filenames.length;i++) {
                 let file_str =  fs.readFileSync("./data/"+filenames[i],'utf-8');
                 let file = JSON.parse(file_str);
-                this.courseInformation = this.courseInformation.concat(file);
+                if (filenames[i]=="courses.json") {
+                    this.courseInformation = file;
+                }
+                if (filenames[i]=="rooms.json") {
+                    this.roomInformation = file;
+                }
             }
 
 
@@ -77,7 +83,13 @@ export default class InsightFacade implements IInsightFacade {
                 return;
             }
 
+
+
             let myzip = new JSZip();
+
+
+
+
             let p = myzip.loadAsync(content,{base64:true})
 
             if (id === "rooms") {
@@ -132,6 +144,7 @@ export default class InsightFacade implements IInsightFacade {
                                     if (roomListNode != null) {
 
                                         let roomsArray = roomListNode.childNodes[3].childNodes;
+                                        //console.log(roomsArray.length);
                                         for (let i = 1; i < roomsArray.length/2; i+=2) {
 
                                             let room : any = {};
@@ -199,6 +212,7 @@ export default class InsightFacade implements IInsightFacade {
                             }
                         }
                         console.log(that.roomInformation.length);
+                        that.save(id,that.roomInformation);
                         for (let j = 0; j < that.roomInformation.length; j++) {
                             if (that.roomInformation[j].rooms_lat != null){
                                console.log(that.roomInformation[j]);
@@ -328,7 +342,14 @@ export default class InsightFacade implements IInsightFacade {
 
                 that.courseInformation.splice(i,1);
             }
+
         }
+
+
+
+
+
+
     }
 
 
@@ -350,7 +371,10 @@ export default class InsightFacade implements IInsightFacade {
             }
         }
 
-        var dataToSave = JSON.stringify(data_selected);
+
+
+
+        let dataToSave = JSON.stringify(data_selected);
 
         try {
 
@@ -381,6 +405,7 @@ export default class InsightFacade implements IInsightFacade {
                 response = {code: 404, body: {"error": 'Message not provided'}};
                 reject(response);
             }
+
         })
     }
 
@@ -443,6 +468,10 @@ export default class InsightFacade implements IInsightFacade {
     performQuery(query: any): Promise <InsightResponse> {
         return new Promise((fulfill,reject)=>{
             let response:InsightResponse = null;
+            response = QH.isValidQuery(query);   // validate the request query main on the parts other than the filter, since I handle it in filter out function
+
+
+
 
             if(this.courseInformation.length==0){
                 response.code = 424;
@@ -450,8 +479,6 @@ export default class InsightFacade implements IInsightFacade {
                 reject(response);
                 return;
             }
-
-            response = QH.isValidQuery(query);   // validate the request query main on the parts other than the filter, since I handle it in filter out function
 
 
             if (response.code == 400){
@@ -471,7 +498,6 @@ export default class InsightFacade implements IInsightFacade {
                 }
 
 
-
                 let body_pre = [];
                 let len = this.courseInformation.length;
                 for(let i = 0;i<len;i++){
@@ -479,9 +505,11 @@ export default class InsightFacade implements IInsightFacade {
                         body_pre.push(this.courseInformation[i]);
                     }
                 }
+
+
+                //sort the output
                 len = body_pre.length;
                 //These are all sections selected
-
                 let order_key=query.OPTIONS.ORDER;  // sort the body_pre if it is necessary
                 if (order_key!=null){
                     body_pre.sort((n1,n2)=>{
@@ -494,12 +522,10 @@ export default class InsightFacade implements IInsightFacade {
                             return -1;
                         }
                     });
-
                 }
 
 
                 let results:{}[]=[];
-
                 for(let i =0;i<body_pre.length;i++){
                     let element:any={};
                     for(let j=query.OPTIONS.COLUMNS.length-1;j>=0;j--){
@@ -507,8 +533,6 @@ export default class InsightFacade implements IInsightFacade {
                     }
                     results.push(element);
                 }
-
-
                 response.code = 200;
                 response.body = {'render':query.OPTIONS.FORM,'result':results}
                 fulfill(response);

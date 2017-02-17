@@ -10,7 +10,7 @@ import InsightFacade from "../src/controller/InsightFacade";
 
 var fs = require('fs');
 
-describe("addDataSet", function () {
+describe("addDataSet_rooms", function () {
 
     let insight : Insight = null;
 
@@ -57,66 +57,4 @@ describe("addDataSet", function () {
                 expect.fail();
             })
     });
-
-    /*it("test1_1", function () {
-     return insight.addDataset('courses.zip',courseContent)
-     .then((response:InsightResponse)=>{
-     sanityCheck(response);
-     expect(response.code).equal(201);
-     })
-     .catch((err)=>{
-
-     expect.fail();
-     })
-     });
-
-     it("test1_2", function () {
-     return insight.addDataset('cous.zip',"")
-     .then((response:InsightResponse)=>{
-     sanityCheck(response);
-     expect.fail();
-     })
-     .catch((err)=>{
-     expect(err.code).equal(400);
-
-     })
-     });
-
-
-
-
-
-     it("test2", function () {
-     return insight.removeDataset('courses.zip')
-     .then((response:InsightResponse)=>{
-     sanityCheck(response);
-     })
-     .catch((err)=>{
-     expect.fail();
-     })
-     });
-
-     it("test3", function () {
-     return insight.addDataset('no_real_data.zip',voidContent)
-     .then((response:InsightResponse)=>{
-     sanityCheck(response);
-     expect.fail();
-     })
-     .catch((err)=>{
-     expect(err.code).equal(400);
-
-     })
-     });
-
-     it("test4", function () {
-     return insight.removeDataset("1.zip")
-     .then((response:InsightResponse)=>{
-     sanityCheck(response);
-     expect.fail();
-     })
-     .catch((err)=>{
-     expect(err.code).equal(404);
-
-     })
-     });*/
 });
