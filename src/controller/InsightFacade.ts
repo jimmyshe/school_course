@@ -26,8 +26,6 @@ export default class InsightFacade implements IInsightFacade {
 
     constructor() {
 
-
-
         try {
 
             let filenames = fs.readdirSync("./data/");
@@ -35,10 +33,13 @@ export default class InsightFacade implements IInsightFacade {
             for(let i=0; i<filenames.length;i++) {
                 let file_str =  fs.readFileSync("./data/"+filenames[i],'utf-8');
                 let file = JSON.parse(file_str);
-                this.courseInformation = this.courseInformation.concat(file);
+                if (filenames[i]=="courses.json") {
+                    this.courseInformation = file;
+                }
+                if (filenames[i]=="rooms.json") {
+                    this.roomInformation = file;
+                }
             }
-
-
         }
         catch (e){
 
@@ -213,6 +214,7 @@ export default class InsightFacade implements IInsightFacade {
                             }
                         }
                         console.log(that.roomInformation.length);
+                        that.save(id,that.roomInformation);
                         for (let j = 0; j < that.roomInformation.length; j++) {
                             if (that.roomInformation[j].rooms_lat != null){
                                console.log(that.roomInformation[j]);
@@ -466,6 +468,10 @@ export default class InsightFacade implements IInsightFacade {
     performQuery(query: any): Promise <InsightResponse> {
         return new Promise((fulfill,reject)=>{
             let response:InsightResponse = null;
+            response = QH.isValidQuery(query);   // validate the request query main on the parts other than the filter, since I handle it in filter out function
+
+
+
 
             if(this.courseInformation.length==0){
                 response.code = 424;
@@ -474,7 +480,7 @@ export default class InsightFacade implements IInsightFacade {
                 return;
             }
 
-            response = QH.isValidQuery(query);   // validate the request query main on the parts other than the filter, since I handle it in filter out function
+
             if (response.code == 400){
                 reject(response);
             }else {
@@ -491,6 +497,7 @@ export default class InsightFacade implements IInsightFacade {
                     reject(response);
                 }
 
+
                 let body_pre = [];
                 let len = this.courseInformation.length;
                 for(let i = 0;i<len;i++){
@@ -498,9 +505,11 @@ export default class InsightFacade implements IInsightFacade {
                         body_pre.push(this.courseInformation[i]);
                     }
                 }
+
+
+                //sort the output
                 len = body_pre.length;
                 //These are all sections selected
-
                 let order_key=query.OPTIONS.ORDER;  // sort the body_pre if it is necessary
                 if (order_key!=null){
                     body_pre.sort((n1,n2)=>{
@@ -513,12 +522,10 @@ export default class InsightFacade implements IInsightFacade {
                             return -1;
                         }
                     });
-
                 }
 
 
                 let results:{}[]=[];
-
                 for(let i =0;i<body_pre.length;i++){
                     let element:any={};
                     for(let j=query.OPTIONS.COLUMNS.length-1;j>=0;j--){
@@ -526,8 +533,6 @@ export default class InsightFacade implements IInsightFacade {
                     }
                     results.push(element);
                 }
-
-
                 response.code = 200;
                 response.body = {'render':query.OPTIONS.FORM,'result':results}
                 fulfill(response);
