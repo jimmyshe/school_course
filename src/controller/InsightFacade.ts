@@ -164,79 +164,16 @@ export default class InsightFacade implements IInsightFacade {
 
                                             roomList.push(room);
 
-                                            /*if (roomList.length > 0) {
-                                                let lat: any;
-                                                let lon: any;
-                                                that.getLatLon(roomList[0].rooms_url).then(function (latlonArray: any) {
-                                                    lat = latlonArray[0];
-                                                    lon = latlonArray[1];
+                                            if (roomList.length > 0) {
+
+                                                return that.getLatLon(roomList[0].rooms_url, roomList).then(function (roomList: any) {
+                                                    return roomList;
                                                 });
-                                                for (let room of roomList) {
-                                                    room.rooms_lat = this.lat;
-                                                    room.rooms_lon = this.lon;
-                                                }
-                                            }*/
+                                            }
                                         }
                                     }
                                     return roomList;
                                 })
-                                    /*.then(function (roomList:any) {
-                                        return new Promise(function (a, b) {
-
-                                            if (roomList.length >= 1) {
-                                                let roomex = roomList[0];
-                                                let latlonUrl = roomex.rooms_url;
-                                                http.get(latlonUrl, function (response : any) {
-                                                    //console.log(response);
-                                                    let body : any = '';
-                                                    response.on('data', function (d: any) {
-                                                        body += d;
-                                                    });
-                                                    response.on('end', function () {
-
-                                                        let latlon = JSON.parse(body);
-                                                        let lat = latlon.lat;
-                                                        let lon = latlon.lon;
-                                                        for (let room of roomList) {
-                                                            room.rooms_lat = lat;
-                                                            room.rooms_lon = lon;
-                                                        }
-                                                        a(roomList);
-                                                    });
-                                                })
-                                            }
-                                        })
-                                    })*/
-
-                                /*let http_promise = room_promise.then(function (roomList:any) {
-                                 return new Promise(function (a, b) {
-
-                                 if (roomList.length === 1) {
-                                 let roomex = roomList[0];
-                                 let latlonUrl = roomex.rooms_url;
-                                 http.get(latlonUrl, function (response : any) {
-                                 console.log(response);
-                                 let body : any = '';
-                                 response.on('data', function (d: any) {
-                                 body += d;
-                                 });
-                                 response.on('end', function () {
-
-                                 let latlon = JSON.parse(body);
-                                 let lat = latlon.lat;
-                                 let lon = latlon.lon;
-                                 for (let room of roomList) {
-                                 room.rooms_lat = lat;
-                                 room.rooms_lon = lon;
-                                 }
-
-                                 return roomList;
-                                 });
-                                 })
-                                 }
-                                 })
-                                 })*/
-
                                 processList.push(room_promise);
                             }
                         }
@@ -256,7 +193,7 @@ export default class InsightFacade implements IInsightFacade {
                         //console.log(validNameList.length);
                         for (let info of informationList) {
                             if (info.length!= 0 && info.length != 74) {
-                                console.log(info.length);
+                                //console.log(info.length);
                                 for (let j = 0; j < info.length; j++) {
                                     //console.log(info[j]);
                                     //console.log(info[j].rooms_shortname);
@@ -271,7 +208,7 @@ export default class InsightFacade implements IInsightFacade {
                         console.log(that.roomInformation.length);
                         for (let j = 0; j < that.roomInformation.length; j++) {
                             if (that.roomInformation[j].rooms_lat != null){
-                            console.log(that.roomInformation[j]);
+                               console.log(that.roomInformation[j]);
                             }
                         }
                         let response2: InsightResponse = {code: 204, body: {}};
@@ -362,7 +299,7 @@ export default class InsightFacade implements IInsightFacade {
         return null;
     }
 
-    getLatLon(url:string) {
+    getLatLon(url:string, roomList: any) {
         return new Promise(function (fulfill, reject) {
             http.get(url, function (response : any) {
                 //console.log(response);
@@ -372,12 +309,15 @@ export default class InsightFacade implements IInsightFacade {
                 });
                 response.on('end', function () {
                     let latlon = JSON.parse(body);
-                    let latlonArray : any[] = [];
+                    console.log(body);
+                    //let latlonArray : any[] = [];
                     let lat = latlon.lat;
                     let lon = latlon.lon;
-                    latlonArray.push(lat);
-                    latlonArray.push(lon);
-                    fulfill(latlonArray);
+                    for (let room of roomList) {
+                        room.rooms_lat = lat;
+                        room.rooms_lon = lon;
+                    }
+                    fulfill(roomList);
                 });
             })
         })
@@ -508,28 +448,7 @@ export default class InsightFacade implements IInsightFacade {
         }
     }
 
-    parseRooms(id:string, buildingInfos:any) {
-        for (let i = 0; i < buildingInfos.length; i++) {
-            if (i%2 === 1) {
-                let buildingInfo = buildingInfos[i];
-                let infoList = buildingInfo.childNodes;
 
-
-                let roomInformationUrl = infoList[9].childNodes[1].attrs[0].value;
-
-                //let contentHtml = document.getElementById(roomInformationUrl).innerHTML;
-
-                let room : any = {};
-
-                room.rooms_shortname = infoList[3].childNodes[0].value.trim();
-                room.rooms_fullname = infoList[5].childNodes[1].childNodes[0].value;
-                room.rooms_address = infoList[7].childNodes[0].value;
-
-
-
-            }
-        }
-    }
 
 
 
