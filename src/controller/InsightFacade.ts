@@ -170,11 +170,24 @@ export default class InsightFacade implements IInsightFacade {
                                             room.rooms_url = buildingUrl;
 
                                             roomList.push(room);
+
+                                            /*if (roomList.length > 0) {
+                                                let lat: any;
+                                                let lon: any;
+                                                that.getLatLon(roomList[0].rooms_url).then(function (latlonArray: any) {
+                                                    lat = latlonArray[0];
+                                                    lon = latlonArray[1];
+                                                });
+                                                for (let room of roomList) {
+                                                    room.rooms_lat = this.lat;
+                                                    room.rooms_lon = this.lon;
+                                                }
+                                            }*/
                                         }
                                     }
                                     return roomList;
                                 })
-                                    .then(function (roomList:any) {
+                                    /*.then(function (roomList:any) {
                                         return new Promise(function (a, b) {
 
                                             if (roomList.length >= 1) {
@@ -200,7 +213,7 @@ export default class InsightFacade implements IInsightFacade {
                                                 })
                                             }
                                         })
-                                    })
+                                    })*/
 
                                 /*let http_promise = room_promise.then(function (roomList:any) {
                                  return new Promise(function (a, b) {
@@ -250,7 +263,7 @@ export default class InsightFacade implements IInsightFacade {
                         //console.log(validNameList.length);
                         for (let info of informationList) {
                             if (info.length!= 0 && info.length != 74) {
-                                //console.log(info.length);
+                                console.log(info.length);
                                 for (let j = 0; j < info.length; j++) {
                                     //console.log(info[j]);
                                     //console.log(info[j].rooms_shortname);
@@ -264,7 +277,9 @@ export default class InsightFacade implements IInsightFacade {
                         }
                         console.log(that.roomInformation.length);
                         for (let j = 0; j < that.roomInformation.length; j++) {
-                            //console.log(that.roomInformation[j]);
+                            if (that.roomInformation[j].rooms_lat != null){
+                            console.log(that.roomInformation[j]);
+                            }
                         }
                         let response2: InsightResponse = {code: 204, body: {}};
                         fulfill(response2);
@@ -354,6 +369,27 @@ export default class InsightFacade implements IInsightFacade {
         return null;
     }
 
+    getLatLon(url:string) {
+        return new Promise(function (fulfill, reject) {
+            http.get(url, function (response : any) {
+                //console.log(response);
+                let body : any = '';
+                response.on('data', function (d: any) {
+                    body += d;
+                });
+                response.on('end', function () {
+                    let latlon = JSON.parse(body);
+                    let latlonArray : any[] = [];
+                    let lat = latlon.lat;
+                    let lon = latlon.lon;
+                    latlonArray.push(lat);
+                    latlonArray.push(lon);
+                    fulfill(latlonArray);
+                });
+            })
+        })
+    }
+
     removeCourses(id:string) {
 
         let that = this;
@@ -373,6 +409,8 @@ export default class InsightFacade implements IInsightFacade {
 
 
     }
+
+
 
     save (id: string, data: any) {
 
