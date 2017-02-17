@@ -26,6 +26,8 @@ export default class InsightFacade implements IInsightFacade {
 
     constructor() {
 
+
+
         try {
 
             let filenames = fs.readdirSync("./data/");
@@ -40,6 +42,8 @@ export default class InsightFacade implements IInsightFacade {
                     this.roomInformation = file;
                 }
             }
+
+
         }
         catch (e){
 
@@ -146,38 +150,32 @@ export default class InsightFacade implements IInsightFacade {
                                             let room : any = {};
 
                                             let singleRoomInformation = roomsArray[i];
-                                            var rooms_number = parse5.serialize(singleRoomInformation.childNodes[1].childNodes[1]);
-                                            var rooms_name = buildingShortName + "_" + rooms_number;
-                                            var rooms_seats = parseInt(parse5.serialize(singleRoomInformation.childNodes[3]));
-                                            var rooms_furniture = parse5.serialize(singleRoomInformation.childNodes[5]).trim();
-                                            var rooms_type = parse5.serialize(singleRoomInformation.childNodes[7]).trim();
+                                            room.rooms_number = parse5.serialize(singleRoomInformation.childNodes[1].childNodes[1]);
+                                            room.rooms_name = buildingShortName + "_" + room.rooms_number;
+                                            room.rooms_seats = parseInt(parse5.serialize(singleRoomInformation.childNodes[3]));
+                                            room.rooms_furniture = parse5.serialize(singleRoomInformation.childNodes[5]).trim();
+                                            room.rooms_type = parse5.serialize(singleRoomInformation.childNodes[7]).trim();
 
-                                            var href = singleRoomInformation.childNodes[1].childNodes[1];
-                                            var rooms_href: any;
+                                            let href = singleRoomInformation.childNodes[1].childNodes[1];
                                             for (var attr of href.attrs) {
                                                 if (attr.name === 'href') {
-                                                    rooms_href = attr.value;
+                                                    room.rooms_href = attr.value;
                                                 }
                                             }
 
                                             room.rooms_fullname = buildingFullName;
                                             room.rooms_shortname = buildingShortName;
                                             room.rooms_address = buildingAddress;
-                                            room.rooms_name = rooms_name;
-                                            room.rooms_seat = rooms_seats;
-                                            room.rooms_type = rooms_type;
-                                            room.rooms_furniture = rooms_furniture;
-                                            room.rooms_href = rooms_href;
                                             room.rooms_url = buildingUrl;
 
                                             roomList.push(room);
 
-                                            if (roomList.length > 0) {
+                                        }
+                                        if (roomList.length > 0) {
 
-                                                return that.getLatLon(roomList[0].rooms_url, roomList).then(function (roomList: any) {
-                                                    return roomList;
-                                                });
-                                            }
+                                            return that.getLatLon(roomList[0].rooms_url, roomList).then(function (roomList: any) {
+                                                return roomList;
+                                            });
                                         }
                                     }
                                     return roomList;
@@ -318,7 +316,7 @@ export default class InsightFacade implements IInsightFacade {
                 });
                 response.on('end', function () {
                     let latlon = JSON.parse(body);
-                    console.log(body);
+                    //console.log(body);
                     //let latlonArray : any[] = [];
                     let lat = latlon.lat;
                     let lon = latlon.lon;
@@ -333,6 +331,8 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     removeCourses(id:string) {
+
+        //console.log('run there!!!');
 
         let that = this;
 
