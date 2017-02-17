@@ -5,8 +5,7 @@ import {IInsightFacade, InsightResponse, QueryRequest} from "./IInsightFacade";
 import {Section} from "./CourseInformation";
 import QH from "./queryHelper";
 import Log from "../Util";
-import {queryParser} from "restify";
-
+import DH from "./datasetHelper"
 
 "use strict";
 import {cpus} from "os";
@@ -75,6 +74,7 @@ export default class InsightFacade implements IInsightFacade {
             if ((id == null) || (content == null)) {
                 let response = {code: 400, body: {"error": 'Message not provided'}};
                 reject(response);
+                return;
             }
 
             let myzip = new JSZip();
@@ -164,12 +164,12 @@ export default class InsightFacade implements IInsightFacade {
 
                                             roomList.push(room);
 
-                                            if (roomList.length > 0) {
+                                        }
+                                        if (roomList.length > 0) {
 
-                                                return that.getLatLon(roomList[0].rooms_url, roomList).then(function (roomList: any) {
-                                                    return roomList;
-                                                });
-                                            }
+                                            return that.getLatLon(roomList[0].rooms_url, roomList).then(function (roomList: any) {
+                                                return roomList;
+                                            });
                                         }
                                     }
                                     return roomList;
@@ -309,7 +309,7 @@ export default class InsightFacade implements IInsightFacade {
                 });
                 response.on('end', function () {
                     let latlon = JSON.parse(body);
-                    console.log(body);
+                    //console.log(body);
                     //let latlonArray : any[] = [];
                     let lat = latlon.lat;
                     let lon = latlon.lon;
@@ -357,9 +357,6 @@ export default class InsightFacade implements IInsightFacade {
             }
         }
 
-
-
-
         var dataToSave = JSON.stringify(data_selected);
 
         try {
@@ -379,8 +376,7 @@ export default class InsightFacade implements IInsightFacade {
         let that = this;
         return new Promise((fulfill, reject) => {
             try {
-
-                var response: InsightResponse;
+                let response: InsightResponse;
                 fs.statSync("./data/" + id + ".json");
                 fs.unlinkSync("./data/" + id + ".json");
                 that.removeCourses(id);
@@ -388,8 +384,7 @@ export default class InsightFacade implements IInsightFacade {
                 fulfill(response);
 
             } catch (err) {
-
-                var response: InsightResponse
+                let response: InsightResponse;
                 response = {code: 404, body: {"error": 'Message not provided'}};
                 reject(response);
             }
@@ -417,7 +412,7 @@ export default class InsightFacade implements IInsightFacade {
                     section.courses_pass = infoList[i].Pass;
                     section.courses_fail = infoList[i].Fail;
                     section.courses_audit = infoList[i].Audit;
-                    section.courses_uuid = infoList[i].id.toString();
+                    section.courses_uuid = String(infoList[i].id);
                     section.source = id;
                     section.course_section = infoList[i].Section;
 
@@ -455,6 +450,13 @@ export default class InsightFacade implements IInsightFacade {
     performQuery(query: any): Promise <InsightResponse> {
         return new Promise((fulfill,reject)=>{
             let response:InsightResponse = null;
+
+            if(this.courseInformation.length==0){
+                response.code = 424;
+                response.body = ['courses'];
+                reject(response);
+                return;
+            }
 
             response = QH.isValidQuery(query);   // validate the request query main on the parts other than the filter, since I handle it in filter out function
 
