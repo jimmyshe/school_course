@@ -5,8 +5,7 @@ import {IInsightFacade, InsightResponse, QueryRequest} from "./IInsightFacade";
 import {Section} from "./CourseInformation";
 import QH from "./queryHelper";
 import Log from "../Util";
-import {queryParser} from "restify";
-
+import DH from "./datasetHelper"
 
 "use strict";
 import {cpus} from "os";
@@ -18,6 +17,7 @@ let http = require('http');
 
 export default class InsightFacade implements IInsightFacade {
 
+    //private dataSets: any;
 
     courseInformation: any[] = [] ;
 
@@ -75,9 +75,16 @@ export default class InsightFacade implements IInsightFacade {
             if ((id == null) || (content == null)) {
                 let response = {code: 400, body: {"error": 'Message not provided'}};
                 reject(response);
+                return;
             }
 
+
+
             let myzip = new JSZip();
+
+
+
+
             let p = myzip.loadAsync(content,{base64:true})
 
             if (id === "rooms") {
@@ -325,8 +332,6 @@ export default class InsightFacade implements IInsightFacade {
 
     removeCourses(id:string) {
 
-        //console.log('run there!!!');
-
         let that = this;
 
         for (let i = that.courseInformation.length-1; i >=0; i--) {
@@ -335,7 +340,14 @@ export default class InsightFacade implements IInsightFacade {
 
                 that.courseInformation.splice(i,1);
             }
+
         }
+
+
+
+
+
+
     }
 
 
@@ -360,7 +372,7 @@ export default class InsightFacade implements IInsightFacade {
 
 
 
-        var dataToSave = JSON.stringify(data_selected);
+        let dataToSave = JSON.stringify(data_selected);
 
         try {
 
@@ -379,8 +391,7 @@ export default class InsightFacade implements IInsightFacade {
         let that = this;
         return new Promise((fulfill, reject) => {
             try {
-
-                var response: InsightResponse;
+                let response: InsightResponse;
                 fs.statSync("./data/" + id + ".json");
                 fs.unlinkSync("./data/" + id + ".json");
                 that.removeCourses(id);
@@ -388,11 +399,11 @@ export default class InsightFacade implements IInsightFacade {
                 fulfill(response);
 
             } catch (err) {
-
-                var response: InsightResponse
+                let response: InsightResponse;
                 response = {code: 404, body: {"error": 'Message not provided'}};
                 reject(response);
             }
+
         })
     }
 
@@ -417,7 +428,7 @@ export default class InsightFacade implements IInsightFacade {
                     section.courses_pass = infoList[i].Pass;
                     section.courses_fail = infoList[i].Fail;
                     section.courses_audit = infoList[i].Audit;
-                    section.courses_uuid = infoList[i].id.toString();
+                    section.courses_uuid = String(infoList[i].id);
                     section.source = id;
                     section.course_section = infoList[i].Section;
 
@@ -456,9 +467,14 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise((fulfill,reject)=>{
             let response:InsightResponse = null;
 
+            if(this.courseInformation.length==0){
+                response.code = 424;
+                response.body = ['courses'];
+                reject(response);
+                return;
+            }
+
             response = QH.isValidQuery(query);   // validate the request query main on the parts other than the filter, since I handle it in filter out function
-
-
             if (response.code == 400){
                 reject(response);
             }else {
@@ -474,8 +490,6 @@ export default class InsightFacade implements IInsightFacade {
                     }
                     reject(response);
                 }
-
-
 
                 let body_pre = [];
                 let len = this.courseInformation.length;
