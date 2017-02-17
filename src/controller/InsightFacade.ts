@@ -17,7 +17,6 @@ let http = require('http');
 
 export default class InsightFacade implements IInsightFacade {
 
-    //private dataSets: any;
 
     courseInformation: any[] = [] ;
 
@@ -78,13 +77,7 @@ export default class InsightFacade implements IInsightFacade {
                 return;
             }
 
-
-
             let myzip = new JSZip();
-
-
-
-
             let p = myzip.loadAsync(content,{base64:true})
 
             if (id === "rooms") {
@@ -171,12 +164,12 @@ export default class InsightFacade implements IInsightFacade {
 
                                             roomList.push(room);
 
-                                            if (roomList.length > 0) {
+                                        }
+                                        if (roomList.length > 0) {
 
-                                                return that.getLatLon(roomList[0].rooms_url, roomList).then(function (roomList: any) {
-                                                    return roomList;
-                                                });
-                                            }
+                                            return that.getLatLon(roomList[0].rooms_url, roomList).then(function (roomList: any) {
+                                                return roomList;
+                                            });
                                         }
                                     }
                                     return roomList;
@@ -316,7 +309,7 @@ export default class InsightFacade implements IInsightFacade {
                 });
                 response.on('end', function () {
                     let latlon = JSON.parse(body);
-                    console.log(body);
+                    //console.log(body);
                     //let latlonArray : any[] = [];
                     let lat = latlon.lat;
                     let lon = latlon.lon;
@@ -332,6 +325,8 @@ export default class InsightFacade implements IInsightFacade {
 
     removeCourses(id:string) {
 
+        //console.log('run there!!!');
+
         let that = this;
 
         for (let i = that.courseInformation.length-1; i >=0; i--) {
@@ -340,14 +335,7 @@ export default class InsightFacade implements IInsightFacade {
 
                 that.courseInformation.splice(i,1);
             }
-
         }
-
-
-
-
-
-
     }
 
 
@@ -369,10 +357,7 @@ export default class InsightFacade implements IInsightFacade {
             }
         }
 
-
-
-
-        let dataToSave = JSON.stringify(data_selected);
+        var dataToSave = JSON.stringify(data_selected);
 
         try {
 
@@ -403,7 +388,6 @@ export default class InsightFacade implements IInsightFacade {
                 response = {code: 404, body: {"error": 'Message not provided'}};
                 reject(response);
             }
-
         })
     }
 
@@ -475,6 +459,8 @@ export default class InsightFacade implements IInsightFacade {
             }
 
             response = QH.isValidQuery(query);   // validate the request query main on the parts other than the filter, since I handle it in filter out function
+
+
             if (response.code == 400){
                 reject(response);
             }else {
@@ -490,6 +476,8 @@ export default class InsightFacade implements IInsightFacade {
                     }
                     reject(response);
                 }
+
+
 
                 let body_pre = [];
                 let len = this.courseInformation.length;
