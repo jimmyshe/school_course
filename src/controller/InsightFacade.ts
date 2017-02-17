@@ -12,6 +12,8 @@ import {cpus} from "os";
 
 let fs = require("fs");
 let JSZip = require("jszip");
+let parse5 = require("parse5");
+let http = require('http');
 
 export default class InsightFacade implements IInsightFacade {
 
@@ -19,17 +21,24 @@ export default class InsightFacade implements IInsightFacade {
 
     courseInformation: any[] = [] ;
 
-   // private infoID: string[] = [];
+    roomInformation: any[] = [];
+
 
     constructor() {
 
+
+
         try {
+
             let filenames = fs.readdirSync("./data/");
+
             for(let i=0; i<filenames.length;i++) {
                 let file_str =  fs.readFileSync("./data/"+filenames[i],'utf-8');
                 let file = JSON.parse(file_str);
                 this.courseInformation = this.courseInformation.concat(file);
             }
+
+
         }
         catch (e){
 
@@ -42,100 +51,307 @@ export default class InsightFacade implements IInsightFacade {
     addDataset(id: string, content: string): Promise<InsightResponse> {
 
         let that = this;
+        let isadded:boolean;
+        try{
+
+            fs.statSync("./data/" + id + ".json");
+            isadded = true;
+            this.removeCourses(id);
+            fs.unlinkSync("./data/" + id + ".json");
+
+
+        }
+        catch (e){
+            //do nothing;
+            isadded = false;
+        }
+
+
+
         return new Promise((fulfill, reject) => {
 
-            if(!DH.isValidDataID(id)){
-                reject({code: 400, body: {"error": 'The ID is not valid'}});
-                return;
-            }
+            // console.log('run here1');
 
-            let isadded:boolean;
-            try{
-                fs.statSync("./data/" + id + ".json");
-                isadded = true;
-                this.removeCourses(id);
-                fs.unlinkSync("./data/" + id + ".json");
-            }
-            catch (e){
-                isadded = false;
-            }
-
-            if (content == null) {
+            if ((id == null) || (content == null)) {
                 let response = {code: 400, body: {"error": 'Message not provided'}};
                 reject(response);
                 return;
             }
 
+
+
             let myzip = new JSZip();
+
+
+
+
             let p = myzip.loadAsync(content,{base64:true})
 
+            if (id === "rooms") {
 
-            p
-                .then(function (zip:any) {
-
+                p.then(function (zip:any) {
                     let processList = <any>[];
                     zip.forEach(function (relativePath: any, file: any) {
-                        // var a1 = relativePath.split('/');
-                        // var filename = a1[a1.length-1];
-                        // console.log(filename);
+
+                        //console.log(relativePath);
+                        let filePath = relativePath.split('/');
+                        let fileName = filePath[filePath.length - 1];
+
+                        if ((!file.dir) && (fileName[0] != ".")){
+                            //console.log(fileName);
+
+                            if (fileName === "index.html") {
+                                let building_promise = file.async("string").then(function (content: any) {
+
+                                    let buildingNameList: any[] = [];
+
+                                    let buildingHtml = parse5.parse(content);
+                                    let buildingList = that.searchNode(buildingHtml, 'class', 'views-table cols-5 table');
+
+                                    for (let i = 0; i < buildingList.childNodes[3].childNodes.length; i++) {
+
+                                        if (i%2 === 1) {
+                                            let buildingInfo = buildingList.childNodes[3].childNodes[i];
+                                            let buildingShortName = buildingInfo.childNodes[3].childNodes[0].value.trim();
+                                            //console.log(buildingShortName);
+                                            buildingNameList.push(buildingShortName);
+                                        }
+                                    }
+                                    return buildingNameList;
+                                })
+                                processList.push(building_promise);
+                            } else {
+                                let room_promise = file.async("string").then(function (content: any) {
+
+                                    let roomList: any[] = [];
+
+                                    let roomHtml = parse5.parse(content);
+
+                                    let roomNameNode = that.searchNode(roomHtml, 'id', 'building-info');
+                                    let roomListNode = that.searchNode(roomHtml, 'class', 'views-table cols-5 table');
+
+                                    let buildingShortName = fileName;
+                                    let buildingFullName = roomNameNode.childNodes[1].childNodes[0].childNodes[0].value;
+                                    let buildingAddress = roomNameNode.childNodes[3].childNodes[0].childNodes[0].value.replace(/,/g,"");
+
+                                    let buildingUrl = "http://skaha.cs.ubc.ca:11316/api/v1/team13/" + buildingAddress.trim().replace(/ /g, "%20");
+
+                                    if (roomListNode != null) {
+
+                                        let roomsArray = roomListNode.childNodes[3].childNodes;
+                                        //console.log(roomsArray.length);
+                                        for (let i = 1; i < roomsArray.length/2; i+=2) {
+
+                                            let room : any = {};
+
+                                            let singleRoomInformation = roomsArray[i];
+                                            var rooms_number = parse5.serialize(singleRoomInformation.childNodes[1].childNodes[1]);
+                                            var rooms_name = buildingShortName + "_" + rooms_number;
+                                            var rooms_seats = parseInt(parse5.serialize(singleRoomInformation.childNodes[3]));
+                                            var rooms_furniture = parse5.serialize(singleRoomInformation.childNodes[5]).trim();
+                                            var rooms_type = parse5.serialize(singleRoomInformation.childNodes[7]).trim();
+
+                                            var href = singleRoomInformation.childNodes[1].childNodes[1];
+                                            var rooms_href: any;
+                                            for (var attr of href.attrs) {
+                                                if (attr.name === 'href') {
+                                                    rooms_href = attr.value;
+                                                }
+                                            }
+
+                                            room.rooms_fullname = buildingFullName;
+                                            room.rooms_shortname = buildingShortName;
+                                            room.rooms_address = buildingAddress;
+                                            room.rooms_name = rooms_name;
+                                            room.rooms_seat = rooms_seats;
+                                            room.rooms_type = rooms_type;
+                                            room.rooms_furniture = rooms_furniture;
+                                            room.rooms_href = rooms_href;
+                                            room.rooms_url = buildingUrl;
+
+                                            roomList.push(room);
+                                        }
+                                    }
+                                    return roomList;
+                                })
+                                    .then(function (roomList:any) {
+                                        return new Promise(function (a, b) {
+
+                                            if (roomList.length >= 1) {
+                                                let roomex = roomList[0];
+                                                let latlonUrl = roomex.rooms_url;
+                                                http.get(latlonUrl, function (response : any) {
+                                                    //console.log(response);
+                                                    let body : any = '';
+                                                    response.on('data', function (d: any) {
+                                                        body += d;
+                                                    });
+                                                    response.on('end', function () {
+
+                                                        let latlon = JSON.parse(body);
+                                                        let lat = latlon.lat;
+                                                        let lon = latlon.lon;
+                                                        for (let room of roomList) {
+                                                            room.rooms_lat = lat;
+                                                            room.rooms_lon = lon;
+                                                        }
+                                                        a(roomList);
+                                                    });
+                                                })
+                                            }
+                                        })
+                                    })
+
+                                /*let http_promise = room_promise.then(function (roomList:any) {
+                                 return new Promise(function (a, b) {
+
+                                 if (roomList.length === 1) {
+                                 let roomex = roomList[0];
+                                 let latlonUrl = roomex.rooms_url;
+                                 http.get(latlonUrl, function (response : any) {
+                                 console.log(response);
+                                 let body : any = '';
+                                 response.on('data', function (d: any) {
+                                 body += d;
+                                 });
+                                 response.on('end', function () {
+
+                                 let latlon = JSON.parse(body);
+                                 let lat = latlon.lat;
+                                 let lon = latlon.lon;
+                                 for (let room of roomList) {
+                                 room.rooms_lat = lat;
+                                 room.rooms_lon = lon;
+                                 }
+
+                                 return roomList;
+                                 });
+                                 })
+                                 }
+                                 })
+                                 })*/
+
+                                processList.push(room_promise);
+                            }
+                        }
+                    });
+
+                    Promise.all(processList).then(function (informationList: any) {
+                        let validNameList :any[] = [];
+
+                        for (let info of informationList) {
+                            if (info.length === 74) {
+                                for (let i = 0; i < info.length; i++) {
+                                    validNameList.push(info[i]);
+                                    //console.log(info[i]);
+                                }
+                            }
+                        }
+                        //console.log(validNameList.length);
+                        for (let info of informationList) {
+                            if (info.length!= 0 && info.length != 74) {
+                                //console.log(info.length);
+                                for (let j = 0; j < info.length; j++) {
+                                    //console.log(info[j]);
+                                    //console.log(info[j].rooms_shortname);
+                                    for (let i = 0; i < validNameList.length; i++) {
+                                        if (info[j].rooms_shortname === validNameList[i]) {
+                                            that.roomInformation.push(info[j])
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        console.log(that.roomInformation.length);
+                        for (let j = 0; j < that.roomInformation.length; j++) {
+                            //console.log(that.roomInformation[j]);
+                        }
+                        let response2: InsightResponse = {code: 204, body: {}};
+                        fulfill(response2);
+
+                    }).catch(function (e: any) {
+                        Log.error("con not unzip")
+                        let response = {code: 400, body: {"error": 'Message not provided'}};
+                        reject(response);
+                    });
+                })
+
+
+            } else {
+
+                p.then(function (zip: any) {
+                    let processList = <any>[];
+                    zip.forEach(function (relativePath: any, file: any) {
+
                         if (!file.dir) {
                             let course_promise = file.async("string");
                             processList.push(course_promise);
                         }
                     });
 
-                    Promise.all(processList)
-                        .then(function (courseList) {
-                            //console.log(courseList);
-                            let info_length = that.courseInformation.length;
-
-                            for (let jsonObj_str of courseList) {
-                                try {
-                                    //console.log(courseObj);
-                                    that.parseCourse(id, (jsonObj_str as string));
-                                }
-                                catch (err) {
-                                    let response1: InsightResponse = {code: 400, body: {"error": "Message not provided"}};
-                                    reject(response1);
-                                    return;
-                                }
-
+                    Promise.all(processList).then(function (courseList) {
+                        let info_length = that.courseInformation.length;
+                        for (let jsonObj_str of courseList) {
+                            try {
+                                //console.log(courseObj);
+                                that.parseCourse(id, (jsonObj_str as string));
                             }
-
-                            if ((that.courseInformation.length === info_length)&&!isadded) {
-
-                                let response3: InsightResponse = {code: 400, body: {"error" : "Message not provided"}};
-                                reject(response3);
-                                return;
+                            catch (err) {
+                                let response1: InsightResponse = {code: 400, body: {"error": "Message not provided"}};
+                                reject(response1);
                             }
+                        }
+                        if ((that.courseInformation.length === info_length) && !isadded) {
+                            let response3: InsightResponse = {code: 400, body: {"error": "Message not provided"}};
+                            reject(response3);
+                        }
+                        let response2: InsightResponse = {code: 204, body: {}};
+                        if (isadded) {
+                            response2.code = 201;
+                        }
+                        that.save(id, that.courseInformation);
+                        fulfill(response2);
 
-                            let response2: InsightResponse = {code: 204, body: {}};
-
-                            if (isadded){
-                                response2.code = 201;
-                            }
-
-                            that.save(id, that.courseInformation);
-                            fulfill(response2);
-                            return;
-                        })
-                        .catch(function (e) {
+                    })
+                        .catch(function (e: any) {
                             Log.error("con not unzip")
                             let response = {code: 400, body: {"error": 'Message not provided'}};
                             reject(response);
-                            return;
                         });
 
-                })
-                .catch(function (e:any) {
-
+                }).catch(function (e: any) {
                     Log.error(e.message);
                     Log.error("con not unzip")
                     let response = {code: 400, body: {"error": 'Message not provided'}};
                     reject(response);
 
                 })
+            }
+
         });
+
+    }
+
+    searchNode(node: any, name: any, value: any) {
+        let attrs = node.attrs || [];
+        let childNodes = node.childNodes || [];
+        let bool = false;
+        for (let attr of attrs) {
+            if ((attr.name === name) && (attr.value === value)) {
+                bool = true;
+            }
+        }
+        if (bool) {
+            return node;
+        }
+        else if (childNodes !== null) {
+            let result: any = null;
+            for (let i = 0; (result === null) && (i < childNodes.length); i++) {
+                result = this.searchNode(childNodes[i], name, value);
+            }
+            return result;
+        }
+        return null;
     }
 
     removeCourses(id:string) {
@@ -160,12 +376,22 @@ export default class InsightFacade implements IInsightFacade {
 
     save (id: string, data: any) {
 
-        let data_selected = [];
-        for(let i = 0;i<this.courseInformation.length;i++){
-            if(data[i].source===id){
+        //this.dataSets[id] = data;
+
+
+        let data_selected : any []= [];
+        if (id === "courses") {
+            for (let i = 0; i < this.courseInformation.length; i++) {
+                data_selected.push(data[i]);
+            }
+        } else  {
+
+            for (let i = 0; i < this.roomInformation.length; i++) {
                 data_selected.push(data[i]);
             }
         }
+
+
 
 
         let dataToSave = JSON.stringify(data_selected);
@@ -193,11 +419,13 @@ export default class InsightFacade implements IInsightFacade {
                 that.removeCourses(id);
                 response = {code: 204, body: {}};
                 fulfill(response);
+
             } catch (err) {
                 let response: InsightResponse;
                 response = {code: 404, body: {"error": 'Message not provided'}};
                 reject(response);
             }
+
         })
     }
 
@@ -224,6 +452,7 @@ export default class InsightFacade implements IInsightFacade {
                     section.courses_audit = infoList[i].Audit;
                     section.courses_uuid = String(infoList[i].id);
                     section.source = id;
+                    section.course_section = infoList[i].Section;
 
 
                     if (section.courses_dept != null && typeof section.courses_dept != 'undefined' &&
@@ -236,12 +465,46 @@ export default class InsightFacade implements IInsightFacade {
                         section.courses_audit != null && typeof section.courses_audit != 'undefined' &&
                         section.courses_uuid != null && typeof section.courses_uuid != 'undefined') {
 
+                        if (section.course_section === "overall") {
+
+                            section.course_year = 1900;
+
+                        } else {
+
+                            section.course_year = infoList[i].Year;
+                        }
+
                         this.courseInformation.push(section);
                     }
                 }
             }
         }
     }
+
+    parseRooms(id:string, buildingInfos:any) {
+        for (let i = 0; i < buildingInfos.length; i++) {
+            if (i%2 === 1) {
+                let buildingInfo = buildingInfos[i];
+                let infoList = buildingInfo.childNodes;
+
+
+                let roomInformationUrl = infoList[9].childNodes[1].attrs[0].value;
+
+                //let contentHtml = document.getElementById(roomInformationUrl).innerHTML;
+
+                let room : any = {};
+
+                room.rooms_shortname = infoList[3].childNodes[0].value.trim();
+                room.rooms_fullname = infoList[5].childNodes[1].childNodes[0].value;
+                room.rooms_address = infoList[7].childNodes[0].value;
+
+
+
+            }
+        }
+    }
+
+
 
     performQuery(query: any): Promise <InsightResponse> {
         return new Promise((fulfill,reject)=>{
