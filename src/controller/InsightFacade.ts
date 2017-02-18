@@ -21,12 +21,10 @@ export default class InsightFacade implements IInsightFacade {
 
     courseInformation: any[] = [] ;
 
-    roomInformations: any[] = [];
+    roomsInformations: any[] = [];
 
 
     constructor() {
-
-
 
         try {
 
@@ -39,7 +37,7 @@ export default class InsightFacade implements IInsightFacade {
                     this.courseInformation = file;
                 }
                 if (filenames[i]=="rooms.json") {
-                    this.roomInformations = file;
+                    this.roomsInformations = file;
                 }
             }
 
@@ -75,7 +73,7 @@ export default class InsightFacade implements IInsightFacade {
 
         return new Promise((fulfill, reject) => {
 
-            // console.log('run here1');
+
 
             if ((id == null) || (content == null)) {
                 let response = {code: 400, body: {"error": 'Message not provided'}};
@@ -83,14 +81,16 @@ export default class InsightFacade implements IInsightFacade {
                 return;
             }
 
+            if ((id != "courses") && (id!= "rooms")) {
+                let response = {code: 400, body: {"error": 'DataSet has an invalid ID'}};
+                reject(response);
+                return;
+            }
+
 
 
             let myzip = new JSZip();
-
-
-
-
-            let p = myzip.loadAsync(content,{base64:true})
+            let p = myzip.loadAsync(content,{base64:true})  // load content into myzip
 
             if (id === "rooms") {
 
@@ -104,7 +104,6 @@ export default class InsightFacade implements IInsightFacade {
 
                         if ((!file.dir) && (fileName[0] != ".")){
                             //console.log(fileName);
-
                             if (fileName === "index.html") {
                                 let building_promise = file.async("string").then(function (content: any) {
 
@@ -172,11 +171,9 @@ export default class InsightFacade implements IInsightFacade {
                                             roomList.push(room);
 
                                         }
-                                        if (roomList.length > 0) {
-
+                                        if (roomList.length > 0) {   // The api is not stable
                                             return that.getLatLon(roomList[0].rooms_url, roomList).then(function (roomList: any) {
-                                                return roomList;
-                                            });
+                                                return roomList;});
                                         }
                                     }
                                     return roomList;
@@ -193,11 +190,9 @@ export default class InsightFacade implements IInsightFacade {
                             if (info.length === 74) {
                                 for (let i = 0; i < info.length; i++) {
                                     validNameList.push(info[i]);
-                                    //console.log(info[i]);
                                 }
                             }
                         }
-                        //console.log(validNameList.length);
                         for (let info of informationList) {
                             if (info.length!= 0 && info.length != 74) {
                                 //console.log(info.length);
@@ -206,20 +201,23 @@ export default class InsightFacade implements IInsightFacade {
                                     //console.log(info[j].rooms_shortname);
                                     for (let i = 0; i < validNameList.length; i++) {
                                         if (info[j].rooms_shortname === validNameList[i]) {
-                                            that.roomInformations.push(info[j])
+                                            that.roomsInformations.push(info[j])
                                         }
                                     }
                                 }
                             }
                         }
-                        console.log(that.roomInformations.length);
-                        that.saveToDisk(id,that.roomInformations);
-                        for (let j = 0; j < that.roomInformations.length; j++) {
-                            if (that.roomInformations[j].rooms_lat != null){
-                               console.log(that.roomInformations[j]);
-                            }
-                        }
+                        //console.log(that.roomInformations.length);
+                        that.saveRamOfIdToDisk(id);
+                        // for (let j = 0; j < that.roomsInformations.length; j++) {
+                        //     if (that.roomsInformations[j].rooms_lat != null){
+                        //        console.log(that.roomsInformations[j]);
+                        //     }
+                        // }
                         let response2: InsightResponse = {code: 204, body: {}};
+                        if(isadded){
+                            response2.code = 201;
+                        }
                         fulfill(response2);
 
                     }).catch(function (e: any) {
@@ -227,12 +225,18 @@ export default class InsightFacade implements IInsightFacade {
                         let response = {code: 400, body: {"error": 'Message not provided'}};
                         reject(response);
                     });
+                }).catch(function (e: any) {
+                    Log.error(e.message);
+                    Log.error("con not unzip")
+                    let response = {code: 400, body: {"error": 'Message not provided'}};
+                    reject(response);
+
                 })
 
 
             }
 
-            else {
+            if (id === "courses") {
 
                 p.then(function (zip: any) {
                     let processList = <any>[];
@@ -264,7 +268,7 @@ export default class InsightFacade implements IInsightFacade {
                         if (isadded) {
                             response2.code = 201;
                         }
-                        that.saveToDisk(id, that.courseInformation);
+                        that.saveRamOfIdToDisk(id);
                         fulfill(response2);
 
                     })
@@ -342,29 +346,26 @@ export default class InsightFacade implements IInsightFacade {
             return;
         }
         if(id=="rooms"){
-            this.roomInformations==[];
+            this.roomsInformations==[];
             return;
         }
 
         throw new Error("delete an invald id");
     }
 
-    saveToDisk (id: string, data: any) {
+    saveRamOfIdToDisk (id: string) {
 
         //this.dataSets[id] = data;
 
 
         let data_selected : any []= [];
         if (id === "courses") {
-            for (let i = 0; i < this.courseInformation.length; i++) {
-                data_selected.push(data[i]);
-            }
+
+            data_selected = this.courseInformation;
         }
         if(id === "rooms")
         {
-            for (let i = 0; i < this.roomInformations.length; i++) {
-                data_selected.push(data[i]);
-            }
+            data_selected = this.roomsInformations;
         }
 
         if(data_selected.length==0){
@@ -439,7 +440,7 @@ export default class InsightFacade implements IInsightFacade {
                     section.courses_fail = infoList[i].Fail;
                     section.courses_audit = infoList[i].Audit;
                     section.courses_uuid = String(infoList[i].id);
-                    section.source = id;
+                    //section.source = id;
                     section.course_section = infoList[i].Section;
 
 
