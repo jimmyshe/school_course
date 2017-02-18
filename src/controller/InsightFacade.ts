@@ -21,7 +21,7 @@ export default class InsightFacade implements IInsightFacade {
 
     courseInformation: any[] = [] ;
 
-    roomInformation: any[] = [];
+    roomInformations: any[] = [];
 
 
     constructor() {
@@ -39,7 +39,7 @@ export default class InsightFacade implements IInsightFacade {
                     this.courseInformation = file;
                 }
                 if (filenames[i]=="rooms.json") {
-                    this.roomInformation = file;
+                    this.roomInformations = file;
                 }
             }
 
@@ -61,7 +61,7 @@ export default class InsightFacade implements IInsightFacade {
 
             fs.statSync("./data/" + id + ".json");
             isadded = true;
-            this.removeCourses(id);
+            this.removeIdInRam(id);
             fs.unlinkSync("./data/" + id + ".json");
 
 
@@ -125,7 +125,8 @@ export default class InsightFacade implements IInsightFacade {
                                     return buildingNameList;
                                 })
                                 processList.push(building_promise);
-                            } else {
+                            }
+                            else {
                                 let room_promise = file.async("string").then(function (content: any) {
 
                                     let roomList: any[] = [];
@@ -205,17 +206,17 @@ export default class InsightFacade implements IInsightFacade {
                                     //console.log(info[j].rooms_shortname);
                                     for (let i = 0; i < validNameList.length; i++) {
                                         if (info[j].rooms_shortname === validNameList[i]) {
-                                            that.roomInformation.push(info[j])
+                                            that.roomInformations.push(info[j])
                                         }
                                     }
                                 }
                             }
                         }
-                        console.log(that.roomInformation.length);
-                        that.save(id,that.roomInformation);
-                        for (let j = 0; j < that.roomInformation.length; j++) {
-                            if (that.roomInformation[j].rooms_lat != null){
-                               console.log(that.roomInformation[j]);
+                        console.log(that.roomInformations.length);
+                        that.saveToDisk(id,that.roomInformations);
+                        for (let j = 0; j < that.roomInformations.length; j++) {
+                            if (that.roomInformations[j].rooms_lat != null){
+                               console.log(that.roomInformations[j]);
                             }
                         }
                         let response2: InsightResponse = {code: 204, body: {}};
@@ -229,7 +230,9 @@ export default class InsightFacade implements IInsightFacade {
                 })
 
 
-            } else {
+            }
+
+            else {
 
                 p.then(function (zip: any) {
                     let processList = <any>[];
@@ -261,7 +264,7 @@ export default class InsightFacade implements IInsightFacade {
                         if (isadded) {
                             response2.code = 201;
                         }
-                        that.save(id, that.courseInformation);
+                        that.saveToDisk(id, that.courseInformation);
                         fulfill(response2);
 
                     })
@@ -330,31 +333,23 @@ export default class InsightFacade implements IInsightFacade {
         })
     }
 
-    removeCourses(id:string) {
+    removeIdInRam(id:string) {
 
         //console.log('run there!!!');
 
-        let that = this;
-
-        for (let i = that.courseInformation.length-1; i >=0; i--) {
-
-            if (that.courseInformation[i].source === id) {
-
-                that.courseInformation.splice(i,1);
-            }
-
+        if(id=="courses"){
+            this.courseInformation=[];
+            return;
+        }
+        if(id=="rooms"){
+            this.roomInformations==[];
+            return;
         }
 
-
-
-
-
-
+        throw new Error("delete an invald id");
     }
 
-
-
-    save (id: string, data: any) {
+    saveToDisk (id: string, data: any) {
 
         //this.dataSets[id] = data;
 
@@ -364,13 +359,17 @@ export default class InsightFacade implements IInsightFacade {
             for (let i = 0; i < this.courseInformation.length; i++) {
                 data_selected.push(data[i]);
             }
-        } else  {
-
-            for (let i = 0; i < this.roomInformation.length; i++) {
+        }
+        if(id === "rooms")
+        {
+            for (let i = 0; i < this.roomInformations.length; i++) {
                 data_selected.push(data[i]);
             }
         }
 
+        if(data_selected.length==0){
+            throw new Error("Error:no data to save");
+        }
 
 
 
@@ -392,11 +391,20 @@ export default class InsightFacade implements IInsightFacade {
     removeDataset(id: string): Promise<InsightResponse> {
         let that = this;
         return new Promise((fulfill, reject) => {
+
+
+            if(id!="courses"&&id!="rooms"){
+                let response: InsightResponse;
+                response = {code: 404, body: {"error": 'Message not provided(Invalid ID)'}};
+                reject(response);
+                return;
+            }
+
             try {
                 let response: InsightResponse;
                 fs.statSync("./data/" + id + ".json");
-                fs.unlinkSync("./data/" + id + ".json");
-                that.removeCourses(id);
+                fs.unlinkSync("./data/" + id + ".json"); // remove from disk
+                that.removeIdInRam(id);
                 response = {code: 204, body: {}};
                 fulfill(response);
 

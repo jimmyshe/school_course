@@ -106,7 +106,7 @@ describe("addDataSet", function () {
     });
     
     it("test3", function () {
-        return insight.addDataset('no_real_data.zip',voidContent)
+        return insight.addDataset('courses',voidContent) //invalid content
             .then((response:InsightResponse)=>{
                 sanityCheck(response);
                 expect.fail();
