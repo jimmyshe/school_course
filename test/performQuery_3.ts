@@ -7,7 +7,7 @@ import Log from "../src/Util";
 import {InsightResponse} from "../src/controller/IInsightFacade";
 
 let fs = require('fs');
-describe("performQuery_2", function () {
+describe("performQuery_3", function () {
     let insight:Insight = null;
     function sanityCheck(response: InsightResponse) {
         expect(response).to.have.property('code');
@@ -17,10 +17,11 @@ describe("performQuery_2", function () {
 
     before(function () {
         Log.test('test Query for rooms');
-        insight = new Insight();
 
-        let courseContent = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
-        return insight.addDataset('rooms',courseContent)
+        insight = new Insight();
+        // make sure the cache file is there
+        let content = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
+        return insight.addDataset('rooms',content)
 
     })
 
@@ -29,5 +30,51 @@ describe("performQuery_2", function () {
         Log.test('end test Query for rooms ');
         insight = null;
     })
+
+
+    it("test of a simple case", function () {
+        return insight.performQuery({
+            "WHERE": {
+                "IS": {
+                    "rooms_name": "DMP_*"
+                }
+            },
+            "OPTIONS": {
+                "COLUMNS": [
+                    "rooms_name"
+                ],
+                "ORDER": "rooms_name",
+                "FORM": "TABLE"
+            }
+        })
+            .then((respons:InsightResponse)=>{
+                sanityCheck(respons);
+                expect(respons.body).to.deep.equal({
+                    "render": "TABLE",
+                    "result": [
+                        {
+                            "rooms_name": "DMP_101"
+                        },
+                        {
+                            "rooms_name": "DMP_110"
+                        },
+                        {
+                            "rooms_name": "DMP_201"
+                        },
+                        {
+                            "rooms_name": "DMP_301"
+                        },
+                        {
+                            "rooms_name": "DMP_310"
+                        }
+                    ]
+                })
+
+            })
+            .catch( (err:InsightResponse)=>{
+                Log.test('Error: query request not success ');
+                expect.fail();
+            })
+    });
 
 });

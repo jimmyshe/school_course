@@ -171,7 +171,7 @@ export default class InsightFacade implements IInsightFacade {
                                             roomList.push(room);
 
                                         }
-                                        if (roomList.length > 0) {   // The api is not stable
+                                        if (roomList.length > 0) {   // The api is not stable // comment out this for stable test but not for real autotest
                                             return that.getLatLon(roomList[0].rooms_url, roomList).then(function (roomList: any) {
                                                 return roomList;});
                                         }
@@ -482,36 +482,66 @@ export default class InsightFacade implements IInsightFacade {
 
 
 
-            if(this.courseInformation.length==0){
-                response.code = 424;
-                response.body = ['courses'];
-                reject(response);
-                return;
-            }
-
 
             if (response.code == 400){
                 reject(response);
             }else {
                 let selected: boolean[] = null;
-                try {
-                    selected = QH.filterOut(this.courseInformation,query["WHERE"]);
+                let typeOfQuery = (response.body as any)[0];
+
+
+                let information =[];
+                if(typeOfQuery == "rooms"){
+                    information = this.roomsInformations;
                 }
-                catch (e){
-                    try {
-                        response = JSON.parse(e.message);
-                    }catch (e){
-                        Log.error("Should not be here, internal error");
-                    }
+                if(typeOfQuery == "courses"){
+                    information = this.courseInformation;
+                }
+
+                if(information.length==0){
+                    response.code = 424;
                     reject(response);
+                    return;
                 }
+
+
+                if(typeOfQuery == "courses") {
+                    try {
+                        selected = QH.filterOut_courses(information, query["WHERE"]);
+                    }
+                    catch (e) {
+                        try {
+                            response = JSON.parse(e.message);
+                        } catch (e) {
+                            Log.error("Should not be here, internal error");
+                        }
+                        reject(response);
+                    }
+                }
+
+                if(typeOfQuery == "rooms"){
+                    try {
+                        selected = QH.filterOut_rooms(information, query["WHERE"]);
+                    }
+                    catch (e) {
+                        try {
+                            response = JSON.parse(e.message);
+                        } catch (e) {
+                            Log.error("Should not be here, internal error");
+                        }
+                        reject(response);
+                    }
+                }
+
+
+
 
 
                 let body_pre = [];
-                let len = this.courseInformation.length;
+                let len = information.length;
                 for(let i = 0;i<len;i++){
                     if(selected[i]){
-                        body_pre.push(this.courseInformation[i]);
+                        body_pre.push(information[i]);
                     }
                 }
 

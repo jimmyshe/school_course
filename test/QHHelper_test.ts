@@ -68,50 +68,50 @@ describe("QH helper test", function () {
 
 
     it("test filter out LT case", function () {
-       let ret = QH.filterOut(testData,{'LT':{courses_avg:4}})
+       let ret = QH.filterOut_courses(testData,{'LT':{courses_avg:4}})
         expect(ret).to.deep.equal([false,false,true]);
         Log.test("filtered out LT case");
     });
 
     it("test filter out GT case", function () {
-        let ret = QH.filterOut(testData,{'GT':{courses_avg:4}})
+        let ret = QH.filterOut_courses(testData,{'GT':{courses_avg:4}})
         expect(ret).to.deep.equal([true,false,false]);
         Log.test("filtered out LT case");
     });
 
     it("test filter out EQ case", function () {
-        let ret = QH.filterOut(testData,{'EQ':{courses_avg:4}})
+        let ret = QH.filterOut_courses(testData,{'EQ':{courses_avg:4}})
         expect(ret).to.deep.equal([false,true,false]);
         Log.test("filtered out LT case");
     });
 
     it("test filter out IS case", function () {
-        let ret = QH.filterOut(testData,{'IS':{courses_dept : "cs"}})
+        let ret = QH.filterOut_courses(testData,{'IS':{courses_dept : "cs"}})
         expect(ret).to.deep.equal([true,true,false]);
         Log.test("filtered out LT case");
     });
 
     it("test filter out NOT case", function () {
-        let ret = QH.filterOut(testData,{'NOT':{'IS':{courses_dept : "cs"}}})
+        let ret = QH.filterOut_courses(testData,{'NOT':{'IS':{courses_dept : "cs"}}})
         expect(ret).to.deep.equal([false,false,true]);
         Log.test("filtered out LT case");
     });
 
     it("test filter out AND case", function () {
-        let ret = QH.filterOut(testData,{'AND':[{'IS':{courses_dept : "cs"}},{'NOT':{'IS':{courses_dept : "cs"}}}]})
+        let ret = QH.filterOut_courses(testData,{'AND':[{'IS':{courses_dept : "cs"}},{'NOT':{'IS':{courses_dept : "cs"}}}]})
         expect(ret).to.deep.equal([false,false,false]);
         Log.test("filtered out LT case");
     });
 
     it("test filter out OR case", function () {
-        let ret = QH.filterOut(testData,{'OR':[{'IS':{courses_dept : "cs"}},{'NOT':{'IS':{courses_dept : "cs"}}}]})
+        let ret = QH.filterOut_courses(testData,{'OR':[{'IS':{courses_dept : "cs"}},{'NOT':{'IS':{courses_dept : "cs"}}}]})
         expect(ret).to.deep.equal([true,true,true]);
         Log.test("filtered out LT case");
     });
 
 
     it("test filter out double NOT case", function () {
-        let ret = QH.filterOut(testData,{'NOT':{'NOT':{'IS':{courses_dept : "cs"}}}})
+        let ret = QH.filterOut_courses(testData,{'NOT':{'NOT':{'IS':{courses_dept : "cs"}}}})
         expect(ret).to.deep.equal([true,true,false]);
         Log.test("filtered out LT case");
     });
@@ -121,7 +121,7 @@ describe("QH helper test", function () {
 
     it("test filter with invalid operation", function () {
         try {
-            let ret = QH.filterOut(testData, {
+            let ret = QH.filterOut_courses(testData, {
                 'OHNO': [{'IS': {courses_dept: "cs"}}, {'NOT': {'IS': {courses_dept: "cs"}}}]
 
             });
@@ -138,7 +138,7 @@ describe("QH helper test", function () {
 
     it("test filter with multiple operations at the same level", function () {
         try {
-            let ret = QH.filterOut(testData, {
+            let ret = QH.filterOut_courses(testData, {
                 'AND': [{'IS': {courses_dept: "cs"}}, {'NOT': {'IS': {courses_dept: "cs"}}}],
                 'NOT': {}  // the extra one
             });
