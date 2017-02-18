@@ -171,8 +171,8 @@ export default class InsightFacade implements IInsightFacade {
 
                                         }
                                         if (roomList.length > 0) {   // The api is not stable // comment out this for stable test but not for real autotest
-                                            // return that.getLatLon(roomList[0].rooms_url, roomList).then(function (roomList: any) {
-                                            //     return roomList;});
+                                            return that.getLatLon(roomList[0].rooms_url, roomList).then(function (roomList: any) {
+                                                return roomList;});
                                         }
                                     }
                                     return roomList;

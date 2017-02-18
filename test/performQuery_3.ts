@@ -7,7 +7,7 @@ import Log from "../src/Util";
 import {InsightResponse} from "../src/controller/IInsightFacade";
 
 let fs = require('fs');
-describe.only("performQuery_3", function () {
+describe("performQuery_3", function () {
     let insight:Insight = null;
     function sanityCheck(response: InsightResponse) {
         expect(response).to.have.property('code');
