@@ -56,10 +56,9 @@ export default class InsightFacade implements IInsightFacade {
         let that = this;
         let isadded:boolean;
         try{
-
+            this.removeIdInRam(id);
             fs.statSync("./data/" + id + ".json");
             isadded = true;
-            this.removeIdInRam(id);
             fs.unlinkSync("./data/" + id + ".json");
 
 
@@ -145,7 +144,7 @@ export default class InsightFacade implements IInsightFacade {
 
                                         let roomsArray = roomListNode.childNodes[3].childNodes;
                                         //console.log(roomsArray.length);
-                                        for (let i = 1; i < roomsArray.length/2; i+=2) {
+                                        for (let i = 1; i < roomsArray.length; i+=2) {
 
                                             let room : any = {};
 
@@ -172,8 +171,8 @@ export default class InsightFacade implements IInsightFacade {
 
                                         }
                                         if (roomList.length > 0) {   // The api is not stable // comment out this for stable test but not for real autotest
-                                            return that.getLatLon(roomList[0].rooms_url, roomList).then(function (roomList: any) {
-                                                return roomList;});
+                                            // return that.getLatLon(roomList[0].rooms_url, roomList).then(function (roomList: any) {
+                                            //     return roomList;});
                                         }
                                     }
                                     return roomList;
@@ -346,7 +345,7 @@ export default class InsightFacade implements IInsightFacade {
             return;
         }
         if(id=="rooms"){
-            this.roomsInformations==[];
+            this.roomsInformations=[];
             return;
         }
 
