@@ -16,7 +16,6 @@ describe("addDataSet_rooms", function () {
 
     let roomContent : string = null;
 
-    let voidContent : string = null;
 
     function sanityCheck(response: InsightResponse) {
         expect(response).to.have.property('code');
@@ -26,24 +25,28 @@ describe("addDataSet_rooms", function () {
 
 
 
+    before(function () {
+        Log.info("start add rooms")
+        roomContent = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
+        insight = new Insight();
+        Log.info("start add rooms")
+
+    })
+
     beforeEach(function () {
         Log.test('BeforeTest: ' + (<any>this).currentTest.title);
-        insight = new Insight();
-        roomContent = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
-        voidContent = new Buffer(fs.readFileSync('./no_real_data.zip')).toString('base64');
-        // console.log(courseContent);
+
     });
 
 
     afterEach(function () {
         Log.test('AfterTest: ' + (<any>this).currentTest.title);
-        //insight = null;
     });
 
 
     it("test1", function () {
         try {
-            fs.unlinkSync("./data/rooms.zip.json")
+            fs.unlinkSync("./data/rooms.json")
         }catch (e){
             Log.info("It is ok, the file does not exist.")
         }
@@ -52,6 +55,20 @@ describe("addDataSet_rooms", function () {
             .then((response:InsightResponse)=>{
                 sanityCheck(response);
                 expect(response.code).equal(204);
+            })
+            .catch((err)=>{
+                expect.fail();
+            })
+    });
+
+
+
+    it("test2", function () {
+        insight = new Insight;
+        return insight.addDataset('rooms',roomContent)
+            .then((response:InsightResponse)=>{
+                sanityCheck(response);
+                expect(response.code).equal(201);
             })
             .catch((err)=>{
                 expect.fail();
