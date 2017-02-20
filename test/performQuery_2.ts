@@ -6,10 +6,10 @@ import {expect} from 'chai';
 import Log from "../src/Util";
 import {InsightResponse} from "../src/controller/IInsightFacade";
 
-var fs = require('fs');
+let fs = require('fs');
 describe("performQuery_2", function () {
 
-    let insight:Insight = null
+    let insight:Insight = null;
     let testQuery_simple = {
         "WHERE":{
             "GT":{

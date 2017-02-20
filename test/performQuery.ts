@@ -283,7 +283,7 @@ describe("performQuery", function () {
                 expect(err).to.deep.equal({
                     "code": 400,
                     "body": {
-                        "error": "the option of columns has an invalid key"
+                        "error": "the option of columns has an invalid key or the query type is wrong"
                     }
                 });
             })
