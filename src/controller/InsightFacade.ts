@@ -120,6 +120,7 @@ export default class InsightFacade implements IInsightFacade {
                                             buildingNameList.push(buildingShortName);
                                         }
                                     }
+                                    //buildingNameList.push("index.html");
                                     return buildingNameList;
                                 })
                                 processList.push(building_promise);
@@ -170,10 +171,10 @@ export default class InsightFacade implements IInsightFacade {
                                             roomList.push(room);
 
                                         }
-                                        /*if (roomList.length > 0) {   // The api is not stable // comment out this for stable test but not for real autotest
+                                        if (roomList.length > 0) {   // The api is not stable // comment out this for stable test but not for real autotest
                                             return that.getLatLon(roomList[0].rooms_url, roomList).then(function (roomList: any) {
                                                 return roomList;});
-                                        }*/
+                                        }
                                     }
                                     return roomList;
                                 })
@@ -235,7 +236,7 @@ export default class InsightFacade implements IInsightFacade {
 
             }
 
-            if (id === "courses") {
+             else if (id === "courses") {
 
                 p.then(function (zip: any) {
                     let processList = <any>[];
