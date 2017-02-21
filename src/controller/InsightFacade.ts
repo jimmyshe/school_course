@@ -456,11 +456,11 @@ export default class InsightFacade implements IInsightFacade {
 
                         if (section.course_section === "overall") {
 
-                            section.course_year = 1900;
+                            section.courses_year = 1900;
 
                         } else {
 
-                            section.course_year = infoList[i].Year;
+                            section.courses_year = infoList[i].Year;
                         }
 
                         this.courseInformation.push(section);
