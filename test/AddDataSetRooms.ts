@@ -45,11 +45,6 @@ describe("addDataSet_rooms", function () {
 
 
     it("test1", function () {
-        try {
-            fs.unlinkSync("./data/rooms.json")
-        }catch (e){
-            Log.info("It is ok, the file does not exist.")
-        }
         insight = new Insight;
         return insight.addDataset('rooms',roomContent)
             .then((response:InsightResponse)=>{
@@ -63,7 +58,7 @@ describe("addDataSet_rooms", function () {
 
 
 
-    it("test2", function () {
+    /*it("test2", function () {
         insight = new Insight;
         return insight.addDataset('rooms',roomContent)
             .then((response:InsightResponse)=>{
@@ -73,5 +68,18 @@ describe("addDataSet_rooms", function () {
             .catch((err)=>{
                 expect.fail();
             })
-    });
+    });*/
+
+    /*it("test3", function () {
+        insight = new Insight;
+        return insight.removeDataset('courses')
+            .then((response:InsightResponse)=>{
+                sanityCheck(response);
+                expect(response.code).equal(404);
+            })
+            .catch((err)=>{
+                expect.fail();
+            })
+    });*/
+
 });

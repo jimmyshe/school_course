@@ -50,11 +50,7 @@ describe("addDataSet", function () {
     // });
 
     it("test1", function () {
-        try {
-            fs.unlinkSync("./data/courses.json")
-        }catch (e){
-            Log.info("It is ok, the file does not exist.")
-        }
+
         insight = new Insight;
         return insight.addDataset('courses',courseContent)
             .then((response:InsightResponse)=>{
@@ -84,6 +80,7 @@ describe("addDataSet", function () {
             .then((response:InsightResponse)=>{
                 sanityCheck(response);
                 expect.fail();
+                expect(response.code).equal(201);
             })
             .catch((err)=>{
                 expect(err.code).equal(400);
@@ -95,7 +92,7 @@ describe("addDataSet", function () {
 
 
 
-    it("test2", function () {
+    /*it("test2", function () {
         return insight.removeDataset('courses')
             .then((response:InsightResponse)=>{
                 sanityCheck(response);
@@ -103,7 +100,7 @@ describe("addDataSet", function () {
             .catch((err)=>{
                 expect.fail();
             })
-    });
+    });*/
     
     it("test3", function () {
         return insight.addDataset('courses',voidContent) //invalid content
@@ -140,8 +137,4 @@ describe("addDataSet", function () {
 
             })
     });
-
-
-
-
 });

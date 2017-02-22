@@ -49,6 +49,7 @@ describe("performQuery_3", function () {
         })
             .then((respons:InsightResponse)=>{
                 sanityCheck(respons);
+                console.log(respons.body);
                 expect(respons.body).to.deep.equal({
                     "render": "TABLE",
                     "result": [

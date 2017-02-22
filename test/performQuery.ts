@@ -8,7 +8,7 @@ import Log from "../src/Util";
 import {InsightResponse} from "../src/controller/IInsightFacade";
 
 
-describe("performQuery", function () {
+/*describe("performQuery", function () {
 
     let insight:Insight = null
 
@@ -430,4 +430,4 @@ describe("performQuery", function () {
             })
     });
 
-});
+});*/
