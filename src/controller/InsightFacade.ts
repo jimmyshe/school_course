@@ -160,7 +160,7 @@ export default class InsightFacade implements IInsightFacade {
                         let roomsInformation:any[] = [];
 
                         for (let info of informationList) {
-                            console.log(info.length);
+                            //console.log(info.length);
                             if (info.length === 74) {
                                 for (let i = 0; i < info.length; i++) {
                                     validNameList.push(info[i]);
@@ -181,7 +181,7 @@ export default class InsightFacade implements IInsightFacade {
                                 }
                             }
                         }
-                        console.log(roomsInformation.length);
+                        //console.log(roomsInformation.length);
                         //console.log(that.roomInformations.length);
                         if (roomsInformation.length != 0){
                             that.saveRamOfIdToDisk(id, roomsInformation);
@@ -243,7 +243,7 @@ export default class InsightFacade implements IInsightFacade {
                                 reject(response1);
                             }
                         }
-                        console.log(courseInformation.length);
+                        //console.log(courseInformation.length);
                         if ((courseInformation.length === 0) && !isadded) {
                             let response3: InsightResponse = {code: 400, body: {"error": "Message not provided"}};
                             reject(response3);
@@ -332,7 +332,7 @@ export default class InsightFacade implements IInsightFacade {
         //console.log(data_selected.length)
 
         let dataToSave = JSON.stringify(data_selected);
-        console.log(dataToSave);
+        //console.log(dataToSave);
 
         try {
 
@@ -481,9 +481,7 @@ export default class InsightFacade implements IInsightFacade {
                 let information =[];
                 if(typeOfQuery == "rooms"){
                     information = that.getDataById('rooms');
-                    for (let room of information){
-                        console.log(room);
-                    }
+
                 }
                 if(typeOfQuery == "courses"){
                     information = that.getDataById('courses');
