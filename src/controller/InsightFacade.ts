@@ -5,10 +5,8 @@ import {IInsightFacade, InsightResponse, QueryRequest} from "./IInsightFacade";
 import {Section} from "./CourseInformation";
 import QH from "./queryHelper";
 import Log from "../Util";
-import DH from "./datasetHelper"
 
 "use strict";
-import {cpus} from "os";
 
 let fs = require("fs");
 let JSZip = require("jszip");
@@ -478,7 +476,7 @@ export default class InsightFacade implements IInsightFacade {
                 reject(response);
             }else {
                 let selected: boolean[] = null;
-                let typeOfQuery = (response.body as any)[0];
+                let typeOfQuery = (response.body as any)["missing"][0];
 
 
                 let information =[];

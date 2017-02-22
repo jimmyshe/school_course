@@ -71,11 +71,11 @@ export default class QH {
          }
 
          if(courses_valid_counter==query.OPTIONS.COLUMNS.length) {
-             ret.body = ["courses"];
+             ret.body = {"missing":["courses"]};
          }
 
          if(room_valid_counter==query.OPTIONS.COLUMNS.length) {
-             ret.body = ["rooms"];
+             ret.body = {"missing":["rooms"]};
          }
 
 
@@ -333,7 +333,7 @@ export default class QH {
             let len = roomInformation.length;
             for (let i = 0; i < len; i++) {
                 if ((roomInformation[i] as any)[comparision_key] == null) {
-                    throw new Error('{"code":424,"body":["rooms"]}');
+                    throw new Error('{"code":424,"body":{"missing":["rooms"]}}');
                 } else {
 
                     if(!isNumber((roomInformation[i] as any)[comparision_key])){
