@@ -23,7 +23,7 @@ let deleteFolderRecursive = function(path:string) {
     }
 };
 
-describe.only("addDataSet_rooms", function () {
+describe("addDataSet_rooms", function () {
 
     let insight : Insight = null;
 

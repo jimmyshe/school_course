@@ -23,7 +23,7 @@ let deleteFolderRecursive = function(path:string) {
 };
 
 
-describe("performQuery_rooms", function () {
+describe.only("performQuery_rooms", function () {
     let insight:Insight = null;
     function sanityCheck(response: InsightResponse) {
         expect(response).to.have.property('code');
@@ -224,6 +224,60 @@ describe("performQuery_rooms", function () {
                         }
                     ]
                 })
+
+            })
+            .catch( (err:InsightResponse)=>{
+                Log.test(err.toString());
+                expect.fail();
+            })
+    });
+
+
+
+    it("test of a simple case c", function () {
+        return insight.performQuery({
+            "WHERE": {
+
+                "AND": [{
+                    "GT": {
+                        "rooms_lat": 49.2612
+                    }
+                },
+                    {
+                        "LT": {
+                            "rooms_lat": 49.26129
+                        }
+                    },
+                    {
+                        "LT": {
+                            "rooms_lon": -123.2480
+                        }
+                    },
+                    {
+                        "GT": {
+                            "rooms_lon": -123.24809
+                        }
+                    }
+                ]
+
+            },
+            "OPTIONS": {
+                "COLUMNS": [
+                    "rooms_name",
+                    "rooms_seats"
+                ],
+                "ORDER": "rooms_name",
+                "FORM": "TABLE"
+            }
+        })
+            .then((respons:InsightResponse)=>{
+                sanityCheck(respons);
+                expect(respons.body).to.deep.equal({"render":"TABLE","result":[
+                    {"rooms_name":"DMP_101","rooms_seats":40},
+                    {"rooms_name":"DMP_110","rooms_seats":120},
+                    {"rooms_name":"DMP_201","rooms_seats":40},
+                    {"rooms_name":"DMP_301","rooms_seats":80},
+                    {"rooms_name":"DMP_310","rooms_seats":160}]})
 
             })
             .catch( (err:InsightResponse)=>{

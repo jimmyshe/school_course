@@ -118,8 +118,8 @@ export default class InsightFacade implements IInsightFacade {
 
                                     let buildingShortName = fileName;
                                     let buildingFullName = roomNameNode.childNodes[1].childNodes[0].childNodes[0].value;
-                                    let buildingAddress = roomNameNode.childNodes[3].childNodes[0].childNodes[0].value.replace(/,/g,"");
-
+                                   // let buildingAddress = roomNameNode.childNodes[3].childNodes[0].childNodes[0].value.replace(/,/g,"");
+                                    let buildingAddress = roomNameNode.childNodes[3].childNodes[0].childNodes[0].value;
                                     let buildingUrl = "http://skaha.cs.ubc.ca:11316/api/v1/team13/" + buildingAddress.trim().replace(/ /g, "%20");
 
                                     if (roomListNode != null) {
