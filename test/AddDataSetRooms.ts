@@ -23,12 +23,13 @@ let deleteFolderRecursive = function(path:string) {
     }
 };
 
-describe("addDataSet_rooms", function () {
+describe.only("addDataSet_rooms", function () {
 
     let insight : Insight = null;
 
     let roomContent : string = null;
 
+    let courseContent:string = null;
 
     function sanityCheck(response: InsightResponse) {
         expect(response).to.have.property('code');
@@ -41,6 +42,7 @@ describe("addDataSet_rooms", function () {
     before(function () {
         Log.info("start add rooms");
         roomContent = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
+        courseContent = new Buffer(fs.readFileSync('./courses.zip')).toString('base64');
         insight = new Insight();
 
         deleteFolderRecursive("./data");
@@ -101,6 +103,40 @@ describe("addDataSet_rooms", function () {
         expect(fs.existsSync("./data/rooms.json")).equal(true);
     });
 
+    it("test3_1", function () {
+        insight = new Insight;
+        return insight.addDataset('courses',courseContent)
+            .then((response:InsightResponse)=>{
+                sanityCheck(response);
+                expect(response.code).equal(204);
+                expect(insight.roomsInformation.length).equal(364);
+                expect(fs.existsSync("./data/rooms.json")).equal(true);
+                expect(insight.courseInformation.length).equal(64612);
+                expect(fs.existsSync("./data/courses.json")).equal(true);
+            })
+            .catch((err)=>{
+                expect.fail();
+            })
+    });
+
+
+
+    it("test3_2", function () {
+        insight = new Insight;
+        return insight.removeDataset('courses')
+            .then((response:InsightResponse)=>{
+                sanityCheck(response);
+                expect(insight.roomsInformation.length).equal(364);
+                expect(fs.existsSync("./data/rooms.json")).equal(true);
+                expect(insight.courseInformation.length).equal(0);
+                expect(fs.existsSync("./data/courses.json")).equal(false);
+            })
+            .catch((err)=>{
+                expect.fail();
+            })
+    });
+
+
     it("test4", function () {
         insight = new Insight;
         return insight.removeDataset("rooms").then(function () {
@@ -111,4 +147,7 @@ describe("addDataSet_rooms", function () {
         })
 
     });
+
+
+
 });
