@@ -85,7 +85,7 @@ export default class QH {
 
              if(!opt_colimns.includes(order_key)) {
                  ret.code = 400;
-                 ret.body = {"error": "the option of order has an invalid key"}
+                 ret.body = {"error": "the option of order has an invalid key"};
                  return ret;
              }
          }

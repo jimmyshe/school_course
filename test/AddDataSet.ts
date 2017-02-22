@@ -8,7 +8,23 @@ import Log from "../src/Util";
 import {InsightResponse} from "../src/controller/IInsightFacade";
 import InsightFacade from "../src/controller/InsightFacade";
 
-var fs = require('fs');
+let fs = require('fs');
+
+let deleteFolderRecursive = function(path:string) {
+    if( fs.existsSync(path) ) {
+        fs.readdirSync(path).forEach(function(file:string) {
+            let curPath = path + "/" + file;
+            if(fs.statSync(curPath).isDirectory()) { // recurse
+                deleteFolderRecursive(curPath);
+            } else { // delete file
+                fs.unlinkSync(curPath);
+            }
+        });
+        fs.rmdirSync(path);
+    }
+};
+
+
 
 describe("addDataSet", function () {
 
@@ -24,6 +40,10 @@ describe("addDataSet", function () {
         expect(response.code).to.be.a('number');
     }
 
+    before(function () {
+        deleteFolderRecursive("./data");
+    })
+
     beforeEach(function () {
         Log.test('BeforeTest: ' + (<any>this).currentTest.title);
         insight = new Insight();
@@ -37,29 +57,21 @@ describe("addDataSet", function () {
         //insight = null;
     });
 
-    // it("test of test", function () {
-    //     return insight.addDataset("weqwe","wqrqw")
-    //         .then((respons:InsightResponse)=>{
-    //             sanityCheck(respons);
-    //             expect.fail();
-    //         })
-    //         .catch((err)=>{
-    //             sanityCheck(err);
-    //             expect(err.code).to.equal(400);
-    //         })
-    // });
+
+    after(function () {
+        deleteFolderRecursive("./data");
+    })
+
+
 
     it("test1", function () {
-        try {
-            fs.unlinkSync("./data/courses.json")
-        }catch (e){
-            Log.info("It is ok, the file does not exist.")
-        }
         insight = new Insight;
         return insight.addDataset('courses',courseContent)
             .then((response:InsightResponse)=>{
                 sanityCheck(response);
                 expect(response.code).equal(204);
+                expect(insight.courseInformation.length).equal(64612);
+                expect(fs.existsSync("./data/courses.json")).equal(true);
             })
             .catch((err)=>{
 
@@ -72,6 +84,9 @@ describe("addDataSet", function () {
             .then((response:InsightResponse)=>{
                 sanityCheck(response);
                 expect(response.code).equal(201);
+
+                expect(insight.courseInformation.length).equal(64612);
+                expect(fs.existsSync("./data/courses.json")).equal(true);
             })
             .catch((err)=>{
 

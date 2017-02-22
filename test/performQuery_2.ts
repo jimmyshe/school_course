@@ -7,7 +7,23 @@ import Log from "../src/Util";
 import {InsightResponse} from "../src/controller/IInsightFacade";
 
 let fs = require('fs');
-describe("performQuery_2", function () {
+
+let deleteFolderRecursive = function(path:string) {
+    if( fs.existsSync(path) ) {
+        fs.readdirSync(path).forEach(function(file:string) {
+            let curPath = path + "/" + file;
+            if(fs.statSync(curPath).isDirectory()) { // recurse
+                deleteFolderRecursive(curPath);
+            } else { // delete file
+                fs.unlinkSync(curPath);
+            }
+        });
+        fs.rmdirSync(path);
+    }
+};
+
+
+describe("performQuery_courses", function () {
 
     let insight:Insight = null;
     let testQuery_simple = {
@@ -34,6 +50,14 @@ describe("performQuery_2", function () {
         expect(response).to.have.property('body');
         expect(response.code).to.be.a('number');
     }
+
+    before(function () {
+        deleteFolderRecursive("./data");
+    });
+
+    after(function () {
+        deleteFolderRecursive("./data");
+    })
 
 
     beforeEach(function () {

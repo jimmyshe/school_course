@@ -7,7 +7,23 @@ import Log from "../src/Util";
 import {InsightResponse} from "../src/controller/IInsightFacade";
 
 let fs = require('fs');
-describe("performQuery_3", function () {
+
+let deleteFolderRecursive = function(path:string) {
+    if( fs.existsSync(path) ) {
+        fs.readdirSync(path).forEach(function(file:string) {
+            let curPath = path + "/" + file;
+            if(fs.statSync(curPath).isDirectory()) { // recurse
+                deleteFolderRecursive(curPath);
+            } else { // delete file
+                fs.unlinkSync(curPath);
+            }
+        });
+        fs.rmdirSync(path);
+    }
+};
+
+
+describe("performQuery_rooms", function () {
     let insight:Insight = null;
     function sanityCheck(response: InsightResponse) {
         expect(response).to.have.property('code');
@@ -15,9 +31,14 @@ describe("performQuery_3", function () {
         expect(response.code).to.be.a('number');
     }
 
+
+
+
+
+
     before(function () {
         Log.test('test Query for rooms');
-
+        deleteFolderRecursive("./data");
         insight = new Insight();
         // make sure the cache file is there
         let content = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
@@ -28,7 +49,7 @@ describe("performQuery_3", function () {
 
     after(function () {
         Log.test('end test Query for rooms ');
-        insight = null;
+        deleteFolderRecursive("./data");
     })
 
 
