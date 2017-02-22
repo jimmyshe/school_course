@@ -58,7 +58,7 @@ describe("addDataSet_rooms", function () {
 
 
 
-    /*it("test2", function () {
+    it("test2", function () {
         insight = new Insight;
         return insight.addDataset('rooms',roomContent)
             .then((response:InsightResponse)=>{
@@ -68,9 +68,9 @@ describe("addDataSet_rooms", function () {
             .catch((err)=>{
                 expect.fail();
             })
-    });*/
+    });
 
-    /*it("test3", function () {
+    it("test3", function () {
         insight = new Insight;
         return insight.removeDataset('courses')
             .then((response:InsightResponse)=>{
@@ -80,6 +80,6 @@ describe("addDataSet_rooms", function () {
             .catch((err)=>{
                 expect.fail();
             })
-    });*/
+    });
 
 });

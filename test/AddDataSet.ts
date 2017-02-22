@@ -79,7 +79,6 @@ describe("addDataSet", function () {
         return insight.addDataset('cous.zip',"") //invalid ID
             .then((response:InsightResponse)=>{
                 sanityCheck(response);
-                expect.fail();
                 expect(response.code).equal(201);
             })
             .catch((err)=>{
@@ -92,15 +91,16 @@ describe("addDataSet", function () {
 
 
 
-    /*it("test2", function () {
+    it("test2", function () {
         return insight.removeDataset('courses')
             .then((response:InsightResponse)=>{
                 sanityCheck(response);
+                expect(response.code).equal(204);
             })
             .catch((err)=>{
                 expect.fail();
             })
-    });*/
+    });
     
     it("test3", function () {
         return insight.addDataset('courses',voidContent) //invalid content
@@ -138,3 +138,4 @@ describe("addDataSet", function () {
             })
     });
 });
+

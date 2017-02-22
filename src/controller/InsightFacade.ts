@@ -160,6 +160,7 @@ export default class InsightFacade implements IInsightFacade {
                         let roomsInformation:any[] = [];
 
                         for (let info of informationList) {
+                            console.log(info.length);
                             if (info.length === 74) {
                                 for (let i = 0; i < info.length; i++) {
                                     validNameList.push(info[i]);
@@ -431,28 +432,28 @@ export default class InsightFacade implements IInsightFacade {
 
     getDataById(id:string) {
 
-        let infoArray:any[] = [];
+
 
         let filenames = fs.readdirSync("./data/");
 
         if (id === 'courses') {
 
             for (let i = 0; i < filenames.length; i++) {
-                let file_str = fs.readFileSync("./data/" + filenames[i], 'utf-8');
-                let file = JSON.parse(file_str);
                 if (filenames[i] === "courses.json") {
-                    infoArray = file;
+                    let file_str = fs.readFileSync("./data/" + filenames[i], 'utf-8');
+                    let file = JSON.parse(file_str);
+                    return file;
                 }
-                return infoArray;
+                //return infoArray;
             }
         } else if (id === 'rooms') {
             for (let i = 0; i < filenames.length; i++) {
-                let file_str = fs.readFileSync("./data/" + filenames[i], 'utf-8');
-                let file = JSON.parse(file_str);
                 if (filenames[i] === "rooms.json") {
-                    infoArray = file;
+                    let file_str = fs.readFileSync("./data/" + filenames[i], 'utf-8');
+                    let file = JSON.parse(file_str);
+                    return file;
                 }
-                return infoArray;
+                //return infoArray;
             }
         }
 
