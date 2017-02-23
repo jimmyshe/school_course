@@ -237,4 +237,122 @@ describe("performQuery_rooms", function () {
             })
     });
 
+    it("test of bounding box", function () {
+        return insight.performQuery({
+            "WHERE": {
+
+                "AND": [{
+                    "GT": {
+                        "rooms_lat": 49.2612
+                    }
+                },
+                    {
+                        "LT": {
+                            "rooms_lat": 49.26129
+                        }
+                    },
+                    {
+                        "LT": {
+                            "rooms_lon": -123.2480
+                        }
+                    },
+                    {
+                        "GT": {
+                            "rooms_lon": -123.24809
+                        }
+                    }
+                ]
+
+            },
+            "OPTIONS": {
+                "COLUMNS": [
+                    "rooms_name"
+                ],
+                "ORDER": "rooms_name",
+                "FORM": "TABLE"
+            }
+        })
+            .then((respons:InsightResponse)=>{
+                sanityCheck(respons);
+                expect(respons.body).to.deep.equal({
+                    "render": "TABLE",
+                    "result": [
+                        {
+                            "rooms_name": "DMP_101"
+                        },
+                        {
+                            "rooms_name": "DMP_110"
+                        },
+                        {
+                            "rooms_name": "DMP_201"
+                        },
+                        {
+                            "rooms_name": "DMP_301"
+                        },
+                        {
+                            "rooms_name": "DMP_310"
+                        }
+                    ]
+                })
+
+            })
+            .catch( (err:InsightResponse)=>{
+                Log.test('Error: query request not success ');
+                expect.fail();
+            })
+    });
+
+    it("test of room furniture", function () {
+        return insight.performQuery({
+            "WHERE": {
+                "IS": {
+                    "rooms_name": "ALRD_*"
+                }
+            },
+            "OPTIONS": {
+                "COLUMNS": [
+                    "rooms_name",
+                    "rooms_furniture"
+                ],
+                "ORDER": "rooms_name",
+                "FORM": "TABLE"
+            }
+        })
+            .then((respons:InsightResponse)=>{
+                sanityCheck(respons);
+                expect(respons.body).to.deep.equal({
+                    "render": "TABLE",
+                    "result": [
+                        {
+                            "rooms_name": "ALRD_105",
+                            "rooms_furniture" : "Classroom-Fixed Tables/Movable Chairs"
+                        },
+                        {
+                            "rooms_name": "ALRD_112",
+                            "rooms_furniture" : "Classroom-Movable Tables & Chairs"
+                        },
+                        {
+                            "rooms_name": "ALRD_113",
+                            "rooms_furniture" : "Classroom-Movable Tables & Chairs"
+                        },
+                        {
+                            "rooms_name": "ALRD_121",
+                            "rooms_furniture" : "Classroom-Fixed Tables/Movable Chairs"
+                        },
+                        {
+                            "rooms_name": "ALRD_B101",
+                            "rooms_furniture" : "Classroom-Fixed Tables/Movable Chairs"
+                        }
+                    ]
+                })
+
+            })
+            .catch( (err:InsightResponse)=>{
+                Log.test('Error: query request not success ');
+                expect.fail();
+            })
+    });
+
+
+
 });

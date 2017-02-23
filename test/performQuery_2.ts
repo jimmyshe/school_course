@@ -924,32 +924,32 @@ describe("performQuery_courses", function () {
                                 {
                                     "courses_instructor": "woodham, robert",
                                     "courses_dept": "cpsc",
-                                    "courses_year": "2009"
+                                    "courses_year": 2009
                                 },
                                 {
                                     "courses_instructor": "woodham, robert",
                                     "courses_dept": "cpsc",
-                                    "courses_year": "2014"
+                                    "courses_year": 2014
                                 },
                                 {
                                     "courses_instructor": "woodham, robert",
                                     "courses_dept": "cpsc",
-                                    "courses_year": "2011"
+                                    "courses_year": 2011
                                 },
                                 {
                                     "courses_instructor": "woodham, robert",
                                     "courses_dept": "cpsc",
-                                    "courses_year": "2010"
+                                    "courses_year": 2010
                                 },
                                 {
                                     "courses_instructor": "woodham, robert",
                                     "courses_dept": "cpsc",
-                                    "courses_year": "2012"
+                                    "courses_year": 2012
                                 },
                                 {
                                     "courses_instructor": "woodham, robert",
                                     "courses_dept": "cpsc",
-                                    "courses_year": "2007"
+                                    "courses_year": 2007
                                 }
                             ]
                         }

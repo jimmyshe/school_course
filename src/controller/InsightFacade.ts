@@ -142,7 +142,7 @@ export default class InsightFacade implements IInsightFacade {
                                                     room.rooms_number = parse5.serialize(singleRoomInformation.childNodes[1].childNodes[1]);
                                                     room.rooms_name = buildingShortName + "_" + room.rooms_number;
                                                     room.rooms_seats = parseInt(parse5.serialize(singleRoomInformation.childNodes[3]));
-                                                    room.rooms_furniture = parse5.serialize(singleRoomInformation.childNodes[5]).trim();
+                                                    room.rooms_furniture = parse5.serialize(singleRoomInformation.childNodes[5]).trim().replace(/&amp;/g, "&");
                                                     room.rooms_type = parse5.serialize(singleRoomInformation.childNodes[7]).trim();
 
                                                     let href = singleRoomInformation.childNodes[1].childNodes[1];
@@ -485,7 +485,7 @@ export default class InsightFacade implements IInsightFacade {
 
                         } else {
 
-                            section.courses_year = infoList[i].Year;
+                            section.courses_year = Number(infoList[i].Year);
                         }
 
                         this.courseInformation.push(section);
