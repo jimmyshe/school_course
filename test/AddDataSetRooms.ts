@@ -78,6 +78,7 @@ describe("addDataSet_rooms", function () {
                 expect(fs.existsSync("./data/rooms.json")).equal(true);
             })
             .catch((err)=>{
+            console.log(err);
                 expect.fail();
             })
     });

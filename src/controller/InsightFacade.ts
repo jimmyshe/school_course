@@ -96,6 +96,7 @@ export default class InsightFacade implements IInsightFacade {
 
                                         let buildingHtml = parse5.parse(content);
                                         let buildingList = that.searchNode(buildingHtml, 'class', 'views-table cols-5 table');
+                                        //console.log(buildingList);
 
                                         for (let i = 0; i < buildingList.childNodes[3].childNodes.length; i++) {
 
@@ -106,11 +107,12 @@ export default class InsightFacade implements IInsightFacade {
                                                 buildingNameList.push(buildingShortName);
                                             }
                                         }
+
                                         return buildingNameList;
+
                                     })
                                     processList.push(building_promise);
-                                }
-                                else {
+                                } else {
                                     let room_promise = file.async("string").then(function (content: any) {
 
                                         let roomList: any[] = [];
@@ -121,49 +123,59 @@ export default class InsightFacade implements IInsightFacade {
                                         let roomListNode = that.searchNode(roomHtml, 'class', 'views-table cols-5 table');
 
                                         let buildingShortName = fileName;
-                                        let buildingFullName = roomNameNode.childNodes[1].childNodes[0].childNodes[0].value;
-                                        let buildingAddress = roomNameNode.childNodes[3].childNodes[0].childNodes[0].value.replace(/,/g, "");
 
-                                        let buildingUrl = "http://skaha.cs.ubc.ca:11316/api/v1/team13/" + buildingAddress.trim().replace(/ /g, "%20");
+                                        let buildingFullName = parse5.serialize(roomNameNode.childNodes[1].childNodes[0]);
+                                        let buildingAddress = parse5.serialize(roomNameNode.childNodes[3].childNodes[0]);
+                                        let buildingUrl = "http://skaha.cs.ubc.ca:11316/api/v1/team13/" + buildingAddress.trim().replace(/ /g,"%20");
 
                                         if (roomListNode != null) {
 
-                                            let roomsArray = roomListNode.childNodes[3].childNodes;
-                                            //console.log(roomsArray.length);
-                                            for (let i = 1; i < roomsArray.length; i += 2) {
+                                            if (roomListNode.childNodes[3] != null) {
 
-                                                let room: any = {};
+                                                let roomsArray = roomListNode.childNodes[3].childNodes;
+                                                    //console.log(roomsArray.length);
+                                                for (let i = 1; i < roomsArray.length; i += 2) {
 
-                                                let singleRoomInformation = roomsArray[i];
-                                                room.rooms_number = parse5.serialize(singleRoomInformation.childNodes[1].childNodes[1]);
-                                                room.rooms_name = buildingShortName + "_" + room.rooms_number;
-                                                room.rooms_seats = parseInt(parse5.serialize(singleRoomInformation.childNodes[3]));
-                                                room.rooms_furniture = parse5.serialize(singleRoomInformation.childNodes[5]).trim();
-                                                room.rooms_type = parse5.serialize(singleRoomInformation.childNodes[7]).trim();
+                                                    let room: any = {};
 
-                                                let href = singleRoomInformation.childNodes[1].childNodes[1];
-                                                for (let attr of href.attrs) {
-                                                    if (attr.name === 'href') {
-                                                        room.rooms_href = attr.value;
+                                                    let singleRoomInformation = roomsArray[i];
+                                                    room.rooms_number = parse5.serialize(singleRoomInformation.childNodes[1].childNodes[1]);
+                                                    room.rooms_name = buildingShortName + "_" + room.rooms_number;
+                                                    room.rooms_seats = parseInt(parse5.serialize(singleRoomInformation.childNodes[3]));
+                                                    room.rooms_furniture = parse5.serialize(singleRoomInformation.childNodes[5]).trim();
+                                                    room.rooms_type = parse5.serialize(singleRoomInformation.childNodes[7]).trim();
+
+                                                    let href = singleRoomInformation.childNodes[1].childNodes[1];
+                                                    for (let attr of href.attrs) {
+                                                        if (attr.name === 'href') {
+                                                            room.rooms_href = attr.value;
+                                                        }
                                                     }
+
+                                                    room.rooms_fullname = buildingFullName;
+                                                    room.rooms_shortname = buildingShortName;
+                                                    room.rooms_address = buildingAddress;
+                                                    room.rooms_url = buildingUrl;
+
+                                                    roomList.push(room);
+
                                                 }
-
-                                                room.rooms_fullname = buildingFullName;
-                                                room.rooms_shortname = buildingShortName;
-                                                room.rooms_address = buildingAddress;
-                                                room.rooms_url = buildingUrl;
-
-                                                roomList.push(room);
-
+                                                if (roomList.length > 0) {   // The api is not stable // comment out this for stable test but not for real autotest
+                                                    return that.getLatLon(roomList[0].rooms_url, roomList).then(function (roomList: any) {
+                                                     return roomList;
+                                                    });
+                                                }
                                             }
-                                            if (roomList.length > 0) {   // The api is not stable // comment out this for stable test but not for real autotest
-                                                return that.getLatLon(roomList[0].rooms_url, roomList).then(function (roomList: any) {
-                                                    return roomList;
-                                                });
+                                            //console.log(roomList.length);
+                                            for (let room of roomList) {
+                                                console.log(room);
                                             }
+                                            return roomList;
                                         }
-                                        return roomList;
-                                    })
+
+                                    }).catch (function (err:any) {
+                                        Log.trace(err.message);
+                                    });
                                     processList.push(room_promise);
                                 }
                             }
@@ -172,20 +184,28 @@ export default class InsightFacade implements IInsightFacade {
                         Promise.all(processList).then(function (informationList: any) {
 
 
+
                             let temp_roomsinfo = that.roomsInformation;
                             that.roomsInformation = [];
 
                             let validNameList: any[] = [];
                             for (let info of informationList) {
-                                if (info.length === 74) {
+                                if (typeof info != 'undefined') {
+                                   // console.log(info.length);
+                                }
+                                //console.log(info);
+                            }
+                            for (let info of informationList) {
+                                if (typeof info != 'undefined' && info.length === 74) {
                                     for (let i = 0; i < info.length; i++) {
                                         validNameList.push(info[i]);
                                     }
                                 }
                             }
+                            console.log(validNameList.length);
 
                             for (let info of informationList) {
-                                if (info.length != 0 && info.length != 74) {
+                                if (typeof info != 'undefined' && info.length != 0 && info.length != 74) {
                                     //console.log(info.length);
                                     for (let j = 0; j < info.length; j++) {
                                         //console.log(info[j]);
@@ -198,7 +218,7 @@ export default class InsightFacade implements IInsightFacade {
                                     }
                                 }
                             }
-                            console.log(that.roomsInformation.length);
+                            console.log(informationList.length);
                             let response2: InsightResponse = {code: 204, body: {}};
                             if (that.roomsInformation.length == 0) {
                                 response2.code = 400;
@@ -217,7 +237,7 @@ export default class InsightFacade implements IInsightFacade {
 
                         }).catch(function (e: any) {
                             Log.error("con not unzip")
-                            let response = {code: 400, body: {"error": 'Message not provided'}};
+                            let response = {code: 400, body: {"error": 'Message not provided1'}};
                             reject(response);
                         });
                     }).catch(function (e: any) {
