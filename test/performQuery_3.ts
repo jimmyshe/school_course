@@ -38,7 +38,7 @@ describe("performQuery_rooms", function () {
 
     before(function () {
         Log.test('test Query for rooms');
-        deleteFolderRecursive("./data");
+        //deleteFolderRecursive("./data");
         insight = new Insight();
         // make sure the cache file is there
         let content = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
@@ -49,7 +49,7 @@ describe("performQuery_rooms", function () {
 
     after(function () {
         Log.test('end test Query for rooms ');
-        deleteFolderRecursive("./data");
+        //deleteFolderRecursive("./data");
     })
 
 

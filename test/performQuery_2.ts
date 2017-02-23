@@ -51,13 +51,13 @@ describe("performQuery_courses", function () {
         expect(response.code).to.be.a('number');
     }
 
-    before(function () {
-        deleteFolderRecursive("./data");
+    /*before(function () {
+       // deleteFolderRecursive("./data");
     });
 
     after(function () {
-        deleteFolderRecursive("./data");
-    })
+        //deleteFolderRecursive("./data");
+    })*/
 
 
     beforeEach(function () {

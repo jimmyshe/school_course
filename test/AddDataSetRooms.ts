@@ -29,6 +29,8 @@ describe("addDataSet_rooms", function () {
 
     let roomContent : string = null;
 
+    let courseContent: string = null;
+
 
     function sanityCheck(response: InsightResponse) {
         expect(response).to.have.property('code');
@@ -39,11 +41,8 @@ describe("addDataSet_rooms", function () {
 
 
     before(function () {
-        Log.info("start add rooms");
-        roomContent = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
-        insight = new Insight();
 
-        deleteFolderRecursive("./data");
+        //deleteFolderRecursive("./data");
 
 
         Log.info("start add rooms")
@@ -52,6 +51,10 @@ describe("addDataSet_rooms", function () {
 
     beforeEach(function () {
         Log.test('BeforeTest: ' + (<any>this).currentTest.title);
+        Log.info("start add rooms");
+        roomContent = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
+        courseContent = new Buffer(fs.readFileSync('./courses.zip')).toString('base64');
+        insight = new Insight();
 
     });
 
@@ -61,7 +64,7 @@ describe("addDataSet_rooms", function () {
     });
 
     after(function () {
-        deleteFolderRecursive("./data");
+        //deleteFolderRecursive("./data");
 
     })
 
@@ -85,6 +88,7 @@ describe("addDataSet_rooms", function () {
         insight = new Insight;
         return insight.addDataset('rooms',roomContent)
             .then((response:InsightResponse)=>{
+            console.log(insight.roomsInformation.length);
                 sanityCheck(response);
                 expect(response.code).equal(201);
                 expect(insight.roomsInformation.length).equal(364);
@@ -110,5 +114,20 @@ describe("addDataSet_rooms", function () {
             expect.fail();
         })
 
+    });
+
+    it("test1", function () {
+        insight = new Insight;
+        return insight.addDataset('courses',courseContent)
+            .then((response:InsightResponse)=>{
+                sanityCheck(response);
+                expect(response.code).equal(201);
+                expect(insight.courseInformation.length).equal(64612);
+                expect(fs.existsSync("./data/courses.json")).equal(true);
+            })
+            .catch((err)=>{
+
+                expect.fail();
+            })
     });
 });
