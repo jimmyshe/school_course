@@ -20,7 +20,7 @@ let deleteFolderRecursive = function(path:string) {
                 fs.unlinkSync(curPath);
             }
         });
-        fs.rmdirSync(path);
+        fs.mkdir(path);
     }
 };
 
@@ -63,6 +63,11 @@ describe("addDataSet", function () {
 
     after(function () {
         //deleteFolderRecursive("./data");
+        try {
+            fs.unlinkSync('./data/courses.json')
+        } catch(err) {
+
+        }
     })
 
 

@@ -513,91 +513,87 @@ export default class InsightFacade implements IInsightFacade {
 
 
                 let information =[];
-                if(typeOfQuery == "rooms"&&fs.existsSync("./data/rooms.json")){
-
+                if(typeOfQuery == "rooms" && fs.existsSync('./data/rooms.json')){
                     information = this.roomsInformation;
-                }
-                if(typeOfQuery == "courses"&&fs.existsSync("./data/courses.json")){
+                } else if(typeOfQuery == "courses" && fs.existsSync('./data/courses.json')){
                     information = this.courseInformation;
                 }
-
-                if(information.length==0){
+                console.log(information.length);
+                if (information.length === 0) {
                     response.code = 424;
+                    response.body = {'missing':[typeOfQuery]};
                     reject(response);
-                    return;
-                }
 
+                } else {
 
-                if(typeOfQuery == "courses") {
-                    try {
-                        selected = QH.filterOut_courses(information, query["WHERE"]);
-                    }
-                    catch (e) {
+                    if (typeOfQuery == "courses") {
                         try {
-                            response = JSON.parse(e.message);
-                        } catch (e) {
-                            Log.error("Should not be here, internal error");
+                            selected = QH.filterOut_courses(information, query["WHERE"]);
                         }
-                        reject(response);
+                        catch (e) {
+                            try {
+                                response = JSON.parse(e.message);
+                            } catch (e) {
+                                Log.error("Should not be here, internal error");
+                            }
+                            reject(response);
+                        }
                     }
-                }
 
-                if(typeOfQuery == "rooms"){
-                    try {
-                        selected = QH.filterOut_rooms(information, query["WHERE"]);
-                    }
-                    catch (e) {
+                    if (typeOfQuery == "rooms") {
                         try {
-                            response = JSON.parse(e.message);
-                        } catch (e) {
-                            Log.error("Should not be here, internal error");
+                            selected = QH.filterOut_rooms(information, query["WHERE"]);
                         }
-                        reject(response);
-                    }
-                }
-
-
-
-
-
-                let body_pre = [];
-                let len = information.length;
-                for(let i = 0;i<len;i++){
-                    if(selected[i]){
-                        body_pre.push(information[i]);
-                    }
-                }
-
-
-                //sort the output
-                len = body_pre.length;
-                //These are all sections selected
-                let order_key=query.OPTIONS.ORDER;  // sort the body_pre if it is necessary
-                if (order_key!=null){
-                    body_pre.sort((n1,n2)=>{
-
-                        if((n1 as any)[order_key] > (n2 as any)[order_key]){
-                            return 1;
-                        }else if((n1 as any)[order_key] == (n2 as any)[order_key]){
-                            return 0;
-                        }else {
-                            return -1;
+                        catch (e) {
+                            try {
+                                response = JSON.parse(e.message);
+                            } catch (e) {
+                                Log.error("Should not be here, internal error");
+                            }
+                            reject(response);
                         }
-                    });
-                }
-
-
-                let results:{}[]=[];
-                for(let i =0;i<body_pre.length;i++){
-                    let element:any={};
-                    for(let j=query.OPTIONS.COLUMNS.length-1;j>=0;j--){
-                        element[query.OPTIONS.COLUMNS[j]]=(body_pre[i] as any)[query.OPTIONS.COLUMNS[j]];
                     }
-                    results.push(element);
+
+
+                    let body_pre = [];
+                    let len = information.length;
+                    for (let i = 0; i < len; i++) {
+                        if (selected[i]) {
+                            body_pre.push(information[i]);
+                        }
+                    }
+
+
+                    //sort the output
+                    len = body_pre.length;
+                    //These are all sections selected
+                    let order_key = query.OPTIONS.ORDER;  // sort the body_pre if it is necessary
+                    if (order_key != null) {
+                        body_pre.sort((n1, n2) => {
+
+                            if ((n1 as any)[order_key] > (n2 as any)[order_key]) {
+                                return 1;
+                            } else if ((n1 as any)[order_key] == (n2 as any)[order_key]) {
+                                return 0;
+                            } else {
+                                return -1;
+                            }
+                        });
+                    }
+
+
+                    let results: {}[] = [];
+                    for (let i = 0; i < body_pre.length; i++) {
+                        let element: any = {};
+                        for (let j = query.OPTIONS.COLUMNS.length - 1; j >= 0; j--) {
+                            element[query.OPTIONS.COLUMNS[j]] = (body_pre[i] as any)[query.OPTIONS.COLUMNS[j]];
+                        }
+                        results.push(element);
+                    }
+                    response.code = 200;
+                    response.body = {'render': query.OPTIONS.FORM, 'result': results}
+                    fulfill(response);
                 }
-                response.code = 200;
-                response.body = {'render':query.OPTIONS.FORM,'result':results}
-                fulfill(response);
             }
         })
     }

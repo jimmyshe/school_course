@@ -18,7 +18,7 @@ let deleteFolderRecursive = function(path:string) {
                 fs.unlinkSync(curPath);
             }
         });
-        fs.rmdirSync(path);
+        fs.mkdir(path);
     }
 };
 
@@ -50,6 +50,11 @@ describe("performQuery_rooms", function () {
     after(function () {
         Log.test('end test Query for rooms ');
         //deleteFolderRecursive("./data");
+        try {
+            fs.unlinkSync('./data/rooms.json');
+        } catch (err) {
+
+        }
     })
 
 
