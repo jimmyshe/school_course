@@ -116,18 +116,4 @@ describe("addDataSet_rooms", function () {
 
     });
 
-    it("test1", function () {
-        insight = new Insight;
-        return insight.addDataset('courses',courseContent)
-            .then((response:InsightResponse)=>{
-                sanityCheck(response);
-                expect(response.code).equal(201);
-                expect(insight.courseInformation.length).equal(64612);
-                expect(fs.existsSync("./data/courses.json")).equal(true);
-            })
-            .catch((err)=>{
-
-                expect.fail();
-            })
-    });
 });

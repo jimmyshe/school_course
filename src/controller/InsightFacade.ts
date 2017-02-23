@@ -210,7 +210,7 @@ export default class InsightFacade implements IInsightFacade {
 
                             if (isadded) {
                                 response2.code = 201;
-                                fs.unlinkSync("./data/rooms.json")
+                                //fs.unlinkSync("./data/rooms.json")
                             }
                             that.saveRamOfIdToDisk(id);
                             fulfill(response2);
@@ -270,7 +270,7 @@ export default class InsightFacade implements IInsightFacade {
 
                             if (isadded) {
                                 response2.code = 201;
-                                fs.unlinkSync("./data/courses.json")
+                                //fs.unlinkSync("./data/courses.json")
                             }
                             that.saveRamOfIdToDisk(id);
                             fulfill(response2);
@@ -381,8 +381,6 @@ export default class InsightFacade implements IInsightFacade {
         if(data_selected.length==0){
             throw new Error("Error:no data to save");
         }
-
-
 
         let dataToSave = JSON.stringify(data_selected);
 

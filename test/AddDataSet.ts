@@ -34,6 +34,8 @@ describe("addDataSet", function () {
     
     let voidContent : string = null;
 
+    let roomContent : string = null;
+
     function sanityCheck(response: InsightResponse) {
         expect(response).to.have.property('code');
         expect(response).to.have.property('body');
@@ -48,6 +50,7 @@ describe("addDataSet", function () {
         Log.test('BeforeTest: ' + (<any>this).currentTest.title);
         insight = new Insight();
         courseContent = new Buffer(fs.readFileSync('./courses.zip')).toString('base64');
+        roomContent = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
         voidContent = new Buffer(fs.readFileSync('./no_real_data.zip')).toString('base64');
         // console.log(courseContent);
     });
@@ -155,8 +158,4 @@ describe("addDataSet", function () {
 
             })
     });
-
-
-
-
 });
