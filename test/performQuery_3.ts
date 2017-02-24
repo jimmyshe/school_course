@@ -353,6 +353,43 @@ describe("performQuery_rooms", function () {
             })
     });
 
+    it("test of latlon", function () {
+        return insight.performQuery({
+            "WHERE": {
+                "IS": {
+                    "rooms_name": "CIRS_*"
+                }
+            },
+            "OPTIONS": {
+                "COLUMNS": [
+                    "rooms_name",
+                    "rooms_lat"
+                ],
+                "ORDER": "rooms_name",
+                "FORM": "TABLE"
+            }
+        })
+            .then((respons:InsightResponse)=>{
+                sanityCheck(respons);
+                console.log(respons.body);
+                expect(respons.body).to.deep.equal({
+                    "render": "TABLE",
+                    "result": [
+                        {
+                            "rooms_name": "CIRS_1250",
+                            "rooms_lat": 49.26207
+                        }
+                    ]
+                })
+
+            })
+            .catch( (err:InsightResponse)=>{
+                Log.test('Error: query request not success ');
+                expect.fail();
+            })
+    });
+
+
 
 
 });
