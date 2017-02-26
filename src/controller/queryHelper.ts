@@ -71,11 +71,11 @@ export default class QH {
          }
 
          if(courses_valid_counter==query.OPTIONS.COLUMNS.length) {
-             ret.body = ["courses"];
+             ret.body = {"missing":["courses"]};
          }
 
          if(room_valid_counter==query.OPTIONS.COLUMNS.length) {
-             ret.body = ["rooms"];
+             ret.body = {"missing":["rooms"]};
          }
 
 
@@ -85,7 +85,7 @@ export default class QH {
 
              if(!opt_colimns.includes(order_key)) {
                  ret.code = 400;
-                 ret.body = {"error": "the option of order has an invalid key"}
+                 ret.body = {"error": "the option of order has an invalid key"};
                  return ret;
              }
          }
@@ -99,7 +99,7 @@ export default class QH {
     public static isValidDateKeyInCourses(key:any):boolean{
 
 
-         let valid_keys = ["courses_id","courses_avg","courses_instructor","courses_dept","courses_title","courses_pass","courses_fail","courses_audit","courses_uuid", "courses_year"];
+         let valid_keys = ["courses_year","courses_id","courses_avg","courses_instructor","courses_dept","courses_title","courses_pass","courses_fail","courses_audit","courses_uuid"]
 
 
          for(let valid_key of valid_keys){
@@ -123,7 +123,7 @@ export default class QH {
         }
         return false;
     }
-
+    
     
     
     // public static filterOut_courses(courseInformation:Section[],
@@ -333,7 +333,7 @@ export default class QH {
             let len = roomInformation.length;
             for (let i = 0; i < len; i++) {
                 if ((roomInformation[i] as any)[comparision_key] == null) {
-                    throw new Error('{"code":424,"body":["rooms"]}');
+                    throw new Error('{"code":424,"body":{"missing":["rooms"]}}');
                 } else {
 
                     if(!isNumber((roomInformation[i] as any)[comparision_key])){

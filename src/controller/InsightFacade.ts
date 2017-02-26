@@ -5,10 +5,8 @@ import {IInsightFacade, InsightResponse, QueryRequest} from "./IInsightFacade";
 import {Section} from "./CourseInformation";
 import QH from "./queryHelper";
 import Log from "../Util";
-import DH from "./datasetHelper"
 
 "use strict";
-import {cpus} from "os";
 
 let fs = require("fs");
 let JSZip = require("jszip");
@@ -21,8 +19,7 @@ export default class InsightFacade implements IInsightFacade {
 
     courseInformation: any[] = [] ;
 
-    roomsInformations: any[] = [];
-
+    roomsInformation: any[] = [];
 
     constructor() {
 
@@ -37,7 +34,7 @@ export default class InsightFacade implements IInsightFacade {
                     this.courseInformation = file;
                 }
                 if (filenames[i]=="rooms.json") {
-                    this.roomsInformations = file;
+                    this.roomsInformation = file;
                 }
             }
 
@@ -55,25 +52,12 @@ export default class InsightFacade implements IInsightFacade {
 
         let that = this;
         let isadded:boolean;
-        try{
-            this.removeIdInRam(id);
-            fs.statSync("./data/" + id + ".json");
+
+        if(fs.existsSync("./data/"+id+".json")){
             isadded = true;
-            fs.unlinkSync("./data/" + id + ".json");
-
-
         }
-        catch (e){
-            //do nothing;
-            isadded = false;
-        }
-
-
 
         return new Promise((fulfill, reject) => {
-
-
-
             if ((id == null) || (content == null)) {
                 let response = {code: 400, body: {"error": 'Message not provided'}};
                 reject(response);
@@ -86,205 +70,247 @@ export default class InsightFacade implements IInsightFacade {
                 return;
             }
 
+            try {
 
+                let myzip = new JSZip();
+                let p = myzip.loadAsync(content, {base64: true})  // load content into myzip
 
-            let myzip = new JSZip();
-            let p = myzip.loadAsync(content,{base64:true})  // load content into myzip
+                if (id === "rooms") {
 
-            if (id === "rooms") {
+                    p.then(function (zip: any) {
+                        let processList = <any>[];
+                        zip.forEach(function (relativePath: any, file: any) {
 
-                p.then(function (zip:any) {
-                    let processList = <any>[];
-                    zip.forEach(function (relativePath: any, file: any) {
+                            //console.log(relativePath);
+                            let filePath = relativePath.split('/');
+                            let fileName = filePath[filePath.length - 1];
 
-                        //console.log(relativePath);
-                        let filePath = relativePath.split('/');
-                        let fileName = filePath[filePath.length - 1];
+                            if ((!file.dir) && (fileName[0] != ".")) {
+                                //console.log(fileName);
+                                if (fileName === "index.htm") {
+                                    let building_promise = file.async("string").then(function (content: any) {
 
-                        if ((!file.dir) && (fileName[0] != ".")){
-                            //console.log(fileName);
-                            if (fileName === "index.html") {
-                                let building_promise = file.async("string").then(function (content: any) {
+                                        let buildingNameList: any[] = [];
 
-                                    let buildingNameList: any[] = [];
+                                        let buildingHtml = parse5.parse(content);
+                                        let buildingList = that.searchNode(buildingHtml, 'class', 'views-table cols-5 table');
+                                        //console.log(buildingList);
 
-                                    let buildingHtml = parse5.parse(content);
-                                    let buildingList = that.searchNode(buildingHtml, 'class', 'views-table cols-5 table');
+                                        for (let i = 0; i < buildingList.childNodes[3].childNodes.length; i++) {
 
-                                    for (let i = 0; i < buildingList.childNodes[3].childNodes.length; i++) {
-
-                                        if (i%2 === 1) {
-                                            let buildingInfo = buildingList.childNodes[3].childNodes[i];
-                                            let buildingShortName = buildingInfo.childNodes[3].childNodes[0].value.trim();
-                                            //console.log(buildingShortName);
-                                            buildingNameList.push(buildingShortName);
+                                            if (i % 2 === 1) {
+                                                let buildingInfo = buildingList.childNodes[3].childNodes[i];
+                                                let buildingShortName = buildingInfo.childNodes[3].childNodes[0].value.trim();
+                                                //console.log(buildingShortName);
+                                                buildingNameList.push(buildingShortName);
+                                            }
                                         }
-                                    }
-                                    //buildingNameList.push("index.html");
-                                    return buildingNameList;
-                                })
-                                processList.push(building_promise);
-                            }
-                            else {
-                                let room_promise = file.async("string").then(function (content: any) {
 
-                                    let roomList: any[] = [];
+                                        return buildingNameList;
 
-                                    let roomHtml = parse5.parse(content);
+                                    })
+                                    processList.push(building_promise);
+                                } else {
+                                    let room_promise = file.async("string").then(function (content: any) {
 
-                                    let roomNameNode = that.searchNode(roomHtml, 'id', 'building-info');
-                                    let roomListNode = that.searchNode(roomHtml, 'class', 'views-table cols-5 table');
+                                        let roomList: any[] = [];
 
-                                    let buildingShortName = fileName;
-                                    let buildingFullName = roomNameNode.childNodes[1].childNodes[0].childNodes[0].value;
-                                    let buildingAddress = roomNameNode.childNodes[3].childNodes[0].childNodes[0].value.replace(/,/g,"");
+                                        let roomHtml = parse5.parse(content);
 
-                                    let buildingUrl = "http://skaha.cs.ubc.ca:11316/api/v1/team13/" + buildingAddress.trim().replace(/ /g, "%20");
+                                        let roomNameNode = that.searchNode(roomHtml, 'id', 'building-info');
+                                        let roomListNode = that.searchNode(roomHtml, 'class', 'views-table cols-5 table');
 
-                                    if (roomListNode != null) {
+                                        let buildingShortName = fileName;
 
-                                        let roomsArray = roomListNode.childNodes[3].childNodes;
-                                        //console.log(roomsArray.length);
-                                        for (let i = 1; i < roomsArray.length; i+=2) {
+                                        let buildingFullName = parse5.serialize(roomNameNode.childNodes[1].childNodes[0]);
+                                        let buildingAddress = parse5.serialize(roomNameNode.childNodes[3].childNodes[0]);
+                                        let buildingUrl = "http://skaha.cs.ubc.ca:11316/api/v1/team13/" + buildingAddress.trim().replace(/ /g,"%20");
 
-                                            let room : any = {};
+                                        if (roomListNode != null) {
 
-                                            let singleRoomInformation = roomsArray[i];
-                                            room.rooms_number = parse5.serialize(singleRoomInformation.childNodes[1].childNodes[1]);
-                                            room.rooms_name = buildingShortName + "_" + room.rooms_number;
-                                            room.rooms_seats = parseInt(parse5.serialize(singleRoomInformation.childNodes[3]));
-                                            room.rooms_furniture = parse5.serialize(singleRoomInformation.childNodes[5]).trim();
-                                            room.rooms_type = parse5.serialize(singleRoomInformation.childNodes[7]).trim();
+                                            if (roomListNode.childNodes[3] != null) {
 
-                                            let href = singleRoomInformation.childNodes[1].childNodes[1];
-                                            for (var attr of href.attrs) {
-                                                if (attr.name === 'href') {
-                                                    room.rooms_href = attr.value;
+                                                let roomsArray = roomListNode.childNodes[3].childNodes;
+                                                    //console.log(roomsArray.length);
+                                                for (let i = 1; i < roomsArray.length; i += 2) {
+
+                                                    let room: any = {};
+
+                                                    let singleRoomInformation = roomsArray[i];
+                                                    room.rooms_number = parse5.serialize(singleRoomInformation.childNodes[1].childNodes[1]);
+                                                    room.rooms_name = buildingShortName + "_" + room.rooms_number;
+                                                    room.rooms_seats = parseInt(parse5.serialize(singleRoomInformation.childNodes[3]));
+                                                    room.rooms_furniture = parse5.serialize(singleRoomInformation.childNodes[5]).trim().replace(/&amp;/g, "&");
+                                                    room.rooms_type = parse5.serialize(singleRoomInformation.childNodes[7]).trim();
+
+                                                    let href = singleRoomInformation.childNodes[1].childNodes[1];
+                                                    for (let attr of href.attrs) {
+                                                        if (attr.name === 'href') {
+                                                            room.rooms_href = attr.value;
+                                                        }
+                                                    }
+
+                                                    room.rooms_fullname = buildingFullName;
+                                                    room.rooms_shortname = buildingShortName;
+                                                    room.rooms_address = buildingAddress;
+                                                    room.rooms_url = buildingUrl;
+
+                                                    roomList.push(room);
+
+                                                }
+                                                if (roomList.length > 0) {   // The api is not stable // comment out this for stable test but not for real autotest
+                                                    return that.getLatLon(roomList[0].rooms_url, roomList).then(function (roomList: any) {
+                                                     return roomList;
+                                                    });
                                                 }
                                             }
-
-                                            room.rooms_fullname = buildingFullName;
-                                            room.rooms_shortname = buildingShortName;
-                                            room.rooms_address = buildingAddress;
-                                            room.rooms_url = buildingUrl;
-
-                                            roomList.push(room);
-
+                                            //console.log(roomList.length);
+                                            for (let room of roomList) {
+                                                console.log(room);
+                                            }
+                                            return roomList;
                                         }
-                                        if (roomList.length > 0) {   // The api is not stable // comment out this for stable test but not for real autotest
-                                            return that.getLatLon(roomList[0].rooms_url, roomList).then(function (roomList: any) {
-                                                return roomList;});
-                                        }
-                                    }
-                                    return roomList;
-                                })
-                                processList.push(room_promise);
-                            }
-                        }
-                    });
 
-                    Promise.all(processList).then(function (informationList: any) {
-                        let validNameList :any[] = [];
-
-                        for (let info of informationList) {
-                            if (info.length === 74) {
-                                for (let i = 0; i < info.length; i++) {
-                                    validNameList.push(info[i]);
+                                    }).catch (function (err:any) {
+                                        Log.trace(err.message);
+                                    });
+                                    processList.push(room_promise);
                                 }
                             }
-                        }
-                        for (let info of informationList) {
-                            if (info.length!= 0 && info.length != 74) {
-                                //console.log(info.length);
-                                for (let j = 0; j < info.length; j++) {
-                                    //console.log(info[j]);
-                                    //console.log(info[j].rooms_shortname);
-                                    for (let i = 0; i < validNameList.length; i++) {
-                                        if (info[j].rooms_shortname === validNameList[i]) {
-                                            that.roomsInformations.push(info[j])
-                                        }
+                        });
+
+                        Promise.all(processList).then(function (informationList: any) {
+
+
+
+                            let temp_roomsinfo = that.roomsInformation;
+                            that.roomsInformation = [];
+
+                            let validNameList: any[] = [];
+                            for (let info of informationList) {
+                                if (typeof info != 'undefined') {
+                                   // console.log(info.length);
+                                }
+                                //console.log(info);
+                            }
+                            for (let info of informationList) {
+                                if (typeof info != 'undefined' && info.length === 74) {
+                                    for (let i = 0; i < info.length; i++) {
+                                        validNameList.push(info[i]);
                                     }
                                 }
                             }
-                        }
-                        //console.log(that.roomInformations.length);
-                        that.saveRamOfIdToDisk(id);
-                        // for (let j = 0; j < that.roomsInformations.length; j++) {
-                        //     if (that.roomsInformations[j].rooms_lat != null){
-                        //        console.log(that.roomsInformations[j]);
-                        //     }
-                        // }
-                        let response2: InsightResponse = {code: 204, body: {}};
-                        if(isadded){
-                            response2.code = 201;
-                        }
-                        fulfill(response2);
+                            console.log(validNameList.length);
 
+                            for (let info of informationList) {
+                                if (typeof info != 'undefined' && info.length != 0 && info.length != 74) {
+                                    //console.log(info.length);
+                                    for (let j = 0; j < info.length; j++) {
+                                        //console.log(info[j]);
+                                        //console.log(info[j].rooms_shortname);
+                                        for (let i = 0; i < validNameList.length; i++) {
+                                            if (info[j].rooms_shortname === validNameList[i]) {
+                                                that.roomsInformation.push(info[j])
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            console.log(informationList.length);
+                            let response2: InsightResponse = {code: 204, body: {}};
+                            if (that.roomsInformation.length == 0) {
+                                response2.code = 400;
+                                response2.body = {"erro": "No valid room data added"};
+                                that.roomsInformation = temp_roomsinfo;
+                                reject(response2);
+                                return;
+                            }
+
+                            if (isadded) {
+                                response2.code = 201;
+                                //fs.unlinkSync("./data/rooms.json")
+                            }
+                            that.saveRamOfIdToDisk(id);
+                            fulfill(response2);
+
+                        }).catch(function (e: any) {
+                            Log.error("con not unzip")
+                            let response = {code: 400, body: {"error": 'Message not provided1'}};
+                            reject(response);
+                        });
                     }).catch(function (e: any) {
+                        Log.error(e.message);
                         Log.error("con not unzip")
                         let response = {code: 400, body: {"error": 'Message not provided'}};
                         reject(response);
-                    });
-                }).catch(function (e: any) {
-                    Log.error(e.message);
-                    Log.error("con not unzip")
-                    let response = {code: 400, body: {"error": 'Message not provided'}};
-                    reject(response);
-
-                })
-
-
-            }
-
-             else if (id === "courses") {
-
-                p.then(function (zip: any) {
-                    let processList = <any>[];
-                    zip.forEach(function (relativePath: any, file: any) {
-
-                        if (!file.dir) {
-                            let course_promise = file.async("string");
-                            processList.push(course_promise);
-                        }
-                    });
-
-                    Promise.all(processList).then(function (courseList) {
-                        let info_length = that.courseInformation.length;
-                        for (let jsonObj_str of courseList) {
-                            try {
-                                //console.log(courseObj);
-                                that.parseCourse(id, (jsonObj_str as string));
-                            }
-                            catch (err) {
-                                let response1: InsightResponse = {code: 400, body: {"error": "Message not provided"}};
-                                reject(response1);
-                            }
-                        }
-                        if ((that.courseInformation.length === info_length) && !isadded) {
-                            let response3: InsightResponse = {code: 400, body: {"error": "Message not provided"}};
-                            reject(response3);
-                        }
-                        let response2: InsightResponse = {code: 204, body: {}};
-                        if (isadded) {
-                            response2.code = 201;
-                        }
-                        that.saveRamOfIdToDisk(id);
-                        fulfill(response2);
 
                     })
-                        .catch(function (e: any) {
-                            Log.error("con not unzip")
-                            let response = {code: 400, body: {"error": 'Message not provided'}};
-                            reject(response);
+
+
+                }
+
+                if (id === "courses") {
+
+                    p.then(function (zip: any) {
+                        let processList = <any>[];
+                        zip.forEach(function (relativePath: any, file: any) {
+
+                            if (!file.dir) {
+                                let course_promise = file.async("string");
+                                processList.push(course_promise);
+                            }
                         });
 
-                }).catch(function (e: any) {
-                    Log.error(e.message);
-                    Log.error("con not unzip")
-                    let response = {code: 400, body: {"error": 'Message not provided'}};
-                    reject(response);
+                        Promise.all(processList).then(function (courseList) {
+                            let temp_coursesinfo = that.courseInformation;
+                            that.courseInformation = [];
+                            for (let jsonObj_str of courseList) {
+                                try {
+                                    //console.log(courseObj);
+                                    that.parseCourse(id, (jsonObj_str as string));
+                                }
+                                catch (err) {
+                                    let response1: InsightResponse = {
+                                        code: 400,
+                                        body: {"error": "Message not provided"}
+                                    };
+                                    reject(response1);
+                                }
+                            }
+                            let response2: InsightResponse = {code: 204, body: {}};
+                            if (that.courseInformation.length == 0) {
+                                response2.code = 400;
+                                response2.body = {"erro": "No valid course data added"};
+                                that.courseInformation = temp_coursesinfo;
+                                reject(response2);
+                                return;
+                            }
 
-                })
+                            if (isadded) {
+                                response2.code = 201;
+                                fs.unlinkSync("./data/courses.json")
+                            }
+                            that.saveRamOfIdToDisk(id);
+                            fulfill(response2);
+
+                        })
+                            .catch(function (e: any) {
+                                Log.error("con not unzip")
+                                let response = {code: 400, body: {"error": 'Message not provided'}};
+                                reject(response);
+                            });
+
+                    }).catch(function (e: any) {
+                        Log.error(e.message);
+                        Log.error("con not unzip")
+                        let response = {code: 400, body: {"error": 'Message not provided'}};
+                        reject(response);
+
+                    })
+                }
+            } catch(err) {
+                let response = {code: 400, body: {"error": 'Message not provided'}};
+                reject(response);
             }
 
         });
@@ -333,7 +359,9 @@ export default class InsightFacade implements IInsightFacade {
                     }
                     fulfill(roomList);
                 });
-            })
+            }).on('err', function (err:any){
+                console.log(err);
+            });
         })
     }
 
@@ -346,7 +374,7 @@ export default class InsightFacade implements IInsightFacade {
             return;
         }
         if(id=="rooms"){
-            this.roomsInformations=[];
+            this.roomsInformation=[];
             return;
         }
 
@@ -365,14 +393,12 @@ export default class InsightFacade implements IInsightFacade {
         }
         if(id === "rooms")
         {
-            data_selected = this.roomsInformations;
+            data_selected = this.roomsInformation;
         }
 
         if(data_selected.length==0){
             throw new Error("Error:no data to save");
         }
-
-
 
         let dataToSave = JSON.stringify(data_selected);
 
@@ -393,26 +419,24 @@ export default class InsightFacade implements IInsightFacade {
         let that = this;
         return new Promise((fulfill, reject) => {
 
+            let response: InsightResponse;
 
             if(id!="courses"&&id!="rooms"){
-                let response: InsightResponse;
                 response = {code: 404, body: {"error": 'Message not provided(Invalid ID)'}};
                 reject(response);
                 return;
             }
 
-            try {
-                let response: InsightResponse;
-                fs.statSync("./data/" + id + ".json");
-                fs.unlinkSync("./data/" + id + ".json"); // remove from disk
+            if(fs.existsSync("./data/"+id+".json")){
                 that.removeIdInRam(id);
+                fs.unlinkSync("./data/"+id+".json");
                 response = {code: 204, body: {}};
                 fulfill(response);
-
-            } catch (err) {
-                let response: InsightResponse;
+                return ;
+            }else {
                 response = {code: 404, body: {"error": 'Message not provided'}};
                 reject(response);
+                return;
             }
 
         })
@@ -440,7 +464,6 @@ export default class InsightFacade implements IInsightFacade {
                     section.courses_fail = infoList[i].Fail;
                     section.courses_audit = infoList[i].Audit;
                     section.courses_uuid = String(infoList[i].id);
-                    //section.source = id;
                     section.course_section = infoList[i].Section;
 
 
@@ -460,7 +483,7 @@ export default class InsightFacade implements IInsightFacade {
 
                         } else {
 
-                            section.courses_year = infoList[i].Year;
+                            section.courses_year = Number(infoList[i].Year);
                         }
 
                         this.courseInformation.push(section);
@@ -476,6 +499,7 @@ export default class InsightFacade implements IInsightFacade {
 
     performQuery(query: any): Promise <InsightResponse> {
         return new Promise((fulfill,reject)=>{
+
             let response:InsightResponse = null;
             response = QH.isValidQuery(query);   // validate the request query main on the parts other than the filter, since I handle it in filter out function
 
@@ -483,94 +507,91 @@ export default class InsightFacade implements IInsightFacade {
                 reject(response);
             }else {
                 let selected: boolean[] = null;
-                let typeOfQuery = (response.body as any)[0];
+                let typeOfQuery = (response.body as any)["missing"][0];
 
 
                 let information =[];
-                if(typeOfQuery == "rooms"){
-                    information = this.roomsInformations;
-                }
-                if(typeOfQuery == "courses"){
+                if(typeOfQuery == "rooms" && fs.existsSync('./data/rooms.json')){
+                    information = this.roomsInformation;
+                } else if(typeOfQuery == "courses" && fs.existsSync('./data/courses.json')){
                     information = this.courseInformation;
                 }
-
-                if(information.length==0){
+                console.log(information.length);
+                if (information.length === 0) {
                     response.code = 424;
+                    response.body = {'missing':[typeOfQuery]};
                     reject(response);
-                    return;
-                }
 
+                } else {
 
-                if(typeOfQuery == "courses") {
-                    try {
-                        selected = QH.filterOut_courses(information, query["WHERE"]);
-                    }
-                    catch (e) {
+                    if (typeOfQuery == "courses") {
                         try {
-                            response = JSON.parse(e.message);
-                        } catch (e) {
-                            Log.error("Should not be here, internal error");
+                            selected = QH.filterOut_courses(information, query["WHERE"]);
                         }
-                        reject(response);
+                        catch (e) {
+                            try {
+                                response = JSON.parse(e.message);
+                            } catch (e) {
+                                Log.error("Should not be here, internal error");
+                            }
+                            reject(response);
+                        }
                     }
-                }
 
-                if(typeOfQuery == "rooms"){
-                    try {
-                        selected = QH.filterOut_rooms(information, query["WHERE"]);
-                    }
-                    catch (e) {
+                    if (typeOfQuery == "rooms") {
                         try {
-                            response = JSON.parse(e.message);
-                        } catch (e) {
-                            Log.error("Should not be here, internal error");
+                            selected = QH.filterOut_rooms(information, query["WHERE"]);
                         }
-                        reject(response);
-                    }
-                }
-
-
-
-
-
-                let body_pre = [];
-                let len = information.length;
-                for(let i = 0;i<len;i++){
-                    if(selected[i]){
-                        body_pre.push(information[i]);
-                    }
-                }
-
-
-                //sort the output
-                len = body_pre.length;
-                //These are all sections selected
-                let order_key=query.OPTIONS.ORDER;  // sort the body_pre if it is necessary
-                if (order_key!=null){
-                    body_pre.sort((n1,n2)=>{
-
-                        if((n1 as any)[order_key] > (n2 as any)[order_key]){
-                            return 1;
-                        }else if((n1 as any)[order_key] == (n2 as any)[order_key]){
-                            return 0;
-                        }else {
-                            return -1;
+                        catch (e) {
+                            try {
+                                response = JSON.parse(e.message);
+                            } catch (e) {
+                                Log.error("Should not be here, internal error");
+                            }
+                            reject(response);
                         }
-                    });
-                }
-
-
-                let results:{}[]=[];
-                for(let i =0;i<body_pre.length;i++){
-                    let element:any={};
-                    for(let j=query.OPTIONS.COLUMNS.length-1;j>=0;j--){
-                        element[query.OPTIONS.COLUMNS[j]]=(body_pre[i] as any)[query.OPTIONS.COLUMNS[j]];
                     }
-                    results.push(element);
+
+
+                    let body_pre = [];
+                    let len = information.length;
+                    for (let i = 0; i < len; i++) {
+                        if (selected[i]) {
+                            body_pre.push(information[i]);
+                        }
+                    }
+
+
+                    //sort the output
+                    len = body_pre.length;
+                    //These are all sections selected
+                    let order_key = query.OPTIONS.ORDER;  // sort the body_pre if it is necessary
+                    if (order_key != null) {
+                        body_pre.sort((n1, n2) => {
+
+                            if ((n1 as any)[order_key] > (n2 as any)[order_key]) {
+                                return 1;
+                            } else if ((n1 as any)[order_key] == (n2 as any)[order_key]) {
+                                return 0;
+                            } else {
+                                return -1;
+                            }
+                        });
+                    }
+
+
+                    let results: {}[] = [];
+                    for (let i = 0; i < body_pre.length; i++) {
+                        let element: any = {};
+                        for (let j = query.OPTIONS.COLUMNS.length - 1; j >= 0; j--) {
+                            element[query.OPTIONS.COLUMNS[j]] = (body_pre[i] as any)[query.OPTIONS.COLUMNS[j]];
+                        }
+                        results.push(element);
+                    }
+                    response.code = 200;
+                    response.body = {'render': query.OPTIONS.FORM, 'result': results}
+                    fulfill(response);
                 }
-                response.code = 200;
-                response.body = {'render':query.OPTIONS.FORM,'result':results}
-                fulfill(response);
             }
         })
     }

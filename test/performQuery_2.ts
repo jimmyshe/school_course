@@ -7,7 +7,23 @@ import Log from "../src/Util";
 import {InsightResponse} from "../src/controller/IInsightFacade";
 
 let fs = require('fs');
-describe("performQuery_2", function () {
+
+let deleteFolderRecursive = function(path:string) {
+    if( fs.existsSync(path) ) {
+        fs.readdirSync(path).forEach(function(file:string) {
+            let curPath = path + "/" + file;
+            if(fs.statSync(curPath).isDirectory()) { // recurse
+                deleteFolderRecursive(curPath);
+            } else { // delete file
+                fs.unlinkSync(curPath);
+            }
+        });
+        fs.mkdir(path);
+    }
+};
+
+
+describe("performQuery_courses", function () {
 
     let insight:Insight = null;
     let testQuery_simple = {
@@ -34,6 +50,15 @@ describe("performQuery_2", function () {
         expect(response).to.have.property('body');
         expect(response.code).to.be.a('number');
     }
+
+    before(function () {
+       // deleteFolderRecursive("./data");
+    });
+
+    after(function () {
+        //deleteFolderRecursive("./data");
+        fs.unlinkSync('./data/courses.json')
+    })
 
 
     beforeEach(function () {
@@ -863,4 +888,78 @@ describe("performQuery_2", function () {
                 expect.fail();
             })
     });
+
+    let testQuery_course_year = {
+        "WHERE":{
+            "AND":[
+                {"IS":{
+                    "courses_dept":"*psc"
+                }},
+                {"IS":{
+                    "courses_instructor":"woodham*"
+                }}
+            ]
+        },
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_dept",
+                "courses_instructor",
+                "courses_year"
+            ],
+            "ORDER":"courses_instructor",
+            "FORM":"TABLE"
+        }
+    }
+    it("test using course year", function () {
+        return insight.performQuery(testQuery_course_year)
+            .then((respons:InsightResponse)=>{
+                sanityCheck(respons);
+                console.log(respons);
+                expect(respons).to.deep.equal(
+                    {
+                        "code": 200,
+                        "body": {
+                            "render": "TABLE",
+                            "result": [
+                                {
+                                    "courses_instructor": "woodham, robert",
+                                    "courses_dept": "cpsc",
+                                    "courses_year": 2009
+                                },
+                                {
+                                    "courses_instructor": "woodham, robert",
+                                    "courses_dept": "cpsc",
+                                    "courses_year": 2014
+                                },
+                                {
+                                    "courses_instructor": "woodham, robert",
+                                    "courses_dept": "cpsc",
+                                    "courses_year": 2011
+                                },
+                                {
+                                    "courses_instructor": "woodham, robert",
+                                    "courses_dept": "cpsc",
+                                    "courses_year": 2010
+                                },
+                                {
+                                    "courses_instructor": "woodham, robert",
+                                    "courses_dept": "cpsc",
+                                    "courses_year": 2012
+                                },
+                                {
+                                    "courses_instructor": "woodham, robert",
+                                    "courses_dept": "cpsc",
+                                    "courses_year": 2007
+                                }
+                            ]
+                        }
+                    }
+                )})
+            .catch( (err:InsightResponse)=>{
+                Log.test('Error: query request not success ');
+                expect.fail();
+            })
+    });
+
+
 });
