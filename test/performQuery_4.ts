@@ -19,7 +19,7 @@ let deleteFolderRecursive = function(path:string) {
                 fs.unlinkSync(curPath);
             }
         });
-        fs.mkdir(path);
+        fs.rmdirSync(path);
     }
 };
 
@@ -39,10 +39,10 @@ describe("performQuery_rooms_not_added", function () {
 
     before(function () {
         Log.test('test Query for rooms');
-        //deleteFolderRecursive("./data");
+        deleteFolderRecursive("./data");
         insight = new Insight();
         // make sure the cache file is there
-        let content = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
+        //let content = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
         //return insight.addDataset('rooms',content)
 
     })
@@ -50,12 +50,12 @@ describe("performQuery_rooms_not_added", function () {
 
     after(function () {
         Log.test('end test Query for rooms ');
-        //deleteFolderRecursive("./data");
-        try {
-            fs.unlinkSync('./data/rooms.json');
-        } catch (err) {
-
-        }
+        deleteFolderRecursive("./data");
+        // try {
+        //     fs.unlinkSync('./data/rooms.json');
+        // } catch (err) {
+        //
+        // }
     })
 
 

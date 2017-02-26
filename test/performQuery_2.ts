@@ -18,7 +18,7 @@ let deleteFolderRecursive = function(path:string) {
                 fs.unlinkSync(curPath);
             }
         });
-        fs.mkdir(path);
+        fs.rmdirSync(path);
     }
 };
 
@@ -52,12 +52,11 @@ describe("performQuery_courses", function () {
     }
 
     before(function () {
-       // deleteFolderRecursive("./data");
+        deleteFolderRecursive("./data");
     });
 
     after(function () {
-        //deleteFolderRecursive("./data");
-        fs.unlinkSync('./data/courses.json')
+        deleteFolderRecursive("./data");
     })
 
 
