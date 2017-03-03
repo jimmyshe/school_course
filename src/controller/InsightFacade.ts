@@ -509,7 +509,6 @@ export default class InsightFacade implements IInsightFacade {
                 let selected: boolean[] = null;
                 let typeOfQuery = (response.body as any)["missing"][0];
 
-
                 let information =[];
                 if(typeOfQuery == "rooms" && fs.existsSync('./data/rooms.json')){
                     information = this.roomsInformation;
@@ -552,7 +551,6 @@ export default class InsightFacade implements IInsightFacade {
                         }
                     }
 
-
                     let body_pre = [];
                     let len = information.length;
                     for (let i = 0; i < len; i++) {
@@ -560,7 +558,6 @@ export default class InsightFacade implements IInsightFacade {
                             body_pre.push(information[i]);
                         }
                     }
-
 
                     //sort the output
                     len = body_pre.length;
@@ -578,7 +575,6 @@ export default class InsightFacade implements IInsightFacade {
                             }
                         });
                     }
-
 
                     let results: {}[] = [];
                     for (let i = 0; i < body_pre.length; i++) {
