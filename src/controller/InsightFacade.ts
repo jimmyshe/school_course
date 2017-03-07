@@ -567,16 +567,28 @@ export default class InsightFacade implements IInsightFacade {
                     //These are all sections selected
                     let order_key = query.OPTIONS.ORDER;  // sort the body_pre if it is necessary
                     if (order_key != null) {
-                        body_pre.sort((n1, n2) => {
+                        if(typeof order_key == "string") {
+                            body_pre.sort((n1, n2) => {
 
-                            if ((n1 as any)[order_key] > (n2 as any)[order_key]) {
-                                return 1;
-                            } else if ((n1 as any)[order_key] == (n2 as any)[order_key]) {
-                                return 0;
-                            } else {
-                                return -1;
-                            }
-                        });
+                                if ((n1 as any)[order_key] > (n2 as any)[order_key]) {
+                                    return 1;
+                                } else if ((n1 as any)[order_key] == (n2 as any)[order_key]) {
+                                    return 0;
+                                } else {
+                                    return -1;
+                                }
+                            });
+                        }
+                        else {
+                            let order_obj = query.OPTIONS.ORDER;
+                            let dir = order_obj['dir'];
+                            let keys =  order_obj['keys'];
+
+
+                            body_pre = QH.adv_mergeSort(body_pre,dir,keys);
+
+
+                        }
                     }
 
 

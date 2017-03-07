@@ -23,7 +23,7 @@ let deleteFolderRecursive = function(path:string) {
 };
 
 
-describe("performQuery_courses", function () {
+describe.only("performQuery_courses", function () {
 
     let insight:Insight = null;
     let testQuery_simple = {

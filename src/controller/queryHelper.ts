@@ -80,14 +80,48 @@ export default class QH {
 
 
          if(query.OPTIONS.ORDER!=null){
-             let order_key:string = query.OPTIONS.ORDER;
-             let opt_colimns:string[] = query.OPTIONS.COLUMNS;
 
-             if(!opt_colimns.includes(order_key)) {
-                 ret.code = 400;
-                 ret.body = {"error": "the option of order has an invalid key"};
-                 return ret;
+             if(typeof query.OPTIONS.ORDER =="string") {
+                 let order_key: string = query.OPTIONS.ORDER;
+                 let opt_colimns: string[] = query.OPTIONS.COLUMNS;
+
+                 if (!opt_colimns.includes(order_key)) {
+                     ret.code = 400;
+                     ret.body = {"error": "the option of order has an invalid key"};
+                     return ret;
+                 }
              }
+             else if(typeof query.OPTIONS.ORDER =="object"){
+                 let order_obj = query.OPTIONS.ORDER;
+                 let opt_colimns: string[] = query.OPTIONS.COLUMNS;
+
+                 if (order_obj['dir']==null||order_obj['keys']==null) {
+                     ret.code = 400;
+                     ret.body = {"error": "the option of order has an invalid key"};
+                     return ret;
+                 }
+                 if((!isArray(order_obj['keys']))||(typeof order_obj['dir']!="string")){
+                     ret.code = 400;
+                     ret.body = {"error": "the option of order has an invalid key:no key or dir"};
+                     return ret;
+                 }
+
+                 let  keys =  order_obj['keys'];
+                 for(let i=0;i<keys.length;i++)
+                 if (!opt_colimns.includes(keys[i])) {
+                     ret.code = 400;
+                     ret.body = {"error": "the option of order has an invalid key:invalid keys"};
+                     return ret;
+                 }
+
+                 let dir = order_obj['dir'];
+                 if(dir!="UP"||dir!="DOWN"){
+                     ret.code = 400;
+                     ret.body = {"error": "the option of order has an invalid key:invalid dir"};
+                     return ret;
+                 }
+             }
+
          }
 
 
@@ -490,4 +524,52 @@ export default class QH {
         }
 
     }
+
+    public static adv_mergeSort(arr:any,dir:string,keys:any):any[]
+    {
+        if (arr.length < 2)
+            return arr;
+
+        let middle = arr.length / 2;
+        let left   = arr.slice(0, middle);
+        let right  = arr.slice(middle, arr.length);
+
+        return this.merge(this.adv_mergeSort(left,dir,keys), this.adv_mergeSort(right,dir,keys),keys,dir);
+    }
+
+    private static merge(left:any, right:any,keys:any,dir:any)
+    {
+        let result = [];
+
+        while (left.length && right.length) {
+
+            if(dir=="UP") {
+
+                let i = 0;
+                while (left[keys[i]] == right[keys[i]]){
+                    i++;
+                    if(i==keys.length){
+                        i=0;
+                        break;
+                    }
+                }
+
+                if (left[keys[i]] <= right[keys[i]]) {
+                    result.push(left.shift());
+                } else {
+                    result.push(right.shift());
+                }
+            }
+        }
+
+        while (left.length)
+            result.push(left.shift());
+
+        while (right.length)
+            result.push(right.shift());
+
+        return result;
+    }
+
+
 }
