@@ -600,6 +600,12 @@ export default class InsightFacade implements IInsightFacade {
                         }
                         results.push(element);
                     }
+
+
+                    //todo
+
+
+
                     response.code = 200;
                     response.body = {'render': query.OPTIONS.FORM, 'result': results}
                     fulfill(response);
