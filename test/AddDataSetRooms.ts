@@ -40,14 +40,7 @@ describe("addDataSet_rooms", function () {
 
 
 
-    before(function () {
-
-        //deleteFolderRecursive("./data");
-
-
-        Log.info("start add rooms")
-
-    });
+    
 
     beforeEach(function () {
         Log.test('BeforeTest: ' + (<any>this).currentTest.title);
