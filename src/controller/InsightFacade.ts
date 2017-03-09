@@ -524,6 +524,9 @@ export default class InsightFacade implements IInsightFacade {
                     reject(response);
 
                 } else {
+                    if(query["WHERE"]=={}){
+                        selected = Array(information.length).fill(true);
+                    }
 
                     if (typeOfQuery == "courses") {
                         try {
@@ -563,53 +566,56 @@ export default class InsightFacade implements IInsightFacade {
                     }
 
 
-                    //sort the output
-                    len = body_pre.length;
-                    //These are all sections selected
-                    let order_key = query.OPTIONS.ORDER;  // sort the body_pre if it is necessary
-                    if (order_key != null) {
-                        if(typeof order_key == "string") {
-                            body_pre.sort((n1, n2) => {
+                    if(query["TRANSFORMATIONS"]==null) {
 
-                                if ((n1 as any)[order_key] > (n2 as any)[order_key]) {
-                                    return 1;
-                                } else if ((n1 as any)[order_key] == (n2 as any)[order_key]) {
-                                    return 0;
-                                } else {
-                                    return -1;
-                                }
-                            });
+                        //sort the output
+                        len = body_pre.length;
+                        //These are all sections selected
+                        let order_key = query.OPTIONS.ORDER;  // sort the body_pre if it is necessary
+                        if (order_key != null) {
+                            if(typeof order_key == "string") {
+                                body_pre.sort((n1, n2) => {
+
+                                    if ((n1 as any)[order_key] > (n2 as any)[order_key]) {
+                                        return 1;
+                                    } else if ((n1 as any)[order_key] == (n2 as any)[order_key]) {
+                                        return 0;
+                                    } else {
+                                        return -1;
+                                    }
+                                });
+                            }
+                            else {
+                                let order_obj = query.OPTIONS.ORDER;
+                                let dir = order_obj['dir'];
+                                let keys =  order_obj['keys'];
+                                body_pre = QH.adv_mergeSort(body_pre,dir,keys);
+                            }
                         }
-                        else {
-                            let order_obj = query.OPTIONS.ORDER;
-                            let dir = order_obj['dir'];
-                            let keys =  order_obj['keys'];
 
-
-                            body_pre = QH.adv_mergeSort(body_pre,dir,keys);
-
-
+                        let results: {}[] = [];
+                        for (let i = 0; i < body_pre.length; i++) {
+                            let element: any = {};
+                            for (let j = query.OPTIONS.COLUMNS.length - 1; j >= 0; j--) {
+                                element[query.OPTIONS.COLUMNS[j]] = (body_pre[i] as any)[query.OPTIONS.COLUMNS[j]];
+                            }
+                            results.push(element);
                         }
+                        response.code = 200;
+                        response.body = {'render': query.OPTIONS.FORM, 'result': results}
+                        fulfill(response);
                     }
 
+                    else {  // here is the cases for query with TRANSFORMATIONS
 
-                    let results: {}[] = [];
-                    for (let i = 0; i < body_pre.length; i++) {
-                        let element: any = {};
-                        for (let j = query.OPTIONS.COLUMNS.length - 1; j >= 0; j--) {
-                            element[query.OPTIONS.COLUMNS[j]] = (body_pre[i] as any)[query.OPTIONS.COLUMNS[j]];
-                        }
-                        results.push(element);
+
+
+                        let group_set:any = [];
+
+                        
+
+
                     }
-
-
-                    //todo
-
-
-
-                    response.code = 200;
-                    response.body = {'render': query.OPTIONS.FORM, 'result': results}
-                    fulfill(response);
                 }
             }
         })

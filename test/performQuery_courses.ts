@@ -6,6 +6,7 @@ import {expect} from 'chai';
 import Log from "../src/Util";
 import {InsightResponse} from "../src/controller/IInsightFacade";
 
+
 let fs = require('fs');
 
 let deleteFolderRecursive = function(path:string) {
@@ -23,7 +24,7 @@ let deleteFolderRecursive = function(path:string) {
 };
 
 
-describe("performQuery_courses", function () {
+describe.only("performQuery_courses", function () {
 
     let insight:Insight = null;
     let testQuery_simple = {
@@ -66,10 +67,6 @@ describe("performQuery_courses", function () {
 
     beforeEach(function () {
         Log.test('BeforeTest: ' + (<any>this).currentTest.title);
-
-
-
-
     });
 
 
@@ -915,7 +912,6 @@ describe("performQuery_courses", function () {
         return insight.performQuery(testQuery_course_year)
             .then((respons:InsightResponse)=>{
                 sanityCheck(respons);
-                console.log(respons);
                 expect(respons).to.deep.equal(
                     {
                         "code": 200,
@@ -961,6 +957,248 @@ describe("performQuery_courses", function () {
                 expect.fail();
             })
     });
+
+
+    it("test the new order format", function () {
+        return insight.performQuery(
+            {
+                "WHERE":{
+                    "GT":{
+                        "courses_avg":97
+                    }
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_avg",
+                        "courses_dept"
+
+                    ],
+                    "ORDER": {
+                        "dir": "DOWN",
+                        "keys": ["courses_dept","courses_avg"]
+                    },
+                    "FORM":"TABLE"
+                }
+            }
+        )
+            .then((respons:InsightResponse)=>{
+                sanityCheck(respons);
+                expect(respons).to.deep.equal(
+                    {
+                        "code": 200,
+                        "body": {
+                            "render": "TABLE",
+                            "result": [
+                                {
+                                    "courses_dept": "spph",
+                                    "courses_avg": 98.98
+                                },
+                                {
+                                    "courses_dept": "spph",
+                                    "courses_avg": 98.98
+                                },
+                                {
+                                    "courses_dept": "nurs",
+                                    "courses_avg": 98.71
+                                },
+                                {
+                                    "courses_dept": "nurs",
+                                    "courses_avg": 98.71
+                                },
+                                {
+                                    "courses_dept": "nurs",
+                                    "courses_avg": 98.58
+                                },
+                                {
+                                    "courses_dept": "nurs",
+                                    "courses_avg": 98.58
+                                },
+                                {
+                                    "courses_dept": "nurs",
+                                    "courses_avg": 98.5
+                                },
+                                {
+                                    "courses_dept": "nurs",
+                                    "courses_avg": 98.5
+                                },
+                                {
+                                    "courses_dept": "nurs",
+                                    "courses_avg": 98.21
+                                },
+                                {
+                                    "courses_dept": "nurs",
+                                    "courses_avg": 98.21
+                                },
+                                {
+                                    "courses_dept": "nurs",
+                                    "courses_avg": 97.53
+                                },
+                                {
+                                    "courses_dept": "nurs",
+                                    "courses_avg": 97.53
+                                },
+                                {
+                                    "courses_dept": "nurs",
+                                    "courses_avg": 97.33
+                                },
+                                {
+                                    "courses_dept": "nurs",
+                                    "courses_avg": 97.33
+                                },
+                                {
+                                    "courses_dept": "math",
+                                    "courses_avg": 99.78
+                                },
+                                {
+                                    "courses_dept": "math",
+                                    "courses_avg": 99.78
+                                },
+                                {
+                                    "courses_dept": "math",
+                                    "courses_avg": 97.48
+                                },
+                                {
+                                    "courses_dept": "math",
+                                    "courses_avg": 97.48
+                                },
+                                {
+                                    "courses_dept": "math",
+                                    "courses_avg": 97.25
+                                },
+                                {
+                                    "courses_dept": "math",
+                                    "courses_avg": 97.25
+                                },
+                                {
+                                    "courses_dept": "math",
+                                    "courses_avg": 97.09
+                                },
+                                {
+                                    "courses_dept": "math",
+                                    "courses_avg": 97.09
+                                },
+                                {
+                                    "courses_dept": "epse",
+                                    "courses_avg": 98.8
+                                },
+                                {
+                                    "courses_dept": "epse",
+                                    "courses_avg": 98.76
+                                },
+                                {
+                                    "courses_dept": "epse",
+                                    "courses_avg": 98.76
+                                },
+                                {
+                                    "courses_dept": "epse",
+                                    "courses_avg": 98.7
+                                },
+                                {
+                                    "courses_dept": "epse",
+                                    "courses_avg": 98.58
+                                },
+                                {
+                                    "courses_dept": "epse",
+                                    "courses_avg": 98.58
+                                },
+                                {
+                                    "courses_dept": "epse",
+                                    "courses_avg": 98.45
+                                },
+                                {
+                                    "courses_dept": "epse",
+                                    "courses_avg": 98.45
+                                },
+                                {
+                                    "courses_dept": "epse",
+                                    "courses_avg": 98.36
+                                },
+                                {
+                                    "courses_dept": "epse",
+                                    "courses_avg": 98.08
+                                },
+                                {
+                                    "courses_dept": "epse",
+                                    "courses_avg": 97.78
+                                },
+                                {
+                                    "courses_dept": "epse",
+                                    "courses_avg": 97.69
+                                },
+                                {
+                                    "courses_dept": "epse",
+                                    "courses_avg": 97.67
+                                },
+                                {
+                                    "courses_dept": "epse",
+                                    "courses_avg": 97.41
+                                },
+                                {
+                                    "courses_dept": "epse",
+                                    "courses_avg": 97.41
+                                },
+                                {
+                                    "courses_dept": "epse",
+                                    "courses_avg": 97.29
+                                },
+                                {
+                                    "courses_dept": "epse",
+                                    "courses_avg": 97.29
+                                },
+                                {
+                                    "courses_dept": "epse",
+                                    "courses_avg": 97.09
+                                },
+                                {
+                                    "courses_dept": "epse",
+                                    "courses_avg": 97.09
+                                },
+                                {
+                                    "courses_dept": "eece",
+                                    "courses_avg": 98.75
+                                },
+                                {
+                                    "courses_dept": "eece",
+                                    "courses_avg": 98.75
+                                },
+                                {
+                                    "courses_dept": "educ",
+                                    "courses_avg": 97.5
+                                },
+                                {
+                                    "courses_dept": "crwr",
+                                    "courses_avg": 98
+                                },
+                                {
+                                    "courses_dept": "crwr",
+                                    "courses_avg": 98
+                                },
+                                {
+                                    "courses_dept": "cnps",
+                                    "courses_avg": 99.19
+                                },
+                                {
+                                    "courses_dept": "cnps",
+                                    "courses_avg": 97.47
+                                },
+                                {
+                                    "courses_dept": "cnps",
+                                    "courses_avg": 97.47
+                                }
+                            ]
+                        }
+                    }
+                )})
+            .catch( (err:InsightResponse)=>{
+                if(1){
+                    throw err;
+                }else {
+                    Log.test('Error: query request not success ');
+                    expect.fail();
+                }
+            })
+    });
+
 
 
 });
