@@ -43,11 +43,9 @@ describe("addDataSet_rooms", function () {
         Log.info("start add rooms");
         roomContent = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
         courseContent = new Buffer(fs.readFileSync('./courses.zip')).toString('base64');
-        insight = new Insight();
 
         deleteFolderRecursive("./data");
-
-
+        insight = new Insight();
         Log.info("start add rooms")
 
     });
@@ -80,8 +78,6 @@ describe("addDataSet_rooms", function () {
                 expect.fail();
             })
     });
-
-
 
     it("test2", function () {
         insight = new Insight;

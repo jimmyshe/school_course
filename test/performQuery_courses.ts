@@ -18,12 +18,12 @@ let deleteFolderRecursive = function(path:string) {
                 fs.unlinkSync(curPath);
             }
         });
-        fs.mkdir(path);
+        fs.rmdirSync(path);
     }
 };
 
 
-describe.only("performQuery_courses", function () {
+describe("performQuery_courses", function () {
 
     let insight:Insight = null;
     let testQuery_simple = {
@@ -52,28 +52,29 @@ describe.only("performQuery_courses", function () {
     }
 
     before(function () {
-       // deleteFolderRecursive("./data");
+        deleteFolderRecursive("./data");
+        insight = new Insight();
+        let courseContent = new Buffer(fs.readFileSync('./courses.zip')).toString('base64');
+        return insight.addDataset('courses',courseContent);
     });
 
     after(function () {
-        //deleteFolderRecursive("./data");
-        fs.unlinkSync('./data/courses.json')
+        deleteFolderRecursive("./data");
+        insight = null;
     })
 
 
     beforeEach(function () {
         Log.test('BeforeTest: ' + (<any>this).currentTest.title);
-        insight = new Insight();
 
-        let courseContent = new Buffer(fs.readFileSync('./courses.zip')).toString('base64');
-        return insight.addDataset('courses',courseContent)
+
+
 
     });
 
 
     afterEach(function () {
         Log.test('AfterTest: ' + (<any>this).currentTest.title);
-        insight = null;
     });
 
 

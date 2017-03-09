@@ -20,7 +20,7 @@ let deleteFolderRecursive = function(path:string) {
                 fs.unlinkSync(curPath);
             }
         });
-        fs.mkdir(path);
+        fs.rmdirSync(path);
     }
 };
 
@@ -43,7 +43,7 @@ describe("addDataSet", function () {
     }
 
     before(function () {
-        //deleteFolderRecursive("./data");
+        deleteFolderRecursive("./data");
     })
 
     beforeEach(function () {
@@ -62,12 +62,7 @@ describe("addDataSet", function () {
 
 
     after(function () {
-        //deleteFolderRecursive("./data");
-        try {
-            fs.unlinkSync('./data/courses.json')
-        } catch(err) {
-
-        }
+        deleteFolderRecursive("./data");
     })
 
 
@@ -163,4 +158,8 @@ describe("addDataSet", function () {
 
             })
     });
+
+
+
+
 });

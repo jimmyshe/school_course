@@ -31,11 +31,6 @@ describe("performQuery_rooms", function () {
         expect(response.code).to.be.a('number');
     }
 
-
-
-
-
-
     before(function () {
         Log.test('test Query for rooms');
         deleteFolderRecursive("./data");
@@ -43,7 +38,6 @@ describe("performQuery_rooms", function () {
         // make sure the cache file is there
         let content = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
         return insight.addDataset('rooms',content)
-
     })
 
 

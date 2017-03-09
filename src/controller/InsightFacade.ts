@@ -234,6 +234,7 @@ export default class InsightFacade implements IInsightFacade {
                             fulfill(response2);
 
                         }).catch(function (e: any) {
+                            Log.error(e.message)
                             Log.error("con not unzip")
                             let response = {code: 400, body: {"error": 'Message not provided1'}};
                             reject(response);
