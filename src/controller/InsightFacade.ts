@@ -524,35 +524,36 @@ export default class InsightFacade implements IInsightFacade {
                     reject(response);
 
                 } else {
-                    if(query["WHERE"]=={}){
+                    if(JSON.stringify( query["WHERE"])== JSON.stringify(  {})){
                         selected = Array(information.length).fill(true);
-                    }
+                    } else {
 
-                    if (typeOfQuery == "courses") {
-                        try {
-                            selected = QH.filterOut_courses(information, query["WHERE"]);
-                        }
-                        catch (e) {
+                        if (typeOfQuery == "courses") {
                             try {
-                                response = JSON.parse(e.message);
-                            } catch (e) {
-                                Log.error("Should not be here, internal error");
+                                selected = QH.filterOut_courses(information, query["WHERE"]);
                             }
-                            reject(response);
+                            catch (e) {
+                                try {
+                                    response = JSON.parse(e.message);
+                                } catch (e) {
+                                    Log.error("Should not be here, internal error");
+                                }
+                                reject(response);
+                            }
                         }
-                    }
 
-                    if (typeOfQuery == "rooms") {
-                        try {
-                            selected = QH.filterOut_rooms(information, query["WHERE"]);
-                        }
-                        catch (e) {
+                        if (typeOfQuery == "rooms") {
                             try {
-                                response = JSON.parse(e.message);
-                            } catch (e) {
-                                Log.error("Should not be here, internal error");
+                                selected = QH.filterOut_rooms(information, query["WHERE"]);
                             }
-                            reject(response);
+                            catch (e) {
+                                try {
+                                    response = JSON.parse(e.message);
+                                } catch (e) {
+                                    Log.error("Should not be here, internal error");
+                                }
+                                reject(response);
+                            }
                         }
                     }
 
@@ -607,13 +608,42 @@ export default class InsightFacade implements IInsightFacade {
                     }
 
                     else {  // here is the cases for query with TRANSFORMATIONS
+                        let trans = query["TRANSFORMATIONS"];
+                        let group = trans["GROUP"];
+                        let apply = trans["APPLY"];
+
+                        // data divided here
+                        let data_grouped:any =[];
+                        let data_grouped_raw:any = [];
+
+                        for(let i = 0;i<body_pre.length;i++){
+
+
+                            let head:any ={};
+
+                            for(let j=0;j<group.length;j++){
+                                head[group[j]]=body_pre[i][group[j]];
+                            }
+
+                            let index = data_grouped.map(function (d:any) {
+                                return JSON.stringify(d);
+                            }).indexOf(JSON.stringify(head));
+
+                            if(index==-1){
+                                data_grouped.push(head);
+                                data_grouped_raw.push([body_pre[i]]);
+                            }else {
+                                data_grouped_raw[index].push(body_pre[i]);
+                            }
+                        }
 
 
 
-                        let group_set:any = [];
+                        //todo implement applay
 
-                        
-
+                        response.code = 200;
+                        response.body = {'render': query.OPTIONS.FORM, 'result': data_grouped}
+                        fulfill(response);
 
                     }
                 }
