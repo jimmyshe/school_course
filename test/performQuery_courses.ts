@@ -25,7 +25,7 @@ let deleteFolderRecursive = function(path:string) {
 };
 
 
-describe.only("performQuery_courses", function () {
+describe("performQuery_courses", function () {
 
     let insight:Insight = null;
     let testQuery_simple = {
@@ -53,7 +53,7 @@ describe.only("performQuery_courses", function () {
         expect(response.code).to.be.a('number');
     }
 
-    before(function (done) {
+    before(function () {
         Log.info("before query courses test")
         deleteFolderRecursive("./data");
         insight = new Insight();
