@@ -25,7 +25,7 @@ let deleteFolderRecursive = function(path:string) {
 };
 
 
-describe("performQuery_courses", function () {
+describe.only("performQuery_courses", function () {
 
     let insight:Insight = null;
     let testQuery_simple = {
@@ -53,7 +53,8 @@ describe("performQuery_courses", function () {
         expect(response.code).to.be.a('number');
     }
 
-    before(function () {
+    before(function (done) {
+        Log.info("before query courses test")
         deleteFolderRecursive("./data");
         insight = new Insight();
         let courseContent = new Buffer(fs.readFileSync('./courses.zip')).toString('base64');
@@ -61,8 +62,7 @@ describe("performQuery_courses", function () {
     });
 
     after(function () {
-        deleteFolderRecursive("./data");
-        insight = null;
+       deleteFolderRecursive("./data");
     })
 
 

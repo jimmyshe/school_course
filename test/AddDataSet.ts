@@ -43,7 +43,7 @@ describe("addDataSet", function () {
     }
 
     before(function () {
-        deleteFolderRecursive("./data");
+       deleteFolderRecursive("./data");
     })
 
     beforeEach(function () {
