@@ -65,7 +65,7 @@ export default class Server {
                     return next();
                 });
 
-                that.rest.put('/dataset/:id', function (req: restify.Request, res: restify.Response, next: restify.Next){
+                /*that.rest.put('/dataset/:id', function (req: restify.Request, res: restify.Response, next: restify.Next){
 
                     let id:string = req.params.id;
                     let buffer: any = [];
@@ -88,7 +88,7 @@ export default class Server {
                     });
                     return next();
 
-                });
+                });*/
 
                 that.rest.del('/dataset/:id', function (req: restify.Request, res: restify.Response, next: restify.Next) {
 
