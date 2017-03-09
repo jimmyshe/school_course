@@ -7,6 +7,7 @@ import restify = require('restify');
 
 import Log from "../Util";
 import {InsightResponse} from "../controller/IInsightFacade";
+import InsightFacade from "../controller/InsightFacade";
 
 /**
  * This configures the REST endpoints for the server.
@@ -15,10 +16,12 @@ export default class Server {
 
     private port: number;
     private rest: restify.Server;
+    private static insightfacade = new InsightFacade();
 
     constructor(port: number) {
         Log.info("Server::<init>( " + port + " )");
         this.port = port;
+        let insightfacade: InsightFacade = new InsightFacade;
     }
 
     /**
@@ -46,6 +49,9 @@ export default class Server {
      */
     public start(): Promise<boolean> {
         let that = this;
+
+        //let insightfacade: InsightFacade = new InsightFacade;
+
         return new Promise(function (fulfill, reject) {
             try {
                 Log.info('Server::start() - start');
@@ -57,6 +63,61 @@ export default class Server {
                 that.rest.get('/', function (req: restify.Request, res: restify.Response, next: restify.Next) {
                     res.send(200);
                     return next();
+                });
+
+                that.rest.put('/dataset/:id', function (req: restify.Request, res: restify.Response, next: restify.Next){
+
+                    let id:string = req.params.id;
+                    let buffer: any = [];
+                    req.on('data', function onRequestData(chunk: any) {
+                        Log.trace('RouteHandler::postDataset(..) on data; chunk length: ' + chunk.length);
+                        buffer.push(chunk);
+                    });
+
+                    req.once('end', function () {
+                        let concated = Buffer.concat(buffer);
+                        req.body = concated.toString('base64');
+                        Log.trace('RouteHandler::postDataset(..) on end; total length: ' + req.body.length);
+
+                        Server.insightfacade.addDataset(id,req.body).then(function(result:InsightResponse){
+                            res.json(result.code,result.body);
+                        }).catch(function (result:InsightResponse){
+                            res.json(result.code,result.body);
+                        });
+
+                    });
+                    return next();
+
+                });
+
+                that.rest.del('/dataset/:id', function (req: restify.Request, res: restify.Response, next: restify.Next) {
+
+                    let id:string = req.params.id;
+
+                    Server.insightfacade.removeDataset(id).then(function(result:InsightResponse){
+                        res.json(result.code, result.body);
+                    }).catch(function(result:InsightResponse){
+                        res.json(result.code, result.body);
+                    });
+
+                    return next();
+
+
+
+                });
+
+                that.rest.post('/query', restify.bodyParser(), function (req: restify.Request, res: restify.Response, next: restify.Next) {
+
+                    let query = req.params;
+
+                    Server.insightfacade.performQuery(query).then(function(result:InsightResponse){
+                        res.json(result.code, result.body);
+                    }).catch(function(result:InsightResponse){
+                        res.json(result.code, result.body);
+                    });
+
+                    return next();
+
                 });
 
                 // provides the echo service
