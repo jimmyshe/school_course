@@ -489,12 +489,6 @@ describe("performQuery_rooms_d3", function () {
                             "rooms_shortname": "SWNG",
                             "countSeats": 3
                         }, {
-                            "rooms_shortname": "LSK",
-                            "countSeats": 1
-                        }, {
-                            "rooms_shortname": "PHRM",
-                            "countSeats": 1
-                        }, {
                             "rooms_shortname": "FRDM",
                             "countSeats": 1
                         }, {
@@ -503,6 +497,94 @@ describe("performQuery_rooms_d3", function () {
                         }, {
                             "rooms_shortname": "IBLC",
                             "countSeats": 1
+                        }, {
+                            "rooms_shortname": "LSK",
+                            "countSeats": 1
+                        }, {
+                            "rooms_shortname": "PHRM",
+                            "countSeats": 1
+                        }                       ]
+                })
+
+            })
+            .catch( (err:InsightResponse)=>{
+                Log.test('Error: query request not success ');
+                expect.fail();
+            })
+    });
+
+    it("test of count and sum", function () {
+        return insight.performQuery({
+            "WHERE": {
+                "AND": [{
+                    "IS": {
+                        "rooms_furniture": "*Tables*"
+                    }
+                }, {
+                    "GT": {
+                        "rooms_seats": 150
+                    }
+                }, {
+                    "LT":{
+                        "rooms_seats":200
+                    }
+                }]
+            },
+            "OPTIONS": {
+                "COLUMNS": [
+                    "rooms_shortname",
+                    "countSeats",
+                    "sumSeats"
+                ],
+                "ORDER": {
+                    "dir": "DOWN",
+                    "keys": ["countSeats"]
+                },
+                "FORM": "TABLE"
+            },
+            "TRANSFORMATIONS": {
+                "GROUP": ["rooms_shortname"],
+                "APPLY": [{
+                    "countSeats": {
+                        "COUNT": "rooms_seats"
+                    }
+                }, {
+                    "sumSeats": {
+                        "SUM": "rooms_seats"
+                    }
+                }]
+            }
+        })
+            .then((respons:InsightResponse)=>{
+                sanityCheck(respons);
+                console.log(respons.body);
+                expect(respons.body).to.deep.equal({
+                    "render": "TABLE",
+                    "result": [
+                        {
+                            "rooms_shortname": "SWNG",
+                            "countSeats": 3,
+                            "sumSeats": 755
+                        }, {
+                            "rooms_shortname": "FRDM",
+                            "countSeats": 1,
+                            "sumSeats": 160
+                        }, {
+                            "rooms_shortname": "DMP",
+                            "countSeats": 1,
+                            "sumSeats": 160
+                        }, {
+                            "rooms_shortname": "IBLC",
+                            "countSeats": 1,
+                            "sumSeats": 154
+                        }, {
+                            "rooms_shortname": "LSK",
+                            "countSeats": 1,
+                            "sumSeats": 183
+                        }, {
+                            "rooms_shortname": "PHRM",
+                            "countSeats": 1,
+                            "sumSeats": 167
                         }                       ]
                 })
 
