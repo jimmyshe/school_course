@@ -511,7 +511,7 @@ export default class InsightFacade implements IInsightFacade {
                 let typeOfQuery = (response.body as any)["missing"][0];
 
 
-                let information =[];
+                let information:any =[];
                 if(typeOfQuery == "rooms" && fs.existsSync('./data/rooms.json')){
                     information = this.roomsInformation;
                 } else if(typeOfQuery == "courses" && fs.existsSync('./data/courses.json')){
@@ -558,7 +558,7 @@ export default class InsightFacade implements IInsightFacade {
                     }
 
 
-                    let body_pre = [];
+                    let body_pre:any = [];
                     let len = information.length;
                     for (let i = 0; i < len; i++) {
                         if (selected[i]) {
@@ -568,14 +568,13 @@ export default class InsightFacade implements IInsightFacade {
 
 
                     if(query["TRANSFORMATIONS"]==null) {
-
                         //sort the output
                         len = body_pre.length;
                         //These are all sections selected
                         let order_key = query.OPTIONS.ORDER;  // sort the body_pre if it is necessary
                         if (order_key != null) {
                             if(typeof order_key == "string") {
-                                body_pre.sort((n1, n2) => {
+                                body_pre.sort((n1:any, n2:any) => {
 
                                     if ((n1 as any)[order_key] > (n2 as any)[order_key]) {
                                         return 1;
@@ -603,7 +602,7 @@ export default class InsightFacade implements IInsightFacade {
                             results.push(element);
                         }
                         response.code = 200;
-                        response.body = {'render': query.OPTIONS.FORM, 'result': results}
+                        response.body = {'render': query.OPTIONS.FORM, 'result': results};
                         fulfill(response);
                     }
 
@@ -637,9 +636,49 @@ export default class InsightFacade implements IInsightFacade {
                             }
                         }
 
+                        //applay
+                        for(let i=0;i<apply.length;i++){
+                            let applykeyName = Object.keys(apply[i])[0];
+                            let applykeyObj = apply[i][applykeyName];
+                            let applyToken = Object.keys( applykeyObj)[0];
+                            let applyDataKey = applykeyObj[applyToken];
 
+                            for(let j=0;j<data_grouped.length;j++){
+                                let applyValue:number;
+                                try {
+                                    applyValue = QH.applyApplykey(applyToken, applyDataKey, data_grouped_raw[j]);
+                                }catch (e){
+                                    response.code = 400;
+                                    response.body = {"error": "the applykey obj is not valid"};
+                                    reject(response);
+                                }
+                                data_grouped[j][applykeyName] = applyValue;
+                            }
+                        }
 
-                        //todo implement applay
+                        //todo sort the groups
+                        len = data_grouped.length
+                        let order_key = query.OPTIONS.ORDER;  // sort the body_pre if it is necessary
+                        if (order_key != null) {
+                            if(typeof order_key == "string") {
+                                data_grouped.sort((n1:any, n2:any) => {
+                                    if ((n1 as any)[order_key] > (n2 as any)[order_key]) {
+                                        return 1;
+                                    } else if ((n1 as any)[order_key] == (n2 as any)[order_key]) {
+                                        return 0;
+                                    } else {
+                                        return -1;
+                                    }
+                                });
+                            }
+                            else {
+                                let order_obj = query.OPTIONS.ORDER;
+                                let dir = order_obj['dir'];
+                                let keys =  order_obj['keys'];
+                                data_grouped = QH.adv_mergeSort(data_grouped,dir,keys);
+                            }
+                        }
+
 
                         response.code = 200;
                         response.body = {'render': query.OPTIONS.FORM, 'result': data_grouped}

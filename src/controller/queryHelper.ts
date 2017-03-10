@@ -181,12 +181,12 @@ export default class QH {
             for(let i=0;i<apply.length;i++){ // check elements in apply
 
                  let applyKey = apply[i];
-                 if(applyKey.getOwnPropertyNames().length!=1){
+                 if( Object.keys(applyKey).length!=1){
                      ret.code = 400;
                      ret.body = {"error": "Invalid apply key"};
                      return ret;
                  }
-                 let applykeyName = applyKey.getOwnPropertyNames[0];
+                 let applykeyName = Object.keys(applyKey)[0];
                  let applykeyObj = applyKey[applykeyName];
 
                 if(!query.OPTIONS.COLUMNS.includes(applykeyName)){
@@ -217,13 +217,14 @@ export default class QH {
         if(!isObject(obj)){
             return false;
         }
-        if(obj.getOwnPropertyNames.length!=1){
+        if(Object.keys(obj).length!=1){
             return false;
         }
-        let applytoken = obj.getOwnPropertyNames[0];
+        let applytoken = Object.keys(obj)[0];
         if(!QH.isValidApplyToken(applytoken)){
             return false;
         }
+        return true
     }
 
     public static isValidApplyToken(key:any):boolean{
@@ -661,7 +662,7 @@ export default class QH {
 
     private static merge(left:any, right:any,keys:any,dir:any)
     {
-        let result = [];
+        let result:any = [];
 
         while (left.length && right.length) {
 
@@ -710,6 +711,105 @@ export default class QH {
             result.push(right.shift());
 
         return result;
+    }
+
+
+    public static applyApplykey(token:string,datakey:string,datasets:any):number{
+
+        let ans;
+        let buffer:any;
+        switch (token){
+            case "MAX":
+                ans = datasets[0][datakey];
+                if(ans==null||!isNumber(ans)){
+                    throw new Error;
+                }
+                for(let i=1;i<datasets.length;i++){
+                    let temp = datasets[i][datakey];
+                    if(temp==null||!isNumber(temp)){
+                        throw new Error;
+                    }
+                    if(temp>ans){
+                        ans = temp;
+                    }
+                }
+                break;
+
+            case "MIN":
+                ans = datasets[0][datakey];
+                if(ans==null||!isNumber(ans)){
+                    throw new Error;
+                }
+                for(let i=1;i<datasets.length;i++){
+                    let temp = datasets[i][datakey];
+                    if(temp==null||!isNumber(temp)){
+                        throw new Error;
+                    }
+                    if(temp<ans){
+                        ans = temp;
+                    }
+                }
+                break;
+
+            case "COUNT":
+                buffer = [];
+                for(let i=0;i<datasets.length;i++){
+                    let temp = datasets[i][datakey];
+                    if(temp==null){
+                        throw new Error;
+                    }
+                    if(buffer.findIndex(temp)==-1){
+                        buffer.push(temp);
+                    }
+                }
+                ans = buffer.length;
+                break;
+
+            case "AVG":
+                buffer = [];
+                for(let i=0;i<datasets.length;i++){
+                    let temp = datasets[i][datakey];
+                    if(temp==null||!isNumber(temp)){
+                        throw new Error;
+                    }
+                    buffer.push(temp);
+                }
+                buffer = buffer.map(function (n:number) {
+                    n = n*10;
+                    n = Number(n.toFixed(0));
+                })
+                ans = 0;
+                for(let i=0;i<buffer.length;i++){
+                    ans+= buffer[i];
+                }
+                ans = ans/buffer.length;
+                ans = ans/10;
+                ans = Number(ans.toFixed(2));
+
+                break;
+            case "SUM":
+                buffer = [];
+                for(let i=0;i<datasets.length;i++){
+                    let temp = datasets[i][datakey];
+                    if(temp==null||!isNumber(temp)){
+                        throw new Error;
+                    }
+                    buffer.push(temp);
+                }
+
+                ans = 0;
+                for(let i=0;i<buffer.length;i++){
+                    ans+= buffer[i];
+                }
+
+
+                break;
+
+
+
+            default: throw new Error;
+        }
+        return ans;
     }
 
 
