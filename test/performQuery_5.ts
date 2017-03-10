@@ -229,7 +229,7 @@ describe("performQuery_rooms_d3", function () {
                 expect.fail();
             })
     });
-
+/*
     it("test of min", function () {
         return insight.performQuery({
             "WHERE": {
@@ -295,8 +295,12 @@ describe("performQuery_rooms_d3", function () {
 
             })
             .catch( (err:InsightResponse)=>{
-                Log.test('Error: query request not success ');
-                expect.fail();
+                if(err.constructor.name == "AssertionError"){
+                    throw err;
+                }else {
+                    Log.test(err.toString());
+                    expect.fail();
+                }
             })
     });
 
@@ -366,8 +370,12 @@ describe("performQuery_rooms_d3", function () {
 
             })
             .catch( (err:InsightResponse)=>{
-                Log.test('Error: query request not success ');
-                expect.fail();
+                if(err.constructor.name == "AssertionError"){
+                    throw err;
+                }else {
+                    Log.test(err.toString());
+                    expect.fail();
+                }
             })
     });
 
@@ -437,8 +445,12 @@ describe("performQuery_rooms_d3", function () {
 
             })
             .catch( (err:InsightResponse)=>{
-                Log.test('Error: query request not success ');
-                expect.fail();
+                if(err.constructor.name == "AssertionError"){
+                    throw err;
+                }else {
+                    Log.test(err.toString());
+                    expect.fail();
+                }
             })
     });
 
@@ -508,8 +520,12 @@ describe("performQuery_rooms_d3", function () {
 
             })
             .catch( (err:InsightResponse)=>{
-                Log.test('Error: query request not success ');
-                expect.fail();
+                if(err.constructor.name == "AssertionError"){
+                    throw err;
+                }else {
+                    Log.test(err.toString());
+                    expect.fail();
+                }
             })
     });
 
@@ -590,11 +606,15 @@ describe("performQuery_rooms_d3", function () {
 
             })
             .catch( (err:InsightResponse)=>{
-                Log.test('Error: query request not success ');
-                expect.fail();
+                if(err.constructor.name == "AssertionError"){
+                    throw err;
+                }else {
+                    Log.test(err.toString());
+                    expect.fail();
+                }
             })
     });
-
+*/
 
 
 

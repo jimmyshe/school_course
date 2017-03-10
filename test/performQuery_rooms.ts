@@ -8,7 +8,7 @@ import {InsightResponse} from "../src/controller/IInsightFacade";
 
 let fs = require('fs');
 
-describe.only("performQuery_rooms", function () {
+describe("performQuery_rooms", function () {
     let insight:Insight = null;
     function sanityCheck(response: InsightResponse) {
         expect(response).to.have.property('code');

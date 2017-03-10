@@ -758,7 +758,7 @@ export default class QH {
                     if(temp==null){
                         throw new Error;
                     }
-                    if(buffer.findIndex(temp)==-1){
+                    if(!(buffer.includes(temp))){
                         buffer.push(temp);
                     }
                 }
@@ -776,7 +776,7 @@ export default class QH {
                 }
                 buffer = buffer.map(function (n:number) {
                     n = n*10;
-                    n = Number(n.toFixed(0));
+                    return  Number(n.toFixed(0));
                 })
                 ans = 0;
                 for(let i=0;i<buffer.length;i++){

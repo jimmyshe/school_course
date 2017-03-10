@@ -1197,7 +1197,7 @@ describe("performQuery_courses", function () {
             })
     });
 
-    it("test group", function () {
+    it.skip("test group", function () {
         return insight.performQuery(
             {
                 "WHERE": {},
