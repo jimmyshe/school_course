@@ -10,21 +10,6 @@ import {AssertionError} from "assert";
 
 let fs = require('fs');
 
-let deleteFolderRecursive = function(path:string) {
-    if( fs.existsSync(path) ) {
-        fs.readdirSync(path).forEach(function(file:string) {
-            let curPath = path + "/" + file;
-            if(fs.statSync(curPath).isDirectory()) { // recurse
-                deleteFolderRecursive(curPath);
-            } else { // delete file
-                fs.unlinkSync(curPath);
-            }
-        });
-        fs.rmdirSync(path);
-    }
-};
-
-
 describe("performQuery_courses", function () {
 
     let insight:Insight = null;
@@ -55,14 +40,26 @@ describe("performQuery_courses", function () {
 
     before(function () {
         Log.info("before query courses test")
-        deleteFolderRecursive("./data");
+
+        if(fs.existsSync("./data/courses.json")){
+            fs.unlinkSync("./data/courses.json");
+        }
+        if(fs.existsSync("./data/rooms.json")){
+            fs.unlinkSync("./data/rooms.json");
+        }
+
         insight = new Insight();
         let courseContent = new Buffer(fs.readFileSync('./courses.zip')).toString('base64');
         return insight.addDataset('courses',courseContent);
     });
 
     after(function () {
-       deleteFolderRecursive("./data");
+        if(fs.existsSync("./data/courses.json")){
+            fs.unlinkSync("./data/courses.json");
+        }
+        if(fs.existsSync("./data/rooms.json")){
+            fs.unlinkSync("./data/rooms.json");
+        }
     })
 
 

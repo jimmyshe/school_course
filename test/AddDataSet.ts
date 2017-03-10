@@ -10,22 +10,6 @@ import InsightFacade from "../src/controller/InsightFacade";
 
 let fs = require('fs');
 
-let deleteFolderRecursive = function(path:string) {
-    if( fs.existsSync(path) ) {
-        fs.readdirSync(path).forEach(function(file:string) {
-            let curPath = path + "/" + file;
-            if(fs.statSync(curPath).isDirectory()) { // recurse
-                deleteFolderRecursive(curPath);
-            } else { // delete file
-                fs.unlinkSync(curPath);
-            }
-        });
-        fs.rmdirSync(path);
-    }
-};
-
-
-
 describe("addDataSet", function () {
 
     let insight : Insight = null;
@@ -43,28 +27,36 @@ describe("addDataSet", function () {
     }
 
     before(function () {
-       deleteFolderRecursive("./data");
+        courseContent = new Buffer(fs.readFileSync('./courses.zip')).toString('base64');
+        roomContent = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
+        voidContent = new Buffer(fs.readFileSync('./no_real_data.zip')).toString('base64');
+        if(fs.existsSync("./data/courses.json")){
+            fs.unlinkSync("./data/courses.json");
+        }
+        if(fs.existsSync("./data/rooms.json")){
+            fs.unlinkSync("./data/rooms.json");
+        }
     })
 
     beforeEach(function () {
         Log.test('BeforeTest: ' + (<any>this).currentTest.title);
         insight = new Insight();
-        courseContent = new Buffer(fs.readFileSync('./courses.zip')).toString('base64');
-        roomContent = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
-        voidContent = new Buffer(fs.readFileSync('./no_real_data.zip')).toString('base64');
-        // console.log(courseContent);
+
     });
 
     afterEach(function () {
         Log.test('AfterTest: ' + (<any>this).currentTest.title);
-        //insight = null;
     });
 
 
     after(function () {
-        deleteFolderRecursive("./data");
+        if(fs.existsSync("./data/courses.json")){
+            fs.unlinkSync("./data/courses.json");
+        }
+        if(fs.existsSync("./data/rooms.json")){
+            fs.unlinkSync("./data/rooms.json");
+        }
     })
-
 
 
     it("test1", function () {
@@ -77,7 +69,6 @@ describe("addDataSet", function () {
                 expect(fs.existsSync("./data/courses.json")).equal(true);
             })
             .catch((err)=>{
-
                 expect.fail();
             })
     });
