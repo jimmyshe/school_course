@@ -628,7 +628,7 @@ export default class InsightFacade implements IInsightFacade {
 
                         let counter = 0;
 
-                        for(let i = 0;i<body_pre.length;i++){
+                        for(let i = 1;i<body_pre.length;i++){
 
 
                             let head:any ={};
