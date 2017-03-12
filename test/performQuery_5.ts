@@ -229,7 +229,7 @@ describe("performQuery_rooms_d3", function () {
                 expect.fail();
             })
     });
-/*
+
     it("test of min", function () {
         return insight.performQuery({
             "WHERE": {
@@ -614,7 +614,7 @@ describe("performQuery_rooms_d3", function () {
                 }
             })
     });
-*/
+
 
 
 

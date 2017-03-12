@@ -615,12 +615,38 @@ export default class InsightFacade implements IInsightFacade {
                         let data_grouped:any =[];
                         let data_grouped_raw:any = [];
 
+                        let p_head:any = {};
+
+                        body_pre = QH.adv_mergeSort(body_pre, "DOWN", group);
+
+                        for (let key_index = 0; key_index < group.length; key_index++) {
+                            p_head[group[key_index]] = body_pre[0][group[key_index]];
+                        }
+
+                        data_grouped.push(p_head);
+                        data_grouped_raw.push([body_pre[0]]);
+
+                        let counter = 0;
+
                         for(let i = 0;i<body_pre.length;i++){
 
 
                             let head:any ={};
 
-                            for(let j=0;j<group.length;j++){
+                            for (let key_index = 0; key_index < group.length; key_index++) {
+                                head[group[key_index]] = body_pre[i][group[key_index]];
+                            }
+
+                            if (JSON.stringify(head) != JSON.stringify(p_head)) {
+                                counter++;
+                                data_grouped.push(head);
+                                p_head = head;
+                                data_grouped_raw.push([body_pre[i]]);
+                            } else {
+                                data_grouped_raw[counter].push(body_pre[i]);
+                            }
+
+                            /*for(let j=0;j<group.length;j++){
                                 head[group[j]]=body_pre[i][group[j]];
                             }
 
@@ -633,7 +659,7 @@ export default class InsightFacade implements IInsightFacade {
                                 data_grouped_raw.push([body_pre[i]]);
                             }else {
                                 data_grouped_raw[index].push(body_pre[i]);
-                            }
+                            }*/
                         }
 
                         //applay
