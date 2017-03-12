@@ -12,19 +12,7 @@ import {InsightResponse} from "../src/controller/IInsightFacade";
 
 let fs = require('fs');
 
-let deleteFolderRecursive = function(path:string) {
-    if( fs.existsSync(path) ) {
-        fs.readdirSync(path).forEach(function(file:string) {
-            let curPath = path + "/" + file;
-            if(fs.statSync(curPath).isDirectory()) { // recurse
-                deleteFolderRecursive(curPath);
-            } else { // delete file
-                fs.unlinkSync(curPath);
-            }
-        });
-        fs.mkdir(path);
-    }
-};
+
 
 
 describe("performQuery_rooms_d3", function () {
