@@ -182,4 +182,32 @@ describe("QH helper test", function () {
 
 
 
+
+    it("test invalid operation d3", function () {
+         let test_query:any ={
+             "WHERE": {},
+             "OPTIONS": {
+                 "COLUMNS": [
+                     "rooms_furniture"
+                 ],
+                 "ORDER": "rooms_furniture",
+                 "FORM": "TABLE"
+             },
+             "TRANSFORMATIONS": {
+                 "GROUP": ["rooms_furniture"],
+                 "APPLY": [{
+                     "maxSeats": {
+                         "MAX": "rooms_seats"
+                     }
+                 }]
+             }
+         }
+         expect(QH.isValidQuery(test_query).code).equal(400);
+
+    });
+
+
+
+
+
 });

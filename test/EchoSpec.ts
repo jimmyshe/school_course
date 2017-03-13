@@ -68,9 +68,6 @@ describe("EchoSpec", function () {
     it("test the server", function () {
         let server = new Server(8888);
         return server.start().then(function () {
-
-
-
             server.stop();
         })
     });

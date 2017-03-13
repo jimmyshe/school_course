@@ -9,20 +9,6 @@ import {InsightResponse} from "../src/controller/IInsightFacade";
 
 let fs = require('fs');
 
-let deleteFolderRecursive = function(path:string) {
-    if( fs.existsSync(path) ) {
-        fs.readdirSync(path).forEach(function(file:string) {
-            let curPath = path + "/" + file;
-            if(fs.statSync(curPath).isDirectory()) { // recurse
-                deleteFolderRecursive(curPath);
-            } else { // delete file
-                fs.unlinkSync(curPath);
-            }
-        });
-        fs.rmdirSync(path);
-    }
-};
-
 describe("addDataSet_rooms", function () {
 
     let insight : Insight = null;
@@ -43,11 +29,15 @@ describe("addDataSet_rooms", function () {
         Log.info("start add rooms");
         roomContent = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
         courseContent = new Buffer(fs.readFileSync('./courses.zip')).toString('base64');
+
+        if(fs.existsSync("./data/courses.json")){
+            fs.unlinkSync("./data/courses.json");
+        }
+        if(fs.existsSync("./data/rooms.json")){
+            fs.unlinkSync("./data/rooms.json");
+        }
+
         insight = new Insight();
-
-        deleteFolderRecursive("./data");
-
-
         Log.info("start add rooms")
 
     });
@@ -63,9 +53,13 @@ describe("addDataSet_rooms", function () {
     });
 
     after(function () {
-        deleteFolderRecursive("./data");
-
-    })
+        if(fs.existsSync("./data/courses.json")){
+            fs.unlinkSync("./data/courses.json");
+        }
+        if(fs.existsSync("./data/rooms.json")){
+            fs.unlinkSync("./data/rooms.json");
+        }
+    });
 
     it("test1", function () {
         insight = new Insight;
@@ -80,8 +74,6 @@ describe("addDataSet_rooms", function () {
                 expect.fail();
             })
     });
-
-
 
     it("test2", function () {
         insight = new Insight;

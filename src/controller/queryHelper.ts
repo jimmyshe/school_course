@@ -5,6 +5,7 @@ import {error} from "util";
 import {isNumber} from "util";
 import {isString} from "util";
 import {isArray} from "util";
+import {isObject} from "util";
 
 export default class QH {
        /*
@@ -47,13 +48,17 @@ export default class QH {
              return ret;
          }
 
+        if (query.OPTIONS.COLUMNS.length == 0){
 
-
+            ret.code = 400;
+            ret.body = {"error": "the option of columns can not be empty"}
+            return ret;
+        }
 
 
          let courses_valid_counter = 0;
          let room_valid_counter = 0;
-
+         let apply_key_counter =0;
 
          for(let j=query.OPTIONS.COLUMNS.length-1;j>=0;j--){
              if (QH.isValidDateKeyInCourses( query.OPTIONS.COLUMNS[j])){
@@ -62,38 +67,207 @@ export default class QH {
              if(QH.isValidDateKeyInRooms(query.OPTIONS.COLUMNS[j])){
                  room_valid_counter++;
              }
+             if(QH.isValidApplyKeyName(query.OPTIONS.COLUMNS[j])){
+                 apply_key_counter++;
+             }
          }
 
-         if(courses_valid_counter!=query.OPTIONS.COLUMNS.length&&room_valid_counter!=query.OPTIONS.COLUMNS.length) {
+         if(query.TRANSFORMATIONS==null&&apply_key_counter>0){
              ret.code = 400;
-             ret.body = {"error": "the option of columns has an invalid key or the query type is wrong"}
+             ret.body = {"error": "the option of columns has an invalid key when the query has trans"}
              return ret;
          }
 
-         if(courses_valid_counter==query.OPTIONS.COLUMNS.length) {
+
+
+        if(courses_valid_counter+apply_key_counter!=query.OPTIONS.COLUMNS.length&&room_valid_counter+apply_key_counter!=query.OPTIONS.COLUMNS.length) {
+            ret.code = 400;
+            ret.body = {"error": "the option of columns has an invalid key or the query type is wrong"}
+            return ret;
+        }
+         if(courses_valid_counter+apply_key_counter==query.OPTIONS.COLUMNS.length) {
              ret.body = {"missing":["courses"]};
          }
 
-         if(room_valid_counter==query.OPTIONS.COLUMNS.length) {
+         if(room_valid_counter+apply_key_counter==query.OPTIONS.COLUMNS.length) {
              ret.body = {"missing":["rooms"]};
          }
 
 
          if(query.OPTIONS.ORDER!=null){
-             let order_key:string = query.OPTIONS.ORDER;
-             let opt_colimns:string[] = query.OPTIONS.COLUMNS;
 
-             if(!opt_colimns.includes(order_key)) {
-                 ret.code = 400;
-                 ret.body = {"error": "the option of order has an invalid key"};
-                 return ret;
+             if(typeof query.OPTIONS.ORDER =="string") {
+                 let order_key: string = query.OPTIONS.ORDER;
+                 let opt_colimns: string[] = query.OPTIONS.COLUMNS;
+
+                 if (!opt_colimns.includes(order_key)) {
+                     ret.code = 400;
+                     ret.body = {"error": "the option of order has an invalid key"};
+                     return ret;
+                 }
              }
+             else if(typeof query.OPTIONS.ORDER =="object"){
+                 let order_obj = query.OPTIONS.ORDER;
+                 let opt_colimns: string[] = query.OPTIONS.COLUMNS;
+
+                 if (order_obj['dir']==null||order_obj['keys']==null) {
+                     ret.code = 400;
+                     ret.body = {"error": "the option of order has an invalid key"};
+                     return ret;
+                 }
+                 if((!isArray(order_obj['keys']))||(typeof order_obj['dir']!="string")){
+                     ret.code = 400;
+                     ret.body = {"error": "the option of order has an invalid key:no key or dir"};
+                     return ret;
+                 }
+
+                 let  keys =  order_obj['keys'];
+                 for(let i=0;i<keys.length;i++)
+                 if (!opt_colimns.includes(keys[i])) {
+                     ret.code = 400;
+                     ret.body = {"error": "the option of order has an invalid key:invalid keys"};
+                     return ret;
+                 }
+
+                 let dir = order_obj['dir'];
+                 if(dir!="UP"&&dir!="DOWN"){
+                     ret.code = 400;
+                     ret.body = {"error": "the option of order has an invalid key:invalid dir"};
+                     return ret;
+                 }
+             }
+
          }
 
+        if(query["TRANSFORMATIONS"]!=null) {
+
+             let trans = query["TRANSFORMATIONS"];
+             if(trans["APPLY"]==null||trans["GROUP"]==null){
+                 ret.code = 400;
+                 ret.body = {"error": "The Transformation part of query is not complete"};
+                 return ret;
+             }
+
+             let group = trans["GROUP"];
+             let apply = trans["APPLY"];
+
+             if(!isArray(group)||!isArray(apply)){
+                 ret.code = 400;
+                 ret.body = {"error": "the group/apply is not an array"};
+                 return ret;
+             }
+
+             if(group.length<1){
+                 ret.code = 400;
+                 ret.body = {"error": "the group should has at least one key"};
+                 return ret;
+             }
+
+
+             for(let i=0;i<group.length;i++){  // check elements in group
+                 if(!query.OPTIONS.COLUMNS.includes(group[i])){
+                     ret.code = 400;
+                     ret.body = {"error": "the group has keys that are not in the columns "};
+                     return ret;
+                 }
+             }
+
+             let namebuffer:any = [];
+
+
+            for(let i=0;i<apply.length;i++){ // check elements in apply
+
+                 let applyKey = apply[i];
+                 if( Object.keys(applyKey).length!=1){
+                     ret.code = 400;
+                     ret.body = {"error": "Invalid apply key"};
+                     return ret;
+                 }
+                 let applykeyName = Object.keys(applyKey)[0];
+                 let applykeyObj = applyKey[applykeyName];
+
+                if(!query.OPTIONS.COLUMNS.includes(applykeyName)){
+                    ret.code = 400;
+                    ret.body = {"error": "the apply has keys that are not in the columns "};
+                    return ret;
+                }
+
+                if(namebuffer.includes(applykeyName)){  // check duplicated key string
+                    ret.code = 400;
+                    ret.body = {"error": "the apply duplicate keyName "};
+                    return ret;
+                }else {
+                    namebuffer.push(applykeyName);
+                }
+
+                if(!QH.isValidAppkeyObj(applykeyObj)){
+                    ret.code = 400;
+                    ret.body = {"error": "the apply has keys that are not valid "};
+                    return ret;
+                }
+            }
+
+            for(let i=0;i<query.OPTIONS.COLUMNS.length;i++){
+                let columns_element = query.OPTIONS.COLUMNS;
+                if(columns_element.includes("_")){
+                    if(!group.includes(columns_element)){
+                        ret.code = 400;
+                        ret.body = {"error": "the columns has keys that are not valid "};
+                        return ret;
+                    }
+                }else {
+                    if(!namebuffer.includes(columns_element)){
+                        ret.code = 400;
+                        ret.body = {"error": "the cloumns has keys that are not valid "};
+                        return ret;
+                    }
+                }
+            }
 
 
 
+        }
          return ret;
+    }
+
+    public static isValidAppkeyObj(obj:any):boolean{
+        if(!isObject(obj)){
+            return false;
+        }
+        if(Object.keys(obj).length!=1){
+            return false;
+        }
+        let applytoken = Object.keys(obj)[0];
+        if(!QH.isValidApplyToken(applytoken)){
+            return false;
+        }
+        return true
+    }
+
+    public static isValidApplyToken(key:any):boolean{
+
+
+        let valid_keys = ["MAX","MIN","AVG","COUNT","SUM"];
+
+        for(let valid_key of valid_keys){
+            if (valid_key == key){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static isValidApplyKeyName(str:any):boolean{
+        if(typeof str!="string"){
+            return false
+        }
+
+        if((str as string).includes("_")){
+            return false
+        }
+
+        return true;
+
     }
 
     public static isValidDateKeyInCourses(key:any):boolean{
@@ -490,4 +664,170 @@ export default class QH {
         }
 
     }
+
+    public static adv_mergeSort(arr:any,dir:string,keys:any):any[]
+    {
+        if (arr.length < 2)
+            return arr;
+
+        let middle = arr.length / 2;
+        let left   = arr.slice(0, middle);
+        let right  = arr.slice(middle, arr.length);
+
+        return this.merge(this.adv_mergeSort(left,dir,keys), this.adv_mergeSort(right,dir,keys),keys,dir);
+    }
+
+    private static merge(left:any, right:any,keys:any,dir:any)
+    {
+        let result:any = [];
+
+        while (left.length && right.length) {
+
+            if(dir=="UP") {
+
+                let i = 0;
+                while (left[0][keys[i]] == right[0][keys[i]]){
+                    i++;
+                    if(i==keys.length){
+                        i=0;
+                        break;
+                    }
+                }
+
+                if (left[0][keys[i]] <= right[0][keys[i]]) {
+                    result.push(left.shift());
+                } else {
+                    result.push(right.shift());
+                }
+            }
+
+
+            if(dir=="DOWN") {
+
+                let i = 0;
+                while (left[0][keys[i]] == right[0][keys[i]]){
+                    i++;
+                    if(i==keys.length){
+                        i=0;
+                        break;
+                    }
+                }
+
+                if (left[0][keys[i]] >= right[0][keys[i]]) {
+                    result.push(left.shift());
+                } else {
+                    result.push(right.shift());
+                }
+            }
+        }
+
+        while (left.length)
+            result.push(left.shift());
+
+        while (right.length)
+            result.push(right.shift());
+
+        return result;
+    }
+
+
+    public static applyApplykey(token:string,datakey:string,datasets:any):number{
+
+        let ans;
+        let buffer:any;
+        switch (token){
+            case "MAX":
+                ans = datasets[0][datakey];
+                if(ans==null||!isNumber(ans)){
+                    throw new Error;
+                }
+                for(let i=1;i<datasets.length;i++){
+                    let temp = datasets[i][datakey];
+                    if(temp==null||!isNumber(temp)){
+                        throw new Error;
+                    }
+                    if(temp>ans){
+                        ans = temp;
+                    }
+                }
+                break;
+
+            case "MIN":
+                ans = datasets[0][datakey];
+                if(ans==null||!isNumber(ans)){
+                    throw new Error;
+                }
+                for(let i=1;i<datasets.length;i++){
+                    let temp = datasets[i][datakey];
+                    if(temp==null||!isNumber(temp)){
+                        throw new Error;
+                    }
+                    if(temp<ans){
+                        ans = temp;
+                    }
+                }
+                break;
+
+            case "COUNT":
+                buffer = [];
+                for(let i=0;i<datasets.length;i++){
+                    let temp = datasets[i][datakey];
+                    if(temp==null){
+                        throw new Error;
+                    }
+                    if(!(buffer.includes(temp))){
+                        buffer.push(temp);
+                    }
+                }
+                ans = buffer.length;
+                break;
+
+            case "AVG":
+                buffer = [];
+                for(let i=0;i<datasets.length;i++){
+                    let temp = datasets[i][datakey];
+                    if(temp==null||!isNumber(temp)){
+                        throw new Error;
+                    }
+                    buffer.push(temp);
+                }
+                buffer = buffer.map(function (n:number) {
+                    n = n*10;
+                    return  Number(n.toFixed(0));
+                })
+                ans = 0;
+                for(let i=0;i<buffer.length;i++){
+                    ans+= buffer[i];
+                }
+                ans = ans/buffer.length;
+                ans = ans/10;
+                ans = Number(ans.toFixed(2));
+
+                break;
+            case "SUM":
+                buffer = [];
+                for(let i=0;i<datasets.length;i++){
+                    let temp = datasets[i][datakey];
+                    if(temp==null||!isNumber(temp)){
+                        throw new Error;
+                    }
+                    buffer.push(temp);
+                }
+
+                ans = 0;
+                for(let i=0;i<buffer.length;i++){
+                    ans+= buffer[i];
+                }
+
+
+                break;
+
+
+
+            default: throw new Error;
+        }
+        return ans;
+    }
+
+
 }

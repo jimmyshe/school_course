@@ -9,20 +9,6 @@ import {InsightResponse} from "../src/controller/IInsightFacade";
 
 let fs = require('fs');
 
-let deleteFolderRecursive = function(path:string) {
-    if( fs.existsSync(path) ) {
-        fs.readdirSync(path).forEach(function(file:string) {
-            let curPath = path + "/" + file;
-            if(fs.statSync(curPath).isDirectory()) { // recurse
-                deleteFolderRecursive(curPath);
-            } else { // delete file
-                fs.unlinkSync(curPath);
-            }
-        });
-        fs.rmdirSync(path);
-    }
-};
-
 
 describe("performQuery_rooms_not_added", function () {
     let insight:Insight = null;
@@ -39,23 +25,19 @@ describe("performQuery_rooms_not_added", function () {
 
     before(function () {
         Log.test('test Query for rooms');
-        deleteFolderRecursive("./data");
+        if(fs.existsSync("./data/courses.json")){
+            fs.unlinkSync("./data/courses.json");
+        }
+        if(fs.existsSync("./data/rooms.json")){
+            fs.unlinkSync("./data/rooms.json");
+        }
         insight = new Insight();
-        // make sure the cache file is there
-        //let content = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
-        //return insight.addDataset('rooms',content)
-
+        // nothing added
     })
 
 
     after(function () {
         Log.test('end test Query for rooms ');
-        deleteFolderRecursive("./data");
-        // try {
-        //     fs.unlinkSync('./data/rooms.json');
-        // } catch (err) {
-        //
-        // }
     })
 
 
