@@ -645,7 +645,9 @@ export default class InsightFacade implements IInsightFacade {
                             } else {
                                 data_grouped_raw[counter].push(body_pre[i]);
                             }
-                            
+
+                        }
+
                         for(let i=0;i<apply.length;i++){
                             let applykeyName = Object.keys(apply[i])[0];
                             let applykeyObj = apply[i][applykeyName];
