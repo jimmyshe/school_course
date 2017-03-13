@@ -234,6 +234,7 @@ export default class InsightFacade implements IInsightFacade {
                             fulfill(response2);
 
                         }).catch(function (e: any) {
+                            Log.error(e.message)
                             Log.error("con not unzip")
                             let response = {code: 400, body: {"error": 'Message not provided1'}};
                             reject(response);
@@ -509,7 +510,8 @@ export default class InsightFacade implements IInsightFacade {
                 let selected: boolean[] = null;
                 let typeOfQuery = (response.body as any)["missing"][0];
 
-                let information =[];
+
+                let information:any =[];
                 if(typeOfQuery == "rooms" && fs.existsSync('./data/rooms.json')){
                     information = this.roomsInformation;
                 } else if(typeOfQuery == "courses" && fs.existsSync('./data/courses.json')){
@@ -522,36 +524,41 @@ export default class InsightFacade implements IInsightFacade {
                     reject(response);
 
                 } else {
+                    if(JSON.stringify( query["WHERE"])== JSON.stringify(  {})){
+                        selected = Array(information.length).fill(true);
+                    } else {
 
-                    if (typeOfQuery == "courses") {
-                        try {
-                            selected = QH.filterOut_courses(information, query["WHERE"]);
-                        }
-                        catch (e) {
+                        if (typeOfQuery == "courses") {
                             try {
-                                response = JSON.parse(e.message);
-                            } catch (e) {
-                                Log.error("Should not be here, internal error");
+                                selected = QH.filterOut_courses(information, query["WHERE"]);
                             }
-                            reject(response);
+                            catch (e) {
+                                try {
+                                    response = JSON.parse(e.message);
+                                } catch (e) {
+                                    Log.error("Should not be here, internal error");
+                                }
+                                reject(response);
+                            }
+                        }
+
+                        if (typeOfQuery == "rooms") {
+                            try {
+                                selected = QH.filterOut_rooms(information, query["WHERE"]);
+                            }
+                            catch (e) {
+                                try {
+                                    response = JSON.parse(e.message);
+                                } catch (e) {
+                                    Log.error("Should not be here, internal error");
+                                }
+                                reject(response);
+                            }
                         }
                     }
 
-                    if (typeOfQuery == "rooms") {
-                        try {
-                            selected = QH.filterOut_rooms(information, query["WHERE"]);
-                        }
-                        catch (e) {
-                            try {
-                                response = JSON.parse(e.message);
-                            } catch (e) {
-                                Log.error("Should not be here, internal error");
-                            }
-                            reject(response);
-                        }
-                    }
 
-                    let body_pre = [];
+                    let body_pre:any = [];
                     let len = information.length;
                     for (let i = 0; i < len; i++) {
                         if (selected[i]) {
@@ -559,34 +566,151 @@ export default class InsightFacade implements IInsightFacade {
                         }
                     }
 
-                    //sort the output
-                    len = body_pre.length;
-                    //These are all sections selected
-                    let order_key = query.OPTIONS.ORDER;  // sort the body_pre if it is necessary
-                    if (order_key != null) {
-                        body_pre.sort((n1, n2) => {
 
-                            if ((n1 as any)[order_key] > (n2 as any)[order_key]) {
-                                return 1;
-                            } else if ((n1 as any)[order_key] == (n2 as any)[order_key]) {
-                                return 0;
-                            } else {
-                                return -1;
+                    if(query["TRANSFORMATIONS"]==null) {
+                        //sort the output
+                        len = body_pre.length;
+                        //These are all sections selected
+                        let order_key = query.OPTIONS.ORDER;  // sort the body_pre if it is necessary
+                        if (order_key != null) {
+                            if(typeof order_key == "string") {
+                                body_pre.sort((n1:any, n2:any) => {
+
+                                    if ((n1 as any)[order_key] > (n2 as any)[order_key]) {
+                                        return 1;
+                                    } else if ((n1 as any)[order_key] == (n2 as any)[order_key]) {
+                                        return 0;
+                                    } else {
+                                        return -1;
+                                    }
+                                });
                             }
-                        });
+                            else {
+                                let order_obj = query.OPTIONS.ORDER;
+                                let dir = order_obj['dir'];
+                                let keys =  order_obj['keys'];
+                                body_pre = QH.adv_mergeSort(body_pre,dir,keys);
+                            }
+                        }
+
+                        let results: {}[] = [];
+                        for (let i = 0; i < body_pre.length; i++) {
+                            let element: any = {};
+                            for (let j = query.OPTIONS.COLUMNS.length - 1; j >= 0; j--) {
+                                element[query.OPTIONS.COLUMNS[j]] = (body_pre[i] as any)[query.OPTIONS.COLUMNS[j]];
+                            }
+                            results.push(element);
+                        }
+                        response.code = 200;
+                        response.body = {'render': query.OPTIONS.FORM, 'result': results};
+                        fulfill(response);
                     }
 
-                    let results: {}[] = [];
-                    for (let i = 0; i < body_pre.length; i++) {
-                        let element: any = {};
-                        for (let j = query.OPTIONS.COLUMNS.length - 1; j >= 0; j--) {
-                            element[query.OPTIONS.COLUMNS[j]] = (body_pre[i] as any)[query.OPTIONS.COLUMNS[j]];
+                    else {  // here is the cases for query with TRANSFORMATIONS
+                        let trans = query["TRANSFORMATIONS"];
+                        let group = trans["GROUP"];
+                        let apply = trans["APPLY"];
+
+                        // data divided here
+                        let data_grouped:any =[];
+                        let data_grouped_raw:any = [];
+
+                        let p_head:any = {};
+
+                        body_pre = QH.adv_mergeSort(body_pre, "DOWN", group);
+
+                        for (let key_index = 0; key_index < group.length; key_index++) {
+                            p_head[group[key_index]] = body_pre[0][group[key_index]];
                         }
-                        results.push(element);
+
+                        data_grouped.push(p_head);
+                        data_grouped_raw.push([body_pre[0]]);
+
+                        let counter = 0;
+
+                        for(let i = 1;i<body_pre.length;i++){
+
+
+                            let head:any ={};
+
+                            for (let key_index = 0; key_index < group.length; key_index++) {
+                                head[group[key_index]] = body_pre[i][group[key_index]];
+                            }
+
+                            if (JSON.stringify(head) != JSON.stringify(p_head)) {
+                                counter++;
+                                data_grouped.push(head);
+                                p_head = head;
+                                data_grouped_raw.push([body_pre[i]]);
+                            } else {
+                                data_grouped_raw[counter].push(body_pre[i]);
+                            }
+
+                            /*for(let j=0;j<group.length;j++){
+                                head[group[j]]=body_pre[i][group[j]];
+                            }
+
+                            let index = data_grouped.map(function (d:any) {
+                                return JSON.stringify(d);
+                            }).indexOf(JSON.stringify(head));
+
+                            if(index==-1){
+                                data_grouped.push(head);
+                                data_grouped_raw.push([body_pre[i]]);
+                            }else {
+                                data_grouped_raw[index].push(body_pre[i]);
+                            }*/
+                        }
+
+                        //applay
+                        for(let i=0;i<apply.length;i++){
+                            let applykeyName = Object.keys(apply[i])[0];
+                            let applykeyObj = apply[i][applykeyName];
+                            let applyToken = Object.keys( applykeyObj)[0];
+                            let applyDataKey = applykeyObj[applyToken];
+
+                            for(let j=0;j<data_grouped.length;j++){
+                                let applyValue:number;
+                                try {
+                                    applyValue = QH.applyApplykey(applyToken, applyDataKey, data_grouped_raw[j]);
+                                }catch (e){
+                                    response.code = 400;
+                                    response.body = {"error": "the applykey obj is not valid"};
+                                    reject(response);
+                                }
+                                data_grouped[j][applykeyName] = applyValue;
+                            }
+                        }
+
+                        //todo sort the groups
+                        len = data_grouped.length
+                        let order_key = query.OPTIONS.ORDER;  // sort the body_pre if it is necessary
+                        if (order_key != null) {
+                            if(typeof order_key == "string") {
+                                data_grouped.sort((n1:any, n2:any) => {
+                                    if ((n1 as any)[order_key] > (n2 as any)[order_key]) {
+                                        return 1;
+                                    } else if ((n1 as any)[order_key] == (n2 as any)[order_key]) {
+                                        return 0;
+                                    } else {
+                                        return -1;
+                                    }
+                                });
+                            }
+                            else {
+                                let order_obj = query.OPTIONS.ORDER;
+                                let dir = order_obj['dir'];
+                                let keys =  order_obj['keys'];
+                                data_grouped = QH.adv_mergeSort(data_grouped,dir,keys);
+                            }
+                        }
+
+
+                        response.code = 200;
+                        response.body = {'render': query.OPTIONS.FORM, 'result': data_grouped}
+                        fulfill(response);
+
                     }
-                    response.code = 200;
-                    response.body = {'render': query.OPTIONS.FORM, 'result': results}
-                    fulfill(response);
                 }
             }
         })
