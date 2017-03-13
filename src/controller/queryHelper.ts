@@ -78,11 +78,7 @@ export default class QH {
              return ret;
          }
 
-        // if(query.TRANSFORMATIONS!=null&&apply_key_counter==0){
-        //     ret.code = 400;
-        //     ret.body = {"error": "the option of columns has no valid apply key when the query has trans"}
-        //     return ret;
-        // }
+
 
         if(courses_valid_counter+apply_key_counter!=query.OPTIONS.COLUMNS.length&&room_valid_counter+apply_key_counter!=query.OPTIONS.COLUMNS.length) {
             ret.code = 400;
@@ -178,6 +174,7 @@ export default class QH {
 
              let namebuffer:any = [];
 
+
             for(let i=0;i<apply.length;i++){ // check elements in apply
 
                  let applyKey = apply[i];
@@ -209,6 +206,26 @@ export default class QH {
                     return ret;
                 }
             }
+
+            for(let i=0;i<query.OPTIONS.COLUMNS.length;i++){
+                let columns_element = query.OPTIONS.COLUMNS;
+                if(columns_element.includes("_")){
+                    if(!group.includes(columns_element)){
+                        ret.code = 400;
+                        ret.body = {"error": "the columns has keys that are not valid "};
+                        return ret;
+                    }
+                }else {
+                    if(!namebuffer.includes(columns_element)){
+                        ret.code = 400;
+                        ret.body = {"error": "the cloumns has keys that are not valid "};
+                        return ret;
+                    }
+                }
+            }
+
+
+
         }
          return ret;
     }
