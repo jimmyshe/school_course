@@ -26,7 +26,7 @@ describe("performQuery_rooms", function () {
         }
         insight = new Insight();
         // make sure the cache file is there
-        let content = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
+        let content = new Buffer(fs.readFileSync('./test/rooms.zip')).toString('base64');
         return insight.addDataset('rooms',content)
     })
 
