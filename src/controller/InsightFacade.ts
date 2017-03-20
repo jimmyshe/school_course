@@ -646,23 +646,8 @@ export default class InsightFacade implements IInsightFacade {
                                 data_grouped_raw[counter].push(body_pre[i]);
                             }
 
-                            /*for(let j=0;j<group.length;j++){
-                                head[group[j]]=body_pre[i][group[j]];
-                            }
-
-                            let index = data_grouped.map(function (d:any) {
-                                return JSON.stringify(d);
-                            }).indexOf(JSON.stringify(head));
-
-                            if(index==-1){
-                                data_grouped.push(head);
-                                data_grouped_raw.push([body_pre[i]]);
-                            }else {
-                                data_grouped_raw[index].push(body_pre[i]);
-                            }*/
                         }
 
-                        //applay
                         for(let i=0;i<apply.length;i++){
                             let applykeyName = Object.keys(apply[i])[0];
                             let applykeyObj = apply[i][applykeyName];
@@ -682,7 +667,6 @@ export default class InsightFacade implements IInsightFacade {
                             }
                         }
 
-                        //todo sort the groups
                         len = data_grouped.length
                         let order_key = query.OPTIONS.ORDER;  // sort the body_pre if it is necessary
                         if (order_key != null) {
