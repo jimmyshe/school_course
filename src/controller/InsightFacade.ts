@@ -200,7 +200,7 @@ export default class InsightFacade implements IInsightFacade {
                                     }
                                 }
                             }
-                            console.log(validNameList.length);
+                            //console.log(validNameList.length);
 
                             for (let info of informationList) {
                                 if (typeof info != 'undefined' && info.length != 0 && info.length != 74) {
@@ -216,7 +216,25 @@ export default class InsightFacade implements IInsightFacade {
                                     }
                                 }
                             }
-                            console.log(informationList.length);
+                            //console.log(informationList.length);
+                            let BuildingNameDuplicate: any [] = [];
+                            for (let i = 0; i < that.roomsInformation.length; i++) {
+                                for (let j = i; j < that.roomsInformation.length; j++) {
+                                    if (that.roomsInformation[j].rooms_shortname === that.roomsInformation[i].rooms_shortname) {
+                                        BuildingNameDuplicate.push(that.roomsInformation[j]);
+                                    }
+                                }
+                            }
+                            let uniqueBuildingLocation: any[] = [];
+                            for (let i = 0; i < that.roomsInformation.length; i++) {
+                               if (that.checkDuplicate(that.roomsInformation[i], BuildingNameDuplicate) === false) {
+                                   let building:any = {};
+                                   building.name = that.roomsInformation[i].rooms_shortname;
+                                   building.lat = that.roomsInformation[i].rooms_lat;
+                                   building.lon = that.roomsInformation[i].rooms_lon;
+                                   uniqueBuildingLocation.push(building);
+                               }
+                            }
                             let response2: InsightResponse = {code: 204, body: {}};
                             if (that.roomsInformation.length == 0) {
                                 response2.code = 400;
@@ -338,6 +356,15 @@ export default class InsightFacade implements IInsightFacade {
             return result;
         }
         return null;
+    }
+
+    checkDuplicate(obj: any, targetList: any) {
+        for (let j = 0; j < targetList.length; j++) {
+            if (obj.rooms_name === targetList.rooms_name) {
+                return true;
+            }
+        }
+        return false;
     }
 
     getLatLon(url:string, roomList: any) {
