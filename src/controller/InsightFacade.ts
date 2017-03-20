@@ -615,53 +615,52 @@ export default class InsightFacade implements IInsightFacade {
                         let data_grouped:any =[];
                         let data_grouped_raw:any = [];
 
-                        body_pre = QH.adv_mergeSort(body_pre,"DOWN",group);
-
                         let p_head:any = {};
 
-                        for(let key_index=0;key_index<group.length;key_index++){
+                        body_pre = QH.adv_mergeSort(body_pre, "DOWN", group);
+
+                        for (let key_index = 0; key_index < group.length; key_index++) {
                             p_head[group[key_index]] = body_pre[0][group[key_index]];
                         }
+
                         data_grouped.push(p_head);
                         data_grouped_raw.push([body_pre[0]]);
+
                         let counter = 0;
+
                         for(let i = 1;i<body_pre.length;i++){
-                            let head:any={};
-                            for(let key_index=0;key_index<group.length;key_index++){
+
+
+                            let head:any ={};
+
+                            for (let key_index = 0; key_index < group.length; key_index++) {
                                 head[group[key_index]] = body_pre[i][group[key_index]];
                             }
-                            if(JSON.stringify(head)!=JSON.stringify(p_head)){
+
+                            if (JSON.stringify(head) != JSON.stringify(p_head)) {
                                 counter++;
                                 data_grouped.push(head);
                                 p_head = head;
                                 data_grouped_raw.push([body_pre[i]]);
-                            }else {
+                            } else {
                                 data_grouped_raw[counter].push(body_pre[i]);
                             }
+
+                            /*for(let j=0;j<group.length;j++){
+                                head[group[j]]=body_pre[i][group[j]];
+                            }
+
+                            let index = data_grouped.map(function (d:any) {
+                                return JSON.stringify(d);
+                            }).indexOf(JSON.stringify(head));
+
+                            if(index==-1){
+                                data_grouped.push(head);
+                                data_grouped_raw.push([body_pre[i]]);
+                            }else {
+                                data_grouped_raw[index].push(body_pre[i]);
+                            }*/
                         }
-
-
-
-                        // for(let i = 0;i<body_pre.length;i++){
-                        //
-                        //
-                        //     let head:any ={};
-                        //
-                        //     for(let j=0;j<group.length;j++){
-                        //         head[group[j]]=body_pre[i][group[j]];
-                        //     }
-                        //
-                        //     let index = data_grouped.map(function (d:any) {
-                        //         return JSON.stringify(d);
-                        //     }).indexOf(JSON.stringify(head));
-                        //
-                        //     if(index==-1){
-                        //         data_grouped.push(head);
-                        //         data_grouped_raw.push([body_pre[i]]);
-                        //     }else {
-                        //         data_grouped_raw[index].push(body_pre[i]);
-                        //     }
-                        // }
 
                         //applay
                         for(let i=0;i<apply.length;i++){
@@ -683,6 +682,7 @@ export default class InsightFacade implements IInsightFacade {
                             }
                         }
 
+                        //todo sort the groups
                         len = data_grouped.length
                         let order_key = query.OPTIONS.ORDER;  // sort the body_pre if it is necessary
                         if (order_key != null) {
@@ -704,9 +704,12 @@ export default class InsightFacade implements IInsightFacade {
                                 data_grouped = QH.adv_mergeSort(data_grouped,dir,keys);
                             }
                         }
+
+
                         response.code = 200;
                         response.body = {'render': query.OPTIONS.FORM, 'result': data_grouped}
                         fulfill(response);
+
                     }
                 }
             }

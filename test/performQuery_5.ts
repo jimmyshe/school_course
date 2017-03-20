@@ -13,8 +13,6 @@ import {InsightResponse} from "../src/controller/IInsightFacade";
 let fs = require('fs');
 
 
-
-
 describe("performQuery_rooms_d3", function () {
     let insight:Insight = null;
     function sanityCheck(response: InsightResponse) {
@@ -28,7 +26,6 @@ describe("performQuery_rooms_d3", function () {
 
     before(function () {
         Log.test('test Query for rooms');
-        //deleteFolderRecursive("./data");
         insight = new Insight();
         // make sure the cache file is there
         let content = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
@@ -39,7 +36,7 @@ describe("performQuery_rooms_d3", function () {
 
     after(function () {
         Log.test('end test Query for rooms ');
-        //deleteFolderRecursive("./data");
+
         try {
             fs.unlinkSync('./data/rooms.json');
         } catch (err) {
@@ -217,7 +214,7 @@ describe("performQuery_rooms_d3", function () {
                 expect.fail();
             })
     });
-/*
+
     it("test of min", function () {
         return insight.performQuery({
             "WHERE": {
@@ -486,24 +483,30 @@ describe("performQuery_rooms_d3", function () {
                     "render": "TABLE",
                     "result": [
                         {
-                            "rooms_shortname": "SWNG",
-                            "countSeats": 3
-                        }, {
-                            "rooms_shortname": "FRDM",
-                            "countSeats": 1
-                        }, {
-                            "rooms_shortname": "DMP",
-                            "countSeats": 1
-                        }, {
-                            "rooms_shortname": "IBLC",
-                            "countSeats": 1
-                        }, {
-                            "rooms_shortname": "LSK",
-                            "countSeats": 1
-                        }, {
-                            "rooms_shortname": "PHRM",
-                            "countSeats": 1
-                        }                       ]
+                            "countSeats": 3,
+                            "rooms_shortname": "SWNG"
+                        },
+                        {
+                            "countSeats": 1,
+                            "rooms_shortname": "PHRM"
+                        },
+                        {
+                            "countSeats": 1,
+                            "rooms_shortname": "LSK"
+                        },
+                        {
+                            "countSeats": 1,
+                            "rooms_shortname": "IBLC"
+                        },
+                        {
+                            "countSeats": 1,
+                            "rooms_shortname": "FRDM"
+                        },
+                        {
+                            "countSeats": 1,
+                            "rooms_shortname": "DMP"
+                        }
+                    ]
                 })
 
             })
@@ -566,30 +569,36 @@ describe("performQuery_rooms_d3", function () {
                     "render": "TABLE",
                     "result": [
                         {
-                            "rooms_shortname": "SWNG",
                             "countSeats": 3,
+                            "rooms_shortname": "SWNG",
                             "sumSeats": 755
-                        }, {
-                            "rooms_shortname": "FRDM",
+                        },
+                        {
                             "countSeats": 1,
-                            "sumSeats": 160
-                        }, {
-                            "rooms_shortname": "DMP",
-                            "countSeats": 1,
-                            "sumSeats": 160
-                        }, {
-                            "rooms_shortname": "IBLC",
-                            "countSeats": 1,
-                            "sumSeats": 154
-                        }, {
-                            "rooms_shortname": "LSK",
-                            "countSeats": 1,
-                            "sumSeats": 183
-                        }, {
                             "rooms_shortname": "PHRM",
-                            "countSeats": 1,
                             "sumSeats": 167
-                        }                       ]
+                        },
+                        {
+                            "countSeats": 1,
+                            "rooms_shortname": "LSK",
+                            "sumSeats": 183
+                        },
+                        {
+                            "countSeats": 1,
+                            "rooms_shortname": "IBLC",
+                            "sumSeats": 154
+                        },
+                        {
+                            "countSeats": 1,
+                            "rooms_shortname": "FRDM",
+                            "sumSeats": 160
+                        },
+                        {
+                            "countSeats": 1,
+                            "rooms_shortname": "DMP",
+                            "sumSeats": 160
+                        }
+                    ]
                 })
 
             })
@@ -602,7 +611,7 @@ describe("performQuery_rooms_d3", function () {
                 }
             })
     });
-*/
+
 
 
 
