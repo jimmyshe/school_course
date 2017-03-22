@@ -4,14 +4,18 @@
     "target": "ES5",
     "noImplicitAny": true,
     "removeComments": true,
+    "moduleResolution": "node",
     "preserveConstEnums": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
   },
   "filesGlob": [
     "/src/**/*.ts",
     "/test/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "typings"
   ]
 }
