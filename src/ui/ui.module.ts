@@ -1,14 +1,25 @@
 /**
  * Created by jimmyshe-ubuntu on 17-3-21.
  */
+import {FormsModule}     from '@angular/forms';
 import { NgModule }      from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { AppComponent }   from './ui.component';
+import { UiComponent }   from './ui.component';
+import {queryFormComponent} from "./query-form.component";
+import { HttpModule }    from '@angular/http';
+import {uiService} from './ui.service';
 
 
 @NgModule({
-    imports:      [ BrowserModule ],
-    declarations: [ AppComponent ],
-    bootstrap:    [ AppComponent ]
+    imports:      [
+        FormsModule,
+        HttpModule,
+        BrowserModule ],
+    declarations: [
+        UiComponent,
+        queryFormComponent
+    ],
+    providers:[uiService],
+    bootstrap:    [ UiComponent ]
 })
-export class AppModule { }
+export class UiModule { }

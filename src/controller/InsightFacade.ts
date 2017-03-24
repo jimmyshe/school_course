@@ -166,7 +166,7 @@ export default class InsightFacade implements IInsightFacade {
                                             }
                                             //console.log(roomList.length);
                                             for (let room of roomList) {
-                                                console.log(room);
+                                                //console.log(room);
                                             }
                                             return roomList;
                                         }
@@ -200,7 +200,7 @@ export default class InsightFacade implements IInsightFacade {
                                     }
                                 }
                             }
-                            console.log(validNameList.length);
+                            //console.log(validNameList.length);
 
                             for (let info of informationList) {
                                 if (typeof info != 'undefined' && info.length != 0 && info.length != 74) {
@@ -216,7 +216,7 @@ export default class InsightFacade implements IInsightFacade {
                                     }
                                 }
                             }
-                            console.log(informationList.length);
+                            //console.log(informationList.length);
                             let response2: InsightResponse = {code: 204, body: {}};
                             if (that.roomsInformation.length == 0) {
                                 response2.code = 400;
@@ -518,6 +518,7 @@ export default class InsightFacade implements IInsightFacade {
                     information = this.courseInformation;
                 }
                 console.log(information.length);
+                console.log(JSON.stringify(query));
                 if (information.length === 0) {
                     response.code = 424;
                     response.body = {'missing':[typeOfQuery]};

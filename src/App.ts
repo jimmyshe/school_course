@@ -12,6 +12,7 @@ export class App {
         Log.info('App::initServer( ' + port + ' ) - start');
 
         let s = new Server(port);
+
         s.start().then(function (val: boolean) {
             Log.info("App::initServer() - started: " + val);
         }).catch(function (err: Error) {
@@ -23,5 +24,7 @@ export class App {
 // This ends up starting the whole system and listens on a hardcoded port (4321)
 Log.info('App - starting');
 let app = new App();
+
 app.initServer(4321);
+
 //app.initServer(8080); // use 8080 make debuging easier

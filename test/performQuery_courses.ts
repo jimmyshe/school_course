@@ -10,7 +10,7 @@ import {AssertionError} from "assert";
 
 let fs = require('fs');
 
-describe("performQuery_courses", function () {
+describe.only("performQuery_courses", function () {
 
     let insight:Insight = null;
     let testQuery_simple = {
@@ -53,14 +53,14 @@ describe("performQuery_courses", function () {
         return insight.addDataset('courses',courseContent);
     });
 
-    after(function () {
-        if(fs.existsSync("./data/courses.json")){
-            fs.unlinkSync("./data/courses.json");
-        }
-        if(fs.existsSync("./data/rooms.json")){
-            fs.unlinkSync("./data/rooms.json");
-        }
-    })
+    // after(function () {
+    //     if(fs.existsSync("./data/courses.json")){
+    //         fs.unlinkSync("./data/courses.json");
+    //     }
+    //     if(fs.existsSync("./data/rooms.json")){
+    //         fs.unlinkSync("./data/rooms.json");
+    //     }
+    // })
 
 
     beforeEach(function () {
