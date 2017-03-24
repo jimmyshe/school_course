@@ -29,8 +29,9 @@ export class queryFormComponent {
 
     getresult(query:any){
         this.UiService.performquery(query).then((ret:any) =>{
-            this.result = ret;
+            this.result = JSON.stringify(ret);
         }).catch((e:any)=>{
+           // console.log(e.message);
             this.result = e.message;
         });
 
