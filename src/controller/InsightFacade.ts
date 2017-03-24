@@ -230,15 +230,26 @@ export default class InsightFacade implements IInsightFacade {
                                if (that.checkDuplicate(that.roomsInformation[i], BuildingNameDuplicate) === false) {
                                    let building:any = {};
                                    building.name = that.roomsInformation[i].rooms_shortname;
-                                   building.lat = that.roomsInformation[i].rooms_lat;
-                                   building.lon = that.roomsInformation[i].rooms_lon;
+                                   building.latitude = that.roomsInformation[i].rooms_lat;
+                                   building.longitude = that.roomsInformation[i].rooms_lon;
                                    uniqueBuildingLocation.push(building);
                                }
+                            }
+                            for (let i = 0; i < that.roomsInformation.length; i++) {
+                                that.roomsInformation[i].distances = {};
+                                for (let j = 0; j < uniqueBuildingLocation.length; j++) {
+                                    let b = uniqueBuildingLocation[j];
+                                    let distance = that.findDistance(that.roomsInformation[i].rooms_lat,
+                                                                that.roomsInformation[i].rooms_lon,
+                                                                b.latitude,
+                                                                b.longitude);
+                                    that.roomsInformation[i].distances[b.name] = distance;
+                                }
                             }
                             let response2: InsightResponse = {code: 204, body: {}};
                             if (that.roomsInformation.length == 0) {
                                 response2.code = 400;
-                                response2.body = {"erro": "No valid room data added"};
+                                response2.body = {"error": "No valid room data added"};
                                 that.roomsInformation = temp_roomsinfo;
                                 reject(response2);
                                 return;
@@ -335,6 +346,41 @@ export default class InsightFacade implements IInsightFacade {
         });
 
     }
+
+    findDistance(lat: any, lon: any, targetLat: any, targetLon: any) {
+
+        let Rk = 6373;
+        let lat1 = lat;
+        let lon1 = lon;
+        let lat2 = targetLat;
+        let lon2 = targetLon;
+
+        let latitude1 = deg2rad(lat1);
+        let longitude1 = deg2rad(lon1);
+        let latitude2 = deg2rad(lat2);
+        let longitude2 = deg2rad(lon2);
+
+        let dlat = latitude2 - latitude1;
+        let dlon = longitude2 - longitude1;
+
+        let a = Math.pow(Math.sin(dlat / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dlon / 2), 2);
+        let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        let dk = c * Rk;
+        let km = round(dk);
+
+        function deg2rad(deg: any) {
+            var rad = deg * Math.PI / 180; // radians = degrees * pi/180
+            return rad;
+        }
+
+        function round(x: any) {
+            return Math.round(x * 1000) / 1000;
+        }
+
+        return km*1000;
+
+    }
+
 
     searchNode(node: any, name: any, value: any) {
         let attrs = node.attrs || [];
