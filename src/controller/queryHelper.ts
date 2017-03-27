@@ -273,7 +273,7 @@ export default class QH {
     public static isValidDateKeyInCourses(key:any):boolean{
 
 
-         let valid_keys = ["courses_year","courses_id","courses_avg","courses_instructor","courses_dept","courses_title","courses_pass","courses_fail","courses_audit","courses_uuid"]
+         let valid_keys = ["courses_size","courses_year","courses_id","courses_avg","courses_instructor","courses_dept","courses_title","courses_pass","courses_fail","courses_audit","courses_uuid"]
 
 
          for(let valid_key of valid_keys){

@@ -19,8 +19,5 @@ export class uiService{
     performquery(query:any):any {
         return this.http.post(this.dataUrl+"query",query).toPromise();
     }
-
-
-
 }
 

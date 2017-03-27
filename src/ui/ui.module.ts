@@ -8,7 +8,7 @@ import { UiComponent }   from './ui.component';
 import {queryFormComponent} from "./query-form.component";
 import { HttpModule }    from '@angular/http';
 import {uiService} from './ui.service';
-
+import {uiCoursesComponent} from './ui.courses'
 
 @NgModule({
     imports:      [
@@ -17,7 +17,8 @@ import {uiService} from './ui.service';
         BrowserModule ],
     declarations: [
         UiComponent,
-        queryFormComponent
+        queryFormComponent,
+        uiCoursesComponent
     ],
     providers:[uiService],
     bootstrap:    [ UiComponent ]

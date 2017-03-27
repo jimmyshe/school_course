@@ -2,7 +2,6 @@
  * Created by jimmyshe-ubuntu on 17-3-21.
  */
 import { Component } from '@angular/core';
-import {uiService} from './ui.service';
 
 
 @Component({

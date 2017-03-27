@@ -3,7 +3,6 @@
  */
 import { Component } from '@angular/core';
 import {uiService} from './ui.service';
-import { HttpModule }    from '@angular/http';
 @Component({
 
     moduleId: module.id,

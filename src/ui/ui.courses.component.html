@@ -1,0 +1,90 @@
+<h2>Courses</h2>
+
+<p *ngFor="let f of filters">{{f}}</p>
+
+
+<form class="form-horizontal">
+
+    <div class="form-group">
+        <label for="logic">Logical relation between all the filters </label>
+        <select class="form-control"  id="logic"
+            required
+            [(ngModel)]="logicConnection" name="logic">
+        <option *ngFor="let p of logocalConnectionList" [value]="p">{{p}}</option>
+    </select>
+    </div>
+
+
+
+    <div class="form-group">
+        <label for="sectionSize">Section Size</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="sectionSize">
+        </div>
+    </div>
+    <div class="radio">
+        <label>
+            <input type="radio" name="sectionSizeOption" id="greaterRadioSectionSize" value="option1">
+        </label>
+    </div>
+    <div class="radio">
+        <label>
+            <input type="radio" name="sectionSizeOption" id="smallerRadioSectionSize" value="option2">
+            LT
+        </label>
+    </div>
+    <div class="radio">
+        <label>
+            <input type="radio" name="sectionSizeOption" id="equalRadioSectionSize" value="option3">
+            EQ
+        </label>
+    </div>
+    <div class="form-group">
+        <label for="department">Department</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="department">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="courseNumber">Course Number</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="courseNumber">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="instructor">Instructor</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="instructor">
+        </div>
+    </div>
+    <div class="radio">
+        <label>
+            <input type="radio" name="sectionRadios" id="andSectionRadio" value="option1">
+            AND
+        </label>
+    </div>
+    <div class="radio">
+        <label>
+            <input type="radio" name="sectionRadios" id="orSectionRadio" value="option2">
+            OR
+        </label>
+    </div>
+    <div class="radio">
+        <label>
+            <input type="radio" name="sectionSortingOption" id="sortingUpSection" value="option1">
+            Sorting Up
+        </label>
+    </div>
+    <div class="radio">
+        <label>
+            <input type="radio" name="sectionSortingOption" id="sortingDownSection" value="option2">
+            Sorting Down
+        </label>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-default">Send Query</button>
+        </div>
+    </div>
+</form>
