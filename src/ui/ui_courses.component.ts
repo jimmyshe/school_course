@@ -15,13 +15,16 @@ import {uiService} from './ui.service';
 export class uiCoursesComponent{
     constructor(private UiService: uiService) { }
 
-    filters:any[] = ["212342134","234234234"];
+
 
     logocalConnectionList:string[] = ['AND','OR'];
+    filter_typeList:string[] = ["Section size","Department","Course number","Instructor,Title"]
+
     logicConnection:string = null;
+    filters:any[] = ["212342134","234234234"];
 
-    filter_types:string[] = ["Section size","Department","Course number","Instructor,Title"]
 
+    filter 
 
 
 

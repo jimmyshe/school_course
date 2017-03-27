@@ -1,20 +1,17 @@
 <h2>Courses</h2>
 
-<p *ngFor="let f of filters">{{f}}</p>
-
-
-<form class="form-horizontal">
-
-    <div class="form-group">
-        <label for="logic">Logical relation between all the filters </label>
-        <select class="form-control"  id="logic"
+<div class="form-group">
+    <label for="logic">Logical relation between all the filters </label>
+    <select class="form-control"  id="logic"
             required
             [(ngModel)]="logicConnection" name="logic">
         <option *ngFor="let p of logocalConnectionList" [value]="p">{{p}}</option>
     </select>
-    </div>
+</div>
+<p *ngFor="let f of filters">{{f}}</p>
 
-
+<h3>Create new filter</h3>
+<form class="form-horizontal">
 
     <div class="form-group">
         <label for="sectionSize">Section Size</label>
@@ -22,6 +19,7 @@
             <input type="text" class="form-control" id="sectionSize">
         </div>
     </div>
+
     <div class="radio">
         <label>
             <input type="radio" name="sectionSizeOption" id="greaterRadioSectionSize" value="option1">
