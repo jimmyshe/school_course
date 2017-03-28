@@ -25,75 +25,25 @@
     <div [hidden]="!filterType">
         <p>{{filterType}}</p>
         <div *ngIf="filterType=='Section size'">
-            <p>{{filterType}}</p>
+            <label for="cpk">choose comparison key </label>
+            <select  class="form-control"  id="cpk"
+                    required
+                    [(ngModel)]="comparisonKey" name="cpk">
+                <option *ngFor="let p of comparisonKeyList" [value]="p">{{p}}</option>
+            </select>
+            <label for="c_value">enter value</label>
+            <input type="NUMBER" class="form-control" id="c_value"
+                   required
+                   [(ngModel)]="comparisonValue" name="c_value">
         </div>
+        <div *ngIf="filterType!='Section size'">
+            <label for="c_value">enter value</label>
+            <input type="text" class="form-control" id="ct_value"
+                   required
+                   [(ngModel)]="comparisonValue" name="ct_value">
+        </div>
+
     </div>
 
 
-
-    <div class="radio">
-        <label>
-            <input type="radio" name="sectionSizeOption" id="greaterRadioSectionSize" value="option1">
-        </label>
-    </div>
-    <div class="radio">
-        <label>
-            <input type="radio" name="sectionSizeOption" id="smallerRadioSectionSize" value="option2">
-            LT
-        </label>
-    </div>
-    <div class="radio">
-        <label>
-            <input type="radio" name="sectionSizeOption" id="equalRadioSectionSize" value="option3">
-            EQ
-        </label>
-    </div>
-    <div class="form-group">
-        <label for="department">Department</label>
-        <div class="col-sm-10">
-            <input type="text" class="form-control" id="department">
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="courseNumber">Course Number</label>
-        <div class="col-sm-10">
-            <input type="text" class="form-control" id="courseNumber">
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="instructor">Instructor</label>
-        <div class="col-sm-10">
-            <input type="text" class="form-control" id="instructor">
-        </div>
-    </div>
-    <div class="radio">
-        <label>
-            <input type="radio" name="sectionRadios" id="andSectionRadio" value="option1">
-            AND
-        </label>
-    </div>
-    <div class="radio">
-        <label>
-            <input type="radio" name="sectionRadios" id="orSectionRadio" value="option2">
-            OR
-        </label>
-    </div>
-    <div class="radio">
-        <label>
-            <input type="radio" name="sectionSortingOption" id="sortingUpSection" value="option1">
-            Sorting Up
-        </label>
-    </div>
-    <div class="radio">
-        <label>
-            <input type="radio" name="sectionSortingOption" id="sortingDownSection" value="option2">
-            Sorting Down
-        </label>
-    </div>
-
-    <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-            <button type="submit" class="btn btn-default">Send Query</button>
-        </div>
-    </div>
 </form>
