@@ -1,0 +1,187 @@
+
+
+<h2>DataSet</h2>
+<form>
+    <div class="form-group">
+        <label for="datasetId">ID:</label>
+        <input type="text" class="form-control" id="datasetId"
+               required
+               [(ngModel)] = "dataSetID" name = "id">
+        <label for="datasetZip">Archive:</label>
+        <input type="file" class="form-control" id="datasetZip"
+               [(ngModel)] = "dataSetContent" name = "datasetZip">
+    </div>
+    <button type="button" class="btn btn-primary" (click) = "submitAddID()">Add Dataset</button>
+    <button type="button" class="btn btn-primary" (click) = "submitRemoveID()">Remove Dataset</button>
+</form>
+
+<div  [hidden]="!submittedAdd" id="render">
+    <h3>Result</h3>
+    <h2>{{resultAdd}}</h2>
+    <button class="btn btn-primary" (click)="submittedAdd=false">edit</button>
+</div>
+
+<div  [hidden]="!submittedRemove" id="render1">
+    <h3>Result</h3>
+    <h2>{{resultRemove}}</h2>
+    <button class="btn btn-primary" (click)="submittedRemove=false">edit</button>
+</div>
+
+<h2>Rooms</h2>
+
+<form class="form-horizontal">
+    <div class="form-group">
+        <label for="buildingName">Building Name</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="buildingName"
+                   [(ngModel)] = "buildingName" name = "buildingName">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="roomNumber">Room Number</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="roomNumber"
+                   [(ngModel)] = "roomNumber" name = "roomNumber">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="roomSize">Room Size</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="roomSize"
+                   [(ngModel)] = "roomSize" name = "roomSize">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="roomType">Room Type</label>
+        <select class="form-control"  id="roomType"
+                [(ngModel)]="roomType" name="roomType">
+            <option *ngFor="let roomType of roomTypes" [value]="roomType">{{roomType}}</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="furnitureType">Furniture Type</label>
+        <select class="form-control"  id="furnitureType"
+                [(ngModel)]="furnitureType" name="furnitureType">
+            <option *ngFor="let furnitureType of furnitureTypes" [value]="furnitureType">{{furnitureType}}</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="roomDistance">Room Distance</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="roomDistance"
+                   [(ngModel)] = "roomDistance" name = "roomDistance">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="targetBuilding">Target Building</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="targetBuilding"
+                   [(ngModel)] = "targetBuilding" name = "targetBuilding">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="andOr">AND/OR</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="andOr"
+                   [(ngModel)] = "andorSelection" name = "andorSelection">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-default"
+                    (click) = "submitRoomQuery()">Send Query</button>
+        </div>
+    </div>
+</form>
+
+<div  [hidden]="!submittedRoomQuery" id="render2">
+    <h3>ResultRoom</h3>
+    <h2>{{resultRoomQuery}}</h2>
+    <button class="btn btn-primary" (click)="submittedRoomQuery=false">edit</button>
+</div>
+
+<h2>Schedule</h2>
+
+<form class="form-horizontal">
+    <div class="form-group">
+        <label for="sdepartment">Department</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="sdepartment"
+                   [(ngModel)] = "sdepartment" name = "sdepartment">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="scourseNumber">Course Number</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="scourseNumber"
+                   [(ngModel)] = "scourseNumber" id = "scourseNumber">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="scourseandOr">AND/OR</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="scourseandOr"
+                   [(ngModel)] = "scourseandorSelection" name = "scourseandorSelection">
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-default" (click) = "submitScheduleCourse()">Send Schedule Courses</button>
+        </div>
+    </div>
+</form>
+
+<div  [hidden]="!submittedscourse" id="render3">
+    <h3>Selected Courses</h3>
+    <h2>{{resultscourse}}</h2>
+    <button class="btn btn-primary" (click)="submittedscourse=false">edit</button>
+</div>
+
+<form class = "form-horizontal">
+    <div class="form-group">
+        <label for="sbuildingName">Building Name</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="sbuildingName"
+                   [(ngModel)] = "sbuildingName" name = "sbuildingName">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="sdistance">Distance</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="sdistance"
+                   [(ngModel)] = "sdistance" name = "sdistance">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="stargetBuilding">Distance</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="stargetBuilding"
+                   [(ngModel)] = "stargetBuilding" name = "stargetBuilding">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="sroomandOr">AND/OR</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="sroomandOr"
+                   [(ngModel)] = "sroomandorSelection" name = "sroomandorSelection">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-default" (click) = "submitScheduleRoom()">Send Schedule Rooms</button>
+        </div>
+    </div>
+</form>
+
+<div  [hidden]="!submittedsroom" id="render4">
+    <h3>Selected Rooms</h3>
+    <h2>{{resultsroom}}</h2>
+    <button class="btn btn-primary" (click)="submittedsroom=false">edit</button>
+</div>

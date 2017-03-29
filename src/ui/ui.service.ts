@@ -75,6 +75,10 @@ export class uiService{
             conditionArray.push(furnitureTypeCondition);
         }
 
+        if (roomDistance != null && targetBuilding != null) {
+
+        }
+
 
         let optionObj = {
             "COLUMNS": [
@@ -93,6 +97,61 @@ export class uiService{
 
         //return JSON.stringify(query);
         return this.http.post(this.dataUrl+ "query", query).toPromise();
+
+    }
+
+
+    performCourseSchedule(sdepartment:string, scourseNumber:string, scourseandorSelection:string){
+        let query:any = {};
+
+        let filterObj:any = {};
+
+        let transObj:any = {};
+
+        let conditionArray: any [] = [];
+
+        if (scourseandorSelection === "and") {
+            filterObj["AND"] = conditionArray;
+        } else if (scourseandorSelection === "or") {
+            filterObj["OR"] = conditionArray;
+        }
+
+        if (sdepartment != null) {
+            let sdepartmentCondition:any = {};
+            sdepartmentCondition["GT"] = {"courses_dept":sdepartment};
+            conditionArray.push(sdepartmentCondition);
+        }
+
+        if (scourseNumber!= null) {
+            let scourseNumberCondition:any = {};
+            scourseNumberCondition["IS"] = {"courses_id":scourseNumber};
+            conditionArray.push(scourseNumberCondition);
+        }
+
+
+        let optionObj = {
+            "COLUMNS": [
+                "rooms_name",
+                "rooms_address",
+                "rooms_type",
+                "rooms_href"
+            ],
+            "FORM": "TABLE"
+        }
+
+        transObj = {
+            "GROUP": ["courses_title"],
+            "APPLY": [{
+                "maxSeats": {
+                    "MAX": "rooms_seats"
+                }
+            }]
+        }
+
+        if (filterObj != {}){
+            query["WHERE"] = filterObj;
+        }
+        query["OPTIONS"] = optionObj;
 
     }
 
