@@ -236,14 +236,14 @@ export default class InsightFacade implements IInsightFacade {
                                }
                             }
                             for (let i = 0; i < that.roomsInformation.length; i++) {
-                                that.roomsInformation[i].distances = {};
+                                //that.roomsInformation[i].distances = {};
                                 for (let j = 0; j < uniqueBuildingLocation.length; j++) {
                                     let b = uniqueBuildingLocation[j];
                                     let distance = that.findDistance(that.roomsInformation[i].rooms_lat,
                                                                 that.roomsInformation[i].rooms_lon,
                                                                 b.latitude,
                                                                 b.longitude);
-                                    that.roomsInformation[i].distances[b.name] = distance;
+                                    that.roomsInformation[i]["rooms_distance_from_"+b.name] = distance;
                                 }
                             }
                             let response2: InsightResponse = {code: 204, body: {}};

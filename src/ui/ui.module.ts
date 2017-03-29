@@ -8,6 +8,7 @@ import { UiComponent }   from './ui.component';
 import {queryFormComponent} from "./query-form.component";
 import { HttpModule }    from '@angular/http';
 import {uiService} from './ui.service';
+import {roomQueryComponent} from "./section-query";
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import {uiService} from './ui.service';
         BrowserModule ],
     declarations: [
         UiComponent,
-        queryFormComponent
+        queryFormComponent,
+        roomQueryComponent
     ],
     providers:[uiService],
     bootstrap:    [ UiComponent ]
