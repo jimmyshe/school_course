@@ -118,13 +118,13 @@
         <label for="scourseNumber">Course Number</label>
         <div class="col-sm-10">
             <input type="text" class="form-control" id="scourseNumber"
-                   [(ngModel)] = "scourseNumber" id = "scourseNumber">
+                   [(ngModel)] = "scourseNumber" name = "scourseNumber">
         </div>
     </div>
     <div class="form-group">
-        <label for="scourseandOr">AND/OR</label>
+        <label for="scourseandorSelection">AND/OR</label>
         <div class="col-sm-10">
-            <input type="text" class="form-control" id="scourseandOr"
+            <input type="text" class="form-control" id="scourseandorSelection"
                    [(ngModel)] = "scourseandorSelection" name = "scourseandorSelection">
         </div>
     </div>
@@ -184,18 +184,4 @@
     <h3>Selected Rooms</h3>
     <h2>{{resultsroom}}</h2>
     <button class="btn btn-primary" (click)="submittedsroom=false">edit</button>
-</div>
-
-<form class="form-horizontal">
-    <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-            <button type="submit" class="btn btn-default" (click) = "submitSchedule()">Send Schedule Request</button>
-        </div>
-    </div>
-</form>
-
-<div  [hidden]="!submittedSchedule" id="render5">
-    <h3>Schedule Result</h3>
-    <h2>{{resultSchedule}}</h2>
-    <button class="btn btn-primary" (click)="submittedSchedule=false">edit</button>
 </div>

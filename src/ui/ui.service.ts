@@ -39,43 +39,37 @@ export class uiService{
 
         let conditionArray: any [] = [];
 
-        if (andorSelection === "and") {
-            filterObj["AND"] = conditionArray;
-        } else if (andorSelection === "or") {
-            filterObj["OR"] = conditionArray;
-        }
-
-        if (roomSize != null) {
+        if (roomSize != "") {
             let roomSizeCondition:any = {};
-            roomSizeCondition["GT"] = {"rooms_size":roomSize};
+            roomSizeCondition["GT"] = {"rooms_size":+roomSize};
             conditionArray.push(roomSizeCondition);
         }
 
-        if (roomNumber != null) {
+        if (roomNumber != "") {
             let roomNumberCondition:any = {};
             roomNumberCondition["IS"] = {"rooms_number":roomNumber};
             conditionArray.push(roomNumberCondition);
         }
 
-        if (buildingName != null) {
+        if (buildingName != "") {
             let buildingNameCondition:any = {};
             buildingNameCondition["IS"] = {"rooms_shortname":buildingName};
             conditionArray.push(buildingNameCondition);
         }
 
-        if (roomType != null) {
+        if (roomType != "--Any--") {
             let roomTypeCondition:any = {};
             roomTypeCondition["IS"] = {"rooms_type":roomType};
             conditionArray.push(roomTypeCondition);
         }
 
-        if (furnitureType != null) {
+        if (furnitureType != "--Any--") {
             let furnitureTypeCondition:any = {};
             furnitureTypeCondition["IS"] = {"rooms_type":roomType};
             conditionArray.push(furnitureTypeCondition);
         }
 
-        if (roomDistance != null && targetBuilding != null) {
+        if (roomDistance != "" && targetBuilding != "") {
 
         }
 
@@ -90,13 +84,21 @@ export class uiService{
             "FORM": "TABLE"
         }
 
+        if (andorSelection === "and") {
+            filterObj["AND"] = conditionArray;
+        } else if (andorSelection === "or") {
+            filterObj["OR"] = conditionArray;
+        } else {
+            filterObj = conditionArray[0];
+        }
+
         if (filterObj != {}){
             query["WHERE"] = filterObj;
         }
         query["OPTIONS"] = optionObj;
 
-        return JSON.stringify(query);
-        //return this.http.post(this.dataUrl+ "query", query).toPromise();
+        //return JSON.stringify(query);
+        return this.http.post(this.dataUrl+ "query", query).toPromise();
 
     }
 
@@ -110,15 +112,9 @@ export class uiService{
 
         let conditionArray: any [] = [];
 
-        if (scourseandorSelection === "and") {
-            filterObj["AND"] = conditionArray;
-        } else if (scourseandorSelection === "or") {
-            filterObj["OR"] = conditionArray;
-        }
-
         if (sdepartment != null) {
             let sdepartmentCondition:any = {};
-            sdepartmentCondition["GT"] = {"courses_dept":sdepartment};
+            sdepartmentCondition["IS"] = {"courses_dept":sdepartment};
             conditionArray.push(sdepartmentCondition);
         }
 
@@ -155,6 +151,14 @@ export class uiService{
             }]
         }
 
+        if (scourseandorSelection === "and") {
+            filterObj["AND"] = conditionArray;
+        } else if (scourseandorSelection === "or") {
+            filterObj["OR"] = conditionArray;
+        } else {
+            filterObj = conditionArray[0];
+        }
+
         if (filterObj != {}){
             query["WHERE"] = filterObj;
         }
@@ -181,12 +185,6 @@ export class uiService{
 
         let conditionArray: any [] = [];
 
-        if (sroomandorSelection === "and") {
-            filterObj["AND"] = conditionArray;
-        } else if (sroomandorSelection === "or") {
-            filterObj["OR"] = conditionArray;
-        }
-
         if (sbuildingName != null) {
             let sbuildingNameCondition:any = {};
             sbuildingNameCondition["GT"] = {"rooms_shortname":sbuildingName};
@@ -207,16 +205,26 @@ export class uiService{
             "FORM": "TABLE"
         }
 
+        if (sroomandorSelection === "and") {
+            filterObj["AND"] = conditionArray;
+        } else if (sroomandorSelection === "or") {
+            filterObj["OR"] = conditionArray;
+        } else {
+            filterObj = conditionArray[0];
+        }
+
         if (filterObj != {}){
             query["WHERE"] = filterObj;
         }
         query["OPTIONS"] = optionObj;
 
-        this.http.post(this.dataUrl+ "query", query).toPromise().then((ret:any)=>{
-            resultArray = ret.body["result"];
-        })
+        return JSON.stringify(query);
 
-        return resultArray;
+        //this.http.post(this.dataUrl+ "query", query).toPromise().then((ret:any)=>{
+            //resultArray = ret.body["result"];
+       // })
+
+        //return resultArray;
     }
 
     scheduleSection(sroom:any, scourse:any){

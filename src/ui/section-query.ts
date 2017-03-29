@@ -103,7 +103,9 @@ export class roomQueryComponent {
     performRoomQuery(roomSize:string, roomNumber:string, buildingName:string, roomDistance:string, targetBuilding:string,
                      roomType:string, furnitureType:string, andorSelection:string){
         this.resultRoomQuery = this.UiService.performRoomQuery(roomSize, roomNumber, buildingName, roomDistance, targetBuilding,
-                                        roomType, furnitureType, andorSelection);
+                                        roomType, furnitureType, andorSelection).then((ret:any)=>{
+            this.resultRoomQuery = JSON.stringify(ret);
+        })
     }
 
     getCourseForScheduling(sdepartment:string, scourseNumber:string, scourseandorSelection:string) {
@@ -152,7 +154,7 @@ export class roomQueryComponent {
         try{
             this.getCourseForScheduling(this.sdepartment, this.scourseNumber, this.scourseandorSelection);
         } catch(e){
-
+            this.resultscourse = e.message;
         }
     }
 
