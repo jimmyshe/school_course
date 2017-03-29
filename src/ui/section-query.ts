@@ -32,6 +32,8 @@ export class roomQueryComponent {
 
     submittedsroom = false;
 
+    submittedSchedule = false;
+
     roomSize: string = "";
 
     roomNumber: string = "";
@@ -81,6 +83,8 @@ export class roomQueryComponent {
 
     resultsroom:any = null;
 
+    resultSchedule:any = null;
+
     addDataSet(id:any, data:any) {
 
         this.UiService.addData(id,data).then((r:any)=>{
@@ -98,20 +102,20 @@ export class roomQueryComponent {
 
     performRoomQuery(roomSize:string, roomNumber:string, buildingName:string, roomDistance:string, targetBuilding:string,
                      roomType:string, furnitureType:string, andorSelection:string){
-        this.UiService.performRoomQuery(roomSize, roomNumber, buildingName, roomDistance, targetBuilding,
-                                        roomType, furnitureType, andorSelection).then((ret:any)=>{
-            this.resultRoomQuery = JSON.stringify(ret.body);
-        }).catch((e:any)=>{
-            this.resultRoomQuery = e.message;
-        });
+        this.resultRoomQuery = this.UiService.performRoomQuery(roomSize, roomNumber, buildingName, roomDistance, targetBuilding,
+                                        roomType, furnitureType, andorSelection);
     }
 
     getCourseForScheduling(sdepartment:string, scourseNumber:string, scourseandorSelection:string) {
-        //this.resultscourse = this.UiService.performCourseSchedule(sdepartment, scourseNumber, scourseandorSelection);
+        this.resultscourse = this.UiService.performCourseSchedule(sdepartment, scourseNumber, scourseandorSelection);
     }
 
     getRoomForScheduling(sbuildingName:string, sdistance:string, stargetBuilding:string, sroomandorSelection:string) {
-        //this.resultsroom = this.UiService.performRoomSchedule(sbuildingName, sdistance, stargetBuilding, sroomandorSelection);
+        this.resultsroom = this.UiService.performRoomSchedule(sbuildingName, sdistance, stargetBuilding, sroomandorSelection);
+    }
+
+    scheduleSection(sroom:any, scourse:any){
+        this.resultSchedule = this.UiService.scheduleSection(sroom, scourse);
     }
 
     submitAddID() {
@@ -159,6 +163,16 @@ export class roomQueryComponent {
         } catch(e){
 
         }
+    }
+
+    submitSchedule(){
+        this.submittedSchedule = true;
+        try{
+            this.scheduleSection(this.resultsroom, this.resultscourse);
+        } catch(e) {
+            this.resultSchedule = e.message;
+        }
+
     }
 
 }

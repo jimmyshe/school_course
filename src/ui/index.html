@@ -185,3 +185,17 @@
     <h2>{{resultsroom}}</h2>
     <button class="btn btn-primary" (click)="submittedsroom=false">edit</button>
 </div>
+
+<form class="form-horizontal">
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-default" (click) = "submitSchedule()">Send Schedule Request</button>
+        </div>
+    </div>
+</form>
+
+<div  [hidden]="!submittedSchedule" id="render5">
+    <h3>Schedule Result</h3>
+    <h2>{{resultSchedule}}</h2>
+    <button class="btn btn-primary" (click)="submittedSchedule=false">edit</button>
+</div>

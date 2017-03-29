@@ -538,7 +538,8 @@ export default class InsightFacade implements IInsightFacade {
                     section.courses_fail = infoList[i].Fail;
                     section.courses_audit = infoList[i].Audit;
                     section.courses_uuid = String(infoList[i].id);
-                    section.course_section = infoList[i].Section;
+                    section.courses_section = infoList[i].Section;
+                    section.courses_size = infoList[i].Pass+infoList[i].Fail;
 
 
                     if (section.courses_dept != null && typeof section.courses_dept != 'undefined' &&
@@ -551,7 +552,7 @@ export default class InsightFacade implements IInsightFacade {
                         section.courses_audit != null && typeof section.courses_audit != 'undefined' &&
                         section.courses_uuid != null && typeof section.courses_uuid != 'undefined') {
 
-                        if (section.course_section === "overall") {
+                        if (section.courses_section === "overall") {
 
                             section.courses_year = 1900;
 
