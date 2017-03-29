@@ -17,7 +17,9 @@ export class uiService{
 
 
     performquery(query:any):any {
-        return this.http.post(this.dataUrl+"query",query).toPromise();
+        return this.http.post(this.dataUrl+"query",query).toPromise()
+            .then(response => response.json().result)
+            .catch(response => response.json());
     }
 
 
@@ -112,13 +114,13 @@ export class uiService{
 
         let conditionArray: any [] = [];
 
-        if (sdepartment != null) {
+        if (sdepartment != "") {
             let sdepartmentCondition:any = {};
             sdepartmentCondition["IS"] = {"courses_dept":sdepartment};
             conditionArray.push(sdepartmentCondition);
         }
 
-        if (scourseNumber!= null) {
+        if (scourseNumber!= "") {
             let scourseNumberCondition:any = {};
             scourseNumberCondition["IS"] = {"courses_id":scourseNumber};
             conditionArray.push(scourseNumberCondition);
@@ -185,13 +187,13 @@ export class uiService{
 
         let conditionArray: any [] = [];
 
-        if (sbuildingName != null) {
+        if (sbuildingName != "") {
             let sbuildingNameCondition:any = {};
             sbuildingNameCondition["GT"] = {"rooms_shortname":sbuildingName};
             conditionArray.push(sbuildingNameCondition);
         }
 
-        if (sdistance!= null && stargetBuilding != null) {
+        if (sdistance!= "" && stargetBuilding != "") {
             let sdistanceCondition:any = {};
             sdistanceCondition["IS"] = {"courses_id":null};
             conditionArray.push(sdistanceCondition);
