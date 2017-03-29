@@ -50,6 +50,8 @@ export default class Server {
     public start(): Promise<boolean> {
         let that = this;
 
+
+
         //let insightfacade: InsightFacade = new InsightFacade;
 
         return new Promise(function (fulfill, reject) {

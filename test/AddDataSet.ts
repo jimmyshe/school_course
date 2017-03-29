@@ -27,9 +27,9 @@ describe("addDataSet", function () {
     }
 
     before(function () {
-        courseContent = new Buffer(fs.readFileSync('./courses.zip')).toString('base64');
-        roomContent = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
-        voidContent = new Buffer(fs.readFileSync('./no_real_data.zip')).toString('base64');
+        courseContent = new Buffer(fs.readFileSync('./test/courses.zip')).toString('base64');
+        roomContent = new Buffer(fs.readFileSync('./test/rooms.zip')).toString('base64');
+        voidContent = new Buffer(fs.readFileSync('./test/no_real_data.zip')).toString('base64');
         if(fs.existsSync("./data/courses.json")){
             fs.unlinkSync("./data/courses.json");
         }

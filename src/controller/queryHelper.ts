@@ -208,7 +208,7 @@ export default class QH {
             }
 
             for(let i=0;i<query.OPTIONS.COLUMNS.length;i++){
-                let columns_element = query.OPTIONS.COLUMNS;
+                let columns_element = query.OPTIONS.COLUMNS[i];
                 if(columns_element.includes("_")){
                     if(!group.includes(columns_element)){
                         ret.code = 400;

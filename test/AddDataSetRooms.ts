@@ -27,8 +27,8 @@ describe("addDataSet_rooms", function () {
 
     before(function () {
         Log.info("start add rooms");
-        roomContent = new Buffer(fs.readFileSync('./rooms.zip')).toString('base64');
-        courseContent = new Buffer(fs.readFileSync('./courses.zip')).toString('base64');
+        roomContent = new Buffer(fs.readFileSync('./test/rooms.zip')).toString('base64');
+        courseContent = new Buffer(fs.readFileSync('./test/courses.zip')).toString('base64');
 
         if(fs.existsSync("./data/courses.json")){
             fs.unlinkSync("./data/courses.json");

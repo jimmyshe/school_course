@@ -10,7 +10,7 @@ import {AssertionError} from "assert";
 
 let fs = require('fs');
 
-describe("performQuery_courses", function () {
+describe.only("performQuery_courses", function () {
 
     let insight:Insight = null;
     let testQuery_simple = {
@@ -49,18 +49,18 @@ describe("performQuery_courses", function () {
         }
 
         insight = new Insight();
-        let courseContent = new Buffer(fs.readFileSync('./courses.zip')).toString('base64');
+        let courseContent = new Buffer(fs.readFileSync('./test/courses.zip')).toString('base64');
         return insight.addDataset('courses',courseContent);
     });
 
-    after(function () {
-        if(fs.existsSync("./data/courses.json")){
-            fs.unlinkSync("./data/courses.json");
-        }
-        if(fs.existsSync("./data/rooms.json")){
-            fs.unlinkSync("./data/rooms.json");
-        }
-    })
+    // after(function () {
+    //     if(fs.existsSync("./data/courses.json")){
+    //         fs.unlinkSync("./data/courses.json");
+    //     }
+    //     if(fs.existsSync("./data/rooms.json")){
+    //         fs.unlinkSync("./data/rooms.json");
+    //     }
+    // })
 
 
     beforeEach(function () {
@@ -1197,7 +1197,7 @@ describe("performQuery_courses", function () {
             })
     });
 
-    it.skip("test group", function () {
+    it("test group", function () {
         return insight.performQuery(
             {
                 "WHERE": {},
@@ -1232,4 +1232,33 @@ describe("performQuery_courses", function () {
             })
     });
 
+    it("test group_ex", function () {
+        return insight.performQuery(
+            {
+                "WHERE": {},
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "courses_uuid"
+                    ],
+                    "ORDER": "courses_uuid",
+                    "FORM": "TABLE"
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["courses_uuid"],
+                    "APPLY": []
+                }
+            }
+        )
+            .then((respons:InsightResponse)=>{
+                sanityCheck(respons);
+                expect((respons as any).body["result"].length).to.equal(64612)})
+            .catch( (err:InsightResponse)=>{
+                if(err.constructor.name == "AssertionError"){
+                    throw err;
+                }else {
+                    Log.test('Error: query request not success ');
+                    expect.fail();
+                }
+            })
+    });
 });
