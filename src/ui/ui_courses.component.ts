@@ -21,15 +21,21 @@ export class uiCoursesComponent{
     found = false;
 
     result:any ="wait..."
+    col:string[];
 
     logocalConnectionList:string[] = ['AND','OR'];
     filter_typeList:string[] = ["Section size","Department","Course number","Instructor","Title"]
     orderKeyList:string[] = [
         "MostFailingStudents",
         "MostPassingStudents",
-        "AvgGrade"];
+        "AvgGrade",
+        "courses_dept",
+        "courses_id",
+        "courses_title",
+        "courseSize"
+    ];
 
-    logicConnection:string = null;
+    logicConnection:string = "AND";
     filters:any[] = [];
 
 
@@ -88,6 +94,9 @@ export class uiCoursesComponent{
                     temp_filter["IS"] = {"courses_title":this.comparisonValue};                }
             }
         }
+        if(this.filters.includes(JSON.stringify(temp_filter))){
+            return;
+        }
         this.filters.push(JSON.stringify(temp_filter));
 
     }
@@ -124,14 +133,7 @@ export class uiCoursesComponent{
 
         if(this.isCourses) {
             query["OPTIONS"] = {
-                "COLUMNS": [
-                    "MostFailingStudents",
-                    "MostPassingStudents",
-                    "AvgGrade",
-                    "courses_dept",
-                    "courses_id",
-                    "courses_title"
-                ],
+                "COLUMNS": this.orderKeyList,
                 "FORM": "TABLE"};
 
             query["TRANSFORMATIONS"] = {
@@ -139,7 +141,7 @@ export class uiCoursesComponent{
                 "APPLY": [
                     {
                         "MostFailingStudents": {
-                                "MAX": "courses_fail"
+                            "MAX": "courses_fail"
                         }
                     },
                     {
@@ -148,9 +150,16 @@ export class uiCoursesComponent{
                         }
                     },
                     {
-                            "AvgGrade": {
-                                "AVG": "courses_avg"}
+                        "AvgGrade": {
+                            "AVG": "courses_avg"
+                        }
+                    },
+                    {
+                        "courseSize":{
+                            "MAX":"courses_size"
+                        }
                     }
+
                 ]
             };
 
@@ -178,6 +187,7 @@ export class uiCoursesComponent{
 
         this.UiService.performquery(query).then((ret:any)=>{
             this.result = ret;
+            this.col = query.OPTIONS.COLUMNS;
         }).catch((e:any)=>{
             this.result = e;
         })

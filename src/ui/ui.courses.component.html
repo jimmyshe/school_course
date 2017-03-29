@@ -54,6 +54,7 @@
     </label>
 
     <div [hidden] = "!isCourses">
+        <h4>Current order key, ranked from high to low</h4>
         <p *ngFor="let f of orderList">{{f}}</p>
         <select class="form-control"  id="order"
                 [(ngModel)]="order" name="order">
@@ -68,5 +69,22 @@
 
 <div [hidden] = "!found">
     <h3>Your result:</h3>
-    <p>{{ret_str}}</p>
+
+    <div *ngIf="result == 'wait...'">
+        <p>{{ret_str}}</p>
+    </div>
+    <div *ngIf="result != 'wait...'">
+        <table style="width:100%">
+            <tr>
+                <th *ngFor="let tab of col">{{tab}}</th>
+            </tr>
+            <tr *ngFor="let row of result">
+                <th *ngFor="let tab of col">{{row[tab]}}</th>
+            </tr>
+        </table>
+    </div>
+
+
+
+
 </div>
