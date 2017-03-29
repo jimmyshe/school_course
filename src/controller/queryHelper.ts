@@ -265,6 +265,12 @@ export default class QH {
                 }
             }
 
+            if(query.OPTIONS.COLUMNS.length != group.length+apply.length){
+                ret.code = 400;
+                ret.body = {"error": "the cloumns has keys that are not in apply or group "};
+                return ret;
+            }
+
 
 
         }
