@@ -27,6 +27,25 @@ export default class QH {
          // The interface defination should do the right job. If it is not the case, I can write more at here.
          // It might not be the case. I have to wrrite it manually.
 
+        let v_key_query = ["OPTIONS","WHERE","TRANSFORMATIONS"];
+
+        for(let i =0;i<Object.keys(query).length;i++){
+            let j = v_key_query.length;
+            let v = false;
+            while (j--) {
+                if (v_key_query[j] === Object.keys(query)[i]) {
+                    v = true;
+                }
+            }
+            if(v == false){
+                ret.code = 400;
+                ret.body = {"error": "the query format is wrong"};
+                return ret;
+            }
+        }
+
+
+
          if(query.OPTIONS==null||query.WHERE==null){
              ret.code = 400;
              ret.body = {"error": "the query format is wrong"};
@@ -47,6 +66,28 @@ export default class QH {
              ret.body = {"error": "the option of columns has a wrong format"}
              return ret;
          }
+
+
+        let v_key_option = ["COLUMNS","ORDER","FORM"];
+
+        for(let i =0;i<Object.keys(query["OPTIONS"]).length;i++){
+            let j = v_key_option.length;
+            let v = false;
+            while (j--) {
+                if (v_key_option[j] === Object.keys(query["OPTIONS"])[i]) {
+                    v = true;
+                }
+            }
+            if(v == false){
+                ret.code = 400;
+                ret.body = {"error": "the option format is wrong"};
+                return ret;
+            }
+        }
+
+
+
+
 
         if (query.OPTIONS.COLUMNS.length == 0){
 

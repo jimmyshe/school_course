@@ -17,7 +17,10 @@ export class uiService{
 
 
     performquery(query:any):any {
-        return this.http.post(this.dataUrl+"query",query).toPromise();
+
+        return this.http.post(this.dataUrl+"query",query).toPromise()
+            .then(response => response.json().result)
+            .catch(response => response.json());
     }
 }
 

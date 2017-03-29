@@ -1,20 +1,10 @@
 <h2>Courses</h2>
 
-<h3>Current filter</h3>
+<h3>Current filters</h3>
 <p *ngFor="let f of filters">{{f}}</p>
-<div class="form-group">
-    <label for="logic">Logical relation between all the filters </label>
-    <select class="form-control"  id="logic"
-            required
-            [(ngModel)]="logicConnection" name="logic">
-        <option *ngFor="let p of logocalConnectionList" [value]="p">{{p}}</option>
-    </select>
-</div>
+<button type="button" class="btn btn-default" (click)="deleteFilters()">empty all filters</button>
 
-
-<h3>Create new filter</h3>
-<form class="form-horizontal">
-
+<h4>Create new filter</h4>
     <label for="filter_type">Select new filter type </label>
     <select class="form-control"  id="filter_type"
             required
@@ -42,8 +32,35 @@
                    required
                    [(ngModel)]="comparisonValue" name="ct_value">
         </div>
-
+        <div>
+            <button type="button" class="btn btn-default" (click)="addFilter()">add a filter</button>
+        </div>
     </div>
 
+<h3>Find</h3>
+<form class="courses_query" (ngSubmit)="find()" #siteForm="ngForm">
+    <label for="logic">Logical relation between all the filters </label>
+    <select class="form-control"  id="logic"
+            required
+            [(ngModel)]="logicConnection" name="logic">
+        <option *ngFor="let p of logocalConnectionList" [value]="p">{{p}}</option>
+    </select>
+    <p>search for courses instead of sections?</p>
+    <label class="switch" for="isCourses">
+        <input type="checkbox"  id="isCourses"
+            [(ngModel)]="isCourses" name="isCourses"
+        >
+        <div class="slider round"></div>
+    </label>
 
+    <div [hidden] = "!isCourses">
+        what ?
+    </div>
+
+    <button type="submit" class="btn btn-default" [disabled]="!siteForm.form.valid">find</button>
 </form>
+
+<div [hidden] = "!found">
+    <h3>Your result:</h3>
+    <p>{{ret_str}}</p>
+</div>
