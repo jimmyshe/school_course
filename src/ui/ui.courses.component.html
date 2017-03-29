@@ -54,7 +54,13 @@
     </label>
 
     <div [hidden] = "!isCourses">
-        what ?
+        <p *ngFor="let f of orderList">{{f}}</p>
+        <select class="form-control"  id="order"
+                [(ngModel)]="order" name="order">
+            <option *ngFor="let p of orderKeyList" [value]="p">{{p}}</option>
+        </select>
+        <button type="button" (click)="addOrder()">add order</button>
+        <button type="button" (click)="deleteOrder()">delete orders</button>
     </div>
 
     <button type="submit" class="btn btn-default" [disabled]="!siteForm.form.valid">find</button>

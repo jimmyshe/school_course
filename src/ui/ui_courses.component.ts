@@ -24,6 +24,10 @@ export class uiCoursesComponent{
 
     logocalConnectionList:string[] = ['AND','OR'];
     filter_typeList:string[] = ["Section size","Department","Course number","Instructor","Title"]
+    orderKeyList:string[] = [
+        "MostFailingStudents",
+        "MostPassingStudents",
+        "AvgGrade"];
 
     logicConnection:string = null;
     filters:any[] = [];
@@ -35,6 +39,22 @@ export class uiCoursesComponent{
     comparisonKeyList:string[] = [">","<","="];
     comparisonKey:string = null;
     comparisonValue:any = null;
+
+    orderList:string[] = [];
+    order:string = null;
+
+    addOrder(){
+        if(this.order == null||this.orderList.includes(this.order)){
+            return;
+        }else {
+            this.orderList.push(this.order);
+        }
+    }
+
+    deleteOrder(){
+        this.orderList = [];
+    }
+
 
     addFilter(){
         let temp_filter:any = {};
@@ -105,7 +125,7 @@ export class uiCoursesComponent{
         if(this.isCourses) {
             query["OPTIONS"] = {
                 "COLUMNS": [
-                    "MostfailingStudents",
+                    "MostFailingStudents",
                     "MostPassingStudents",
                     "AvgGrade",
                     "courses_dept",
@@ -114,26 +134,33 @@ export class uiCoursesComponent{
                 ],
                 "FORM": "TABLE"};
 
-                query["TRANSFORMATIONS"] = {
-                    "GROUP": ["courses_dept","courses_id","courses_title"],
-                    "APPLY": [
-                        {
-                            "MostfailingStudents": {
+            query["TRANSFORMATIONS"] = {
+                "GROUP": ["courses_dept","courses_id","courses_title"],
+                "APPLY": [
+                    {
+                        "MostFailingStudents": {
                                 "MAX": "courses_fail"
-                            }
-                        },
-                        {
-                            "MostPassingStudents": {
-                                "MAX": "courses_pass"
-                            }
-                        },
-                        {
-                            "AvgGrade": {
-                                "AVG": "courses_avg"
-                            }
                         }
-                    ]
-                };
+                    },
+                    {
+                        "MostPassingStudents": {
+                            "MAX": "courses_pass"
+                        }
+                    },
+                    {
+                            "AvgGrade": {
+                                "AVG": "courses_avg"}
+                    }
+                ]
+            };
+
+            if(this.orderList.length!=0){
+                query.OPTIONS["ORDER"] = {
+                    "dir":"DOWN",
+                    "keys":this.orderList
+                }
+            }
+
         }else {
             query["OPTIONS"] = {
                 "COLUMNS": [
