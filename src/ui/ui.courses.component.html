@@ -1,7 +1,18 @@
 <h2>Courses</h2>
 
-<h3>Current filters</h3>
-<p *ngFor="let f of filters">{{f}}</p>
+<!--<h3>Current filters</h3>-->
+<!--<p *ngFor="let f of filters">{{f}}</p>-->
+
+
+    <table style="width:100%">
+        <tr>
+            <th>Cureent filters</th>
+        </tr>
+        <tr *ngFor="let f of filters">{{f}}</tr>
+    </table>
+
+
+
 <button type="button" class="btn btn-default" (click)="deleteFilters()">empty all filters</button>
 
 <h4>Create new filter</h4>
@@ -54,8 +65,17 @@
     </label>
 
     <div [hidden] = "!isCourses">
-        <h4>Current order key, ranked from high to low</h4>
-        <p *ngFor="let f of orderList">{{f}}</p>
+        <!--<h4>Current order key, ranked from high to low</h4>-->
+        <!--<p *ngFor="let f of orderList">{{f}}</p>-->
+
+        <table style="width:100%">
+            <tr>
+                <th>Current order key, ranked from high to low</th>
+            </tr>
+            <tr *ngFor="let f of orderList">{{f}}</tr>
+        </table>
+
+
         <select class="form-control"  id="order"
                 [(ngModel)]="order" name="order">
             <option *ngFor="let p of orderKeyList" [value]="p">{{p}}</option>
