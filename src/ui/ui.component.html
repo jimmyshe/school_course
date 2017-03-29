@@ -1,4 +1,18 @@
 
-<!--<query-form></query-form>-->
 
-<courses-ui></courses-ui>
+
+
+<ul class="nav nav-tabs">
+    <li>
+        <button  class="switch_page" (click)="switchbt(0)">query</button>
+    </li>
+    <li>
+        <button  class="switch_page" (click)="switchbt(1)">courses_ui</button>
+    </li>
+</ul>
+<div *ngIf="active[0]">
+    <query-form></query-form>
+</div>
+<div *ngIf="active[1]">
+    <courses-ui></courses-ui>
+</div>
