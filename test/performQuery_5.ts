@@ -230,6 +230,11 @@ describe("performQuery_rooms_d3", function () {
                     "LT":{
                         "rooms_seats":200
                     }
+                }, {
+                    "LT":{
+                        "rooms_distance_from_SWNG":3
+
+                    }
                 }]
             },
             "OPTIONS": {
@@ -260,21 +265,6 @@ describe("performQuery_rooms_d3", function () {
                         {
                             "rooms_shortname": "SWNG",
                             "minSeats": 187
-                        }, {
-                            "rooms_shortname": "LSK",
-                            "minSeats": 183
-                        }, {
-                            "rooms_shortname": "PHRM",
-                            "minSeats": 167
-                        }, {
-                            "rooms_shortname": "FRDM",
-                            "minSeats": 160
-                        }, {
-                            "rooms_shortname": "DMP",
-                            "minSeats": 160
-                        }, {
-                            "rooms_shortname": "IBLC",
-                            "minSeats": 154
                         }]
                 })
 

@@ -34,6 +34,8 @@ export class roomQueryComponent {
 
     submittedSchedule = false;
 
+    submittedfeedme = false;
+
     roomSize: string = "";
 
     roomNumber: string = "";
@@ -69,6 +71,11 @@ export class roomQueryComponent {
     sroomandorSelection:string = "";
 
 
+    fbuildingName:string = "";
+
+    fdistance:string = "";
+
+
     get diagnostic() {
         return this.dataSetID;
     }
@@ -84,6 +91,8 @@ export class roomQueryComponent {
     resultsroom:any = null;
 
     resultSchedule:any = null;
+
+    resultfeedme:any = null;
 
     addDataSet(id:any, data:any) {
 
@@ -102,10 +111,8 @@ export class roomQueryComponent {
 
     performRoomQuery(roomSize:string, roomNumber:string, buildingName:string, roomDistance:string, targetBuilding:string,
                      roomType:string, furnitureType:string, andorSelection:string){
-        this.resultRoomQuery = this.UiService.performRoomQuery(roomSize, roomNumber, buildingName, roomDistance, targetBuilding,
-                                        roomType, furnitureType, andorSelection).then((ret:any)=>{
-            this.resultRoomQuery = JSON.stringify(ret);
-        })
+        this.resultRoomQuery = this.resultRoomQuery = this.UiService.performRoomQuery(roomSize, roomNumber, buildingName, roomDistance, targetBuilding,
+                                        roomType, furnitureType, andorSelection);
     }
 
     getCourseForScheduling(sdepartment:string, scourseNumber:string, scourseandorSelection:string) {
@@ -118,6 +125,10 @@ export class roomQueryComponent {
 
     scheduleSection(sroom:any, scourse:any){
         this.resultSchedule = this.UiService.scheduleSection(sroom, scourse);
+    }
+
+    getDinning(fbuildingName:string, fdistance:string){
+        this.resultfeedme = this.UiService.getDinning(fbuildingName, fdistance);
     }
 
     submitAddID() {
@@ -174,7 +185,16 @@ export class roomQueryComponent {
         } catch(e) {
             this.resultSchedule = e.message;
         }
+    }
 
+    submitFeedRequest(){
+        this.submittedfeedme = true;
+        try{
+            this.getDinning(this.fbuildingName, this.fdistance);
+        } catch(e) {
+            this.resultfeedme = e.message;
+
+        }
     }
 
 }

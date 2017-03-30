@@ -290,8 +290,10 @@ export default class QH {
         let valid_keys = ["rooms_fullname","rooms_shortname","rooms_number","rooms_name","rooms_address",
         "rooms_lat","rooms_lon","rooms_seats","rooms_type","rooms_furniture","rooms_href"];
 
+        let distanceString = "rooms_distance_from_";
+
         for(let valid_key of valid_keys){
-            if (valid_key == key){
+            if (valid_key == key || key.includes(distanceString)){
                 return true;
             }
         }
