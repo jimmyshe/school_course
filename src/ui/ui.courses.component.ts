@@ -37,11 +37,9 @@ export class uiCoursesComponent{
 
     logicConnection:string = "AND";
     filters:any[] = [];
-
-
     filterType:string = null;
 
-    //for section size
+
     comparisonKeyList:string[] = [">","<","="];
     comparisonKey:string = null;
     comparisonValue:any = null;

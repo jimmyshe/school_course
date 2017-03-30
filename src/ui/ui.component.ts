@@ -14,7 +14,7 @@ import { Component } from '@angular/core';
 
 export class UiComponent {
 
-    active:boolean[] = [true,false]
+    active:boolean[] = [true,false,false]
 
 
     switchbt(n:number){

@@ -4,15 +4,21 @@
 
 <ul class="nav nav-tabs">
     <li>
-        <button  class="switch_page" (click)="switchbt(0)">query</button>
+        <button  class="switch_page" (click)="switchbt(0)">addData</button>
     </li>
     <li>
         <button  class="switch_page" (click)="switchbt(1)">courses_ui</button>
     </li>
+    <li>
+        <button  class="switch_page" (click)="switchbt(2)">rooms_ui</button>
+    </li>
 </ul>
 <div *ngIf="active[0]">
-    <query-form></query-form>
+    <add_data></add_data>
 </div>
 <div *ngIf="active[1]">
     <courses-ui></courses-ui>
+</div>
+<div *ngIf="active[2]">
+    <rooms-ui></rooms-ui>
 </div>

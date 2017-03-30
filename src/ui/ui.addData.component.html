@@ -1,10 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+<form>
+    <div class="form-group">
+        <label for="datasetId">ID:</label>
+        <input type="text" class="form-control" id="datasetId"
+               required
+               [(ngModel)] = "dataSetID" name = "id">
+        <label >Archive:</label>
+        <input type="file" name="file" (change)="fileChangeEvent($event)" >
+    </div>
+    <button type="button" [disabled]="!isokforadd" class="btn btn-primary" (click) = "addDataSet()" >Add Dataset</button>
+    <button type="button" [disabled]="dataSetID==null" class="btn btn-primary" (click) = "removeDataSet()">Remove Dataset</button>
+</form>
+
+<div  [hidden]="!submittedAdd" id="render">
+    <h3>Result:</h3>
+    <p *ngIf="result == null">wait...</p>
+    <p *ngIf="result != null">{{ret_str}}</p>
+</div>
+
+

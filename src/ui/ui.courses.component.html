@@ -1,8 +1,5 @@
 <h2>Courses</h2>
 
-<!--<h3>Current filters</h3>-->
-<!--<p *ngFor="let f of filters">{{f}}</p>-->
-
 
     <table style="width:100%">
         <tr>
@@ -19,7 +16,7 @@
     <label for="filter_type">Select new filter type </label>
     <select class="form-control"  id="filter_type"
             required
-            [(ngModel)]="filterType" name="logic">
+            [(ngModel)]="filterType" name="filter_type">
         <option *ngFor="let p of filter_typeList" [value]="p">{{p}}</option>
     </select>
 
@@ -84,7 +81,7 @@
         <button type="button" (click)="deleteOrder()">delete orders</button>
     </div>
 
-    <button type="submit" class="btn btn-default" [disabled]="!siteForm.form.valid">find</button>
+    <button type="submit" class="btn btn-primary" [disabled]="!siteForm.form.valid">find</button>
 </form>
 
 <div [hidden] = "!found">
@@ -93,7 +90,7 @@
     <div *ngIf="result == 'wait...'">
         <p>{{ret_str}}</p>
     </div>
-    <div *ngIf="result != 'wait...'">
+    <div *ngIf="result != 'wait...'&&result!=400&&result!=424">
         <table style="width:100%">
             <tr>
                 <th *ngFor="let tab of col">{{tab}}</th>
@@ -102,5 +99,12 @@
                 <th *ngFor="let tab of col">{{row[tab]}}</th>
             </tr>
         </table>
+    </div>
+    <div *ngIf="result == 424">
+        <p>{{ret_str}}the query failed because it depends on an id that has not been added.</p>
+
+    </div>
+    <div *ngIf="result == 400">
+        <p>{{ret_str}}the query failed.</p>
     </div>
 </div>

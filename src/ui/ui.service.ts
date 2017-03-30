@@ -20,7 +20,21 @@ export class uiService{
 
         return this.http.post(this.dataUrl+"query",query).toPromise()
             .then(response => response.json().result)
+            .catch(response => response.status);
+    }
+
+    addData(id:any, data:any):any{
+        return this.http.put(this.dataUrl+"dataset/"+id, data).toPromise()
+            .then(response => response.status)
             .catch(response => response.json());
     }
+
+    removeData(id:any):any{
+        return this.http.delete(this.dataUrl+"dataset/"+id).toPromise()
+            .then(response => response.status)
+            .catch(response => response.json());
+    }
+
+
 }
 

@@ -96,7 +96,9 @@ export default class Server {
 
                     let id:string = req.params.id;
 
+
                     Server.insightfacade.removeDataset(id).then(function(result:InsightResponse){
+                        console.log(JSON.stringify(result));
                         res.json(result.code, result.body);
                     }).catch(function(result:InsightResponse){
                         res.json(result.code, result.body);
