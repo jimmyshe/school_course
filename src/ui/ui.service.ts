@@ -402,7 +402,8 @@ export class uiService{
 
         let optionObj = {
             "COLUMNS": [
-                "rooms_name"
+                "rooms_name",
+                "rooms_din"
             ],
             "FORM": "TABLE"
         }

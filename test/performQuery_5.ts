@@ -61,7 +61,8 @@ describe("performQuery_rooms_d3", function () {
             "OPTIONS": {
                 "COLUMNS": [
                     "rooms_shortname",
-                    "maxSeats"
+                    "maxSeats",
+                    "rooms_din"
                 ],
                 "ORDER": {
                     "dir": "DOWN",
@@ -84,13 +85,16 @@ describe("performQuery_rooms_d3", function () {
                     "render": "TABLE",
                     "result": [{
                         "rooms_shortname": "OSBO",
-                        "maxSeats": 442
+                        "maxSeats": 442,
+                        "rooms_din": "No cafe inside this building"
                     }, {
                         "rooms_shortname": "HEBB",
-                        "maxSeats": 375
+                        "maxSeats": 375,
+                        "rooms_din": "No cafe inside this building"
                     }, {
                         "rooms_shortname": "LSC",
-                        "maxSeats": 350
+                        "maxSeats": 350,
+                        "rooms_din": "Perugia"
                     }]
                 })
 

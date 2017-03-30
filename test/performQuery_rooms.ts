@@ -89,6 +89,52 @@ describe("performQuery_rooms", function () {
             })
     });
 
+    it("test of a simple case din", function () {
+        return insight.performQuery({
+            "WHERE": {
+                "IS": {
+                    "rooms_name": "DMP_*"
+                }
+            },
+            "OPTIONS": {
+                "COLUMNS": [
+                    "rooms_name"
+                ],
+                "ORDER": "rooms_name",
+                "FORM": "TABLE"
+            }
+        })
+            .then((respons:InsightResponse)=>{
+                sanityCheck(respons);
+                console.log(respons.body);
+                expect(respons.body).to.deep.equal({
+                    "render": "TABLE",
+                    "result": [
+                        {
+                            "rooms_name": "DMP_101"
+                        },
+                        {
+                            "rooms_name": "DMP_110"
+                        },
+                        {
+                            "rooms_name": "DMP_201"
+                        },
+                        {
+                            "rooms_name": "DMP_301"
+                        },
+                        {
+                            "rooms_name": "DMP_310"
+                        }
+                    ]
+                })
+
+            })
+            .catch( (err:InsightResponse)=>{
+                Log.test('Error: query request not success ');
+                expect.fail();
+            })
+    });
+
     it("test of a simple case b", function () {
         return insight.performQuery({
             "WHERE": {

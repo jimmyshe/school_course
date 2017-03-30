@@ -155,6 +155,8 @@ export default class InsightFacade implements IInsightFacade {
                                                     room.rooms_address = buildingAddress;
                                                     room.rooms_url = buildingUrl;
 
+                                                    room.rooms_din = that.getDinningPlace(buildingShortName);
+
                                                     roomList.push(room);
 
                                                 }
@@ -345,6 +347,40 @@ export default class InsightFacade implements IInsightFacade {
 
         });
 
+    }
+
+    getDinningPlace(name:string){
+        if (name === "ICCS"){
+            return "Reboot Cafe";
+        } else if (name === "ESB") {
+            return "Magma Cafe";
+        } else if (name === "IRC") {
+            return "IRC SnackBar";
+        } else if ( name === "DLAM") {
+            return "Bento Sushi";
+        } else if (name === "ANGU") {
+            return "Triple O";
+        } else if (name === "FSC") {
+            return "Tim Hortons";
+        } else if (name === "KAIS") {
+            return "Starbucks";
+        } else if (name === "PHRM") {
+            return "Daily Dose";
+        } else if (name === "CIRS") {
+            return "The Loop Cafe";
+        } else if (name === "SCRF") {
+            return "Neville's";
+        } else if (name === "LSC") {
+            return "Perugia";
+        } else if (name === "ALRD") {
+            return "Law Cafe";
+        } else if (name === "BUCH") {
+            return "Stir It Up";
+        } else if (name === "IBLC") {
+            return "Ike's Cafe";
+        } else {
+            return "No cafe inside this building";
+        }
     }
 
     findDistance(lat: any, lon: any, targetLat: any, targetLon: any) {
