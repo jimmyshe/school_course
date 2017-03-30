@@ -61,7 +61,8 @@ describe("performQuery_rooms_d3", function () {
             "OPTIONS": {
                 "COLUMNS": [
                     "rooms_shortname",
-                    "maxSeats"
+                    "maxSeats",
+                    "rooms_din"
                 ],
                 "ORDER": {
                     "dir": "DOWN",
@@ -84,13 +85,16 @@ describe("performQuery_rooms_d3", function () {
                     "render": "TABLE",
                     "result": [{
                         "rooms_shortname": "OSBO",
-                        "maxSeats": 442
+                        "maxSeats": 442,
+                        "rooms_din": "No cafe inside this building"
                     }, {
                         "rooms_shortname": "HEBB",
-                        "maxSeats": 375
+                        "maxSeats": 375,
+                        "rooms_din": "No cafe inside this building"
                     }, {
                         "rooms_shortname": "LSC",
-                        "maxSeats": 350
+                        "maxSeats": 350,
+                        "rooms_din": "Perugia"
                     }]
                 })
 
@@ -230,6 +234,11 @@ describe("performQuery_rooms_d3", function () {
                     "LT":{
                         "rooms_seats":200
                     }
+                }, {
+                    "LT":{
+                        "rooms_distance_from_SWNG":3
+
+                    }
                 }]
             },
             "OPTIONS": {
@@ -260,21 +269,6 @@ describe("performQuery_rooms_d3", function () {
                         {
                             "rooms_shortname": "SWNG",
                             "minSeats": 187
-                        }, {
-                            "rooms_shortname": "LSK",
-                            "minSeats": 183
-                        }, {
-                            "rooms_shortname": "PHRM",
-                            "minSeats": 167
-                        }, {
-                            "rooms_shortname": "FRDM",
-                            "minSeats": 160
-                        }, {
-                            "rooms_shortname": "DMP",
-                            "minSeats": 160
-                        }, {
-                            "rooms_shortname": "IBLC",
-                            "minSeats": 154
                         }]
                 })
 
