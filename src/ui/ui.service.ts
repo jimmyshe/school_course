@@ -34,7 +34,5 @@ export class uiService{
             .then(response => response.status)
             .catch(response => response.json());
     }
-
-
 }
 

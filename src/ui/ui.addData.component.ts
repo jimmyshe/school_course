@@ -67,13 +67,16 @@ export class uiAddDataComponent {
                 this.result = "the operation was successful and the id was new"
             }
 
-            if(ret == 201){
+            else if(ret == 201){
                 this.result = "the operation was successful and the id already existed";
             }
+
+            else {
+                this.result = ret;
+            }
+
             this.dataSetID = null;
 
-        }).catch((e:any)=>{
-            this.result = e;
         })
     }
 
@@ -86,13 +89,11 @@ export class uiAddDataComponent {
         this.UiService.removeData(this.dataSetID).then((ret:any)=>{
             if(ret == 204){
                 this.result = "the operation was successful"
+            }else {
+                this.result = ret;
             }
             this.dataSetID = null;
-        }).catch((e:any)=>{
-            this.result = e;
         });
 
     }
-
-
 }

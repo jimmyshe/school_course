@@ -106,9 +106,9 @@ export class uiRoomsComponent{
 
         query["OPTIONS"] = {
             "COLUMNS": [
-                "rooms_seats",
                 "rooms_shortname",
                 "rooms_number",
+                "rooms_seats",
                 "rooms_type",
                 "rooms_furniture"
                 ],
@@ -117,13 +117,25 @@ export class uiRoomsComponent{
 
         if(this.isLocation){
 
-            let temp = query.WHERE;
-            if(JSON.stringify(temp)=="{}"){
-                temp = {
-                    //todo
+            let skey = "rooms_distance_from_"+this.targetBuilding;
+            let temp:any = {};
+            temp['LT'] = {};
+            temp.LT[skey] = this.targetDistance;
+
+
+
+            if(JSON.stringify(query.WHERE)=="{}"){
+                query.WHERE = temp;
+            }else {
+                query.WHERE = {
+                    "AND":[
+                        temp,
+                        query.WHERE
+                    ]
                 }
             }
 
+            query.OPTIONS.COLUMNS.push(skey);
         }
 
 
@@ -135,8 +147,6 @@ export class uiRoomsComponent{
         this.UiService.performquery(query).then((ret:any)=>{
             this.result = ret;
             this.col = query.OPTIONS.COLUMNS;
-        }).catch((e:any)=>{
-            this.result = e;
         })
 
 

@@ -186,8 +186,6 @@ export class uiCoursesComponent{
         this.UiService.performquery(query).then((ret:any)=>{
             this.result = ret;
             this.col = query.OPTIONS.COLUMNS;
-        }).catch((e:any)=>{
-            this.result = e;
         })
 
 
