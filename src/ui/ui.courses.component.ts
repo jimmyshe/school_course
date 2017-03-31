@@ -6,7 +6,6 @@ import {uiService} from './ui.service';
 
 
 @Component({
-
     moduleId: module.id,
     selector: 'courses-ui',
     templateUrl: './ui.courses.component.html',
@@ -265,15 +264,11 @@ export class uiCoursesComponent{
 
                 i.countSection  = Math.floor(i.countSection)+1;
             }
-
             //console.log(JSON.stringify(ret));
             this.updateCoursesI.emit(ret);
             this.result = ret;
-        })
+        });
 
         this.updateCoursesI.emit("wait for courses");
     }
-
-
-
 }

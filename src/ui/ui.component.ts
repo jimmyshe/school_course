@@ -27,7 +27,7 @@ export class UiComponent {
     }
 
 
-    active:boolean[] = [true,false,false,false]
+    active:boolean[] = [true,false,false,false,false]
 
 
     switchbt(n:number){

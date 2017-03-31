@@ -15,6 +15,9 @@
     <li>
         <button  class="switch_page" (click)="switchbt(3)">schedule_ui</button>
     </li>
+    <li>
+        <button  class="switch_page" (click)="switchbt(4)">feed_ui</button>
+    </li>
 </ul>
 <div [hidden]="!active[0]">
     <add_data></add_data>
@@ -27,4 +30,7 @@
 </div>
 <div [hidden]="!active[3]">
     <schedule-ui [courses]="courses_ret" [rooms]="rooms_ret"></schedule-ui>
+</div>
+<div [hidden]="!active[4]">
+    <feed-ui ></feed-ui>
 </div>
