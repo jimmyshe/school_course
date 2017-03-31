@@ -12,13 +12,19 @@
     <li>
         <button  class="switch_page" (click)="switchbt(2)">rooms_ui</button>
     </li>
+    <li>
+        <button  class="switch_page" (click)="switchbt(3)">schedule_ui</button>
+    </li>
 </ul>
-<div *ngIf="active[0]">
+<div [hidden]="!active[0]">
     <add_data></add_data>
 </div>
-<div *ngIf="active[1]">
-    <courses-ui></courses-ui>
+<div [hidden]="!active[1]">
+    <courses-ui (updateCoursesI)="coursesIChange($event)"></courses-ui>
 </div>
-<div *ngIf="active[2]">
-    <rooms-ui></rooms-ui>
+<div [hidden]="!active[2]">
+    <rooms-ui (updateRoomsI)="roomsIChange($event)"></rooms-ui>
+</div>
+<div [hidden]="!active[3]">
+    <schedule-ui [courses]="courses_ret" [rooms]="rooms_ret"></schedule-ui>
 </div>

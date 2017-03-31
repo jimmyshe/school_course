@@ -11,7 +11,7 @@ import {uiService} from './ui.service';
 import {uiCoursesComponent} from './ui.courses.component'
 import {uiAddDataComponent} from './ui.addData.component'
 import {uiRoomsComponent} from './ui.rooms.component'
-
+import {uiScheduleComponent} from './ui.schedule.component'
 @NgModule({
     imports:      [
         FormsModule,
@@ -22,7 +22,8 @@ import {uiRoomsComponent} from './ui.rooms.component'
         queryFormComponent,
         uiCoursesComponent,
         uiAddDataComponent,
-        uiRoomsComponent
+        uiRoomsComponent,
+        uiScheduleComponent
     ],
     providers:[uiService],
     bootstrap:    [ UiComponent ]

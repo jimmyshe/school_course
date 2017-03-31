@@ -1,7 +1,7 @@
 /**
  * Created by cq2essz on 2017/3/29.
  */
-import { Component } from '@angular/core';
+import { Component,EventEmitter,Output } from '@angular/core';
 import {uiService} from './ui.service';
 
 @Component({
@@ -14,6 +14,9 @@ import {uiService} from './ui.service';
 
 export class uiRoomsComponent{
     constructor(private UiService: uiService) { }
+
+    @Output() updateRoomsI:EventEmitter<JSON> = new EventEmitter();
+
 
     found = false;
     result:any ="wait...";
@@ -148,7 +151,6 @@ export class uiRoomsComponent{
             this.result = ret;
             this.col = query.OPTIONS.COLUMNS;
         })
-
 
     }
 

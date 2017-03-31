@@ -1,8 +1,9 @@
 /**
  * Created by cq2essz on 2017/3/26.
  */
-import { Component } from '@angular/core';
+import {Component, Output,EventEmitter} from '@angular/core';
 import {uiService} from './ui.service';
+
 
 @Component({
 
@@ -14,6 +15,9 @@ import {uiService} from './ui.service';
 
 export class uiCoursesComponent{
     constructor(private UiService: uiService) { }
+
+    @Output() updateCoursesI:EventEmitter<JSON> = new EventEmitter();
+
 
 
     isCourses = false;
@@ -32,7 +36,8 @@ export class uiCoursesComponent{
         "courses_dept",
         "courses_id",
         "courses_title",
-        "courseSize"
+        "maxSize",
+        "countSection"
     ];
 
     logicConnection:string = "AND";
@@ -153,8 +158,13 @@ export class uiCoursesComponent{
                         }
                     },
                     {
-                        "courseSize":{
+                        "maxSize":{
                             "MAX":"courses_size"
+                        }
+                    },
+                    {
+                        "countSection": {
+                            "COUNT": "courses_uuid"
                         }
                     }
 

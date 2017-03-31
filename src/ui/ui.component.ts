@@ -1,7 +1,7 @@
 /**
  * Created by jimmyshe-ubuntu on 17-3-21.
  */
-import { Component } from '@angular/core';
+import { Input,Component,EventEmitter,Output } from '@angular/core';
 
 
 @Component({
@@ -14,7 +14,20 @@ import { Component } from '@angular/core';
 
 export class UiComponent {
 
-    active:boolean[] = [true,false,false]
+    rooms_ret:JSON = null;
+    courses_ret:JSON = null;
+    coursesIChange(i:JSON){
+        this.courses_ret = i;
+        console.log(JSON.stringify(this.courses_ret));
+    }
+
+    roomsIChange(i:JSON){
+        this.rooms_ret = i;
+        console.log(JSON.stringify(this.rooms_ret));
+    }
+
+
+    active:boolean[] = [true,false,false,false]
 
 
     switchbt(n:number){

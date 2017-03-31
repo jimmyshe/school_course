@@ -15,7 +15,6 @@ export class uiService{
     private dataUrl = "http://localhost:4321/"
     constructor(private http: Http) { }
 
-
     performquery(query:any):any {
 
         return this.http.post(this.dataUrl+"query",query).toPromise()
