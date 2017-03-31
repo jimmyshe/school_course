@@ -1,0 +1,37 @@
+<h2>Feed Me Now</h2>
+<form >
+        <label for="fbuildingName">Building Name</label>
+        <div>
+            <input type="text" class="form-control" id="fbuildingName"
+                   required
+                   [(ngModel)] = "fbuildingName" name = "fbuildingName">
+        </div>
+
+
+        <label for="fdistance">Distance</label>
+        <div>
+            <input type="number" class="form-control" id="fdistance"
+                   required
+                   [(ngModel)] = "fdistance" name = "fdistance">
+        </div>
+
+
+        <div >
+            <button type="submit" class="btn btn-default" (click) = "submitFeedRequest()" [disabled]="fdistance==null||fbuildingName==null">Send Current Location</button>
+        </div>
+
+</form>
+
+
+    <h3>Dinning Options</h3>
+
+<table *ngIf="result!=null">
+    <tr *ngFor="let i of result">
+        <th>
+            {{i.rooms_shortname}}
+        </th>
+        <th>
+            {{i.rooms_din}}
+        </th>
+    </tr>
+</table>
