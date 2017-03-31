@@ -18,12 +18,12 @@ export class UiComponent {
     courses_ret:JSON = null;
     coursesIChange(i:JSON){
         this.courses_ret = i;
-        console.log(JSON.stringify(this.courses_ret));
+        //console.log(JSON.stringify(this.courses_ret));
     }
 
     roomsIChange(i:JSON){
         this.rooms_ret = i;
-        console.log(JSON.stringify(this.rooms_ret));
+        //console.log(JSON.stringify(this.rooms_ret));
     }
 
 

@@ -16,15 +16,14 @@ import {uiService} from './ui.service';
 export class uiCoursesComponent{
     constructor(private UiService: uiService) { }
 
-    @Output() updateCoursesI:EventEmitter<JSON> = new EventEmitter();
-
+    @Output() updateCoursesI:EventEmitter<any> = new EventEmitter();
 
 
     isCourses = false;
 
     found = false;
 
-    result:any ="wait..."
+    result:any ="wait...";
     col:string[];
 
     logocalConnectionList:string[] = ['AND','OR'];
@@ -108,7 +107,6 @@ export class uiCoursesComponent{
         this.filters = [];
     }
 
-
     find(){
 
         this.found = true;
@@ -130,8 +128,6 @@ export class uiCoursesComponent{
             }else {
                 query.WHERE["OR"] = temp;
             }
-
-
         }
 
         if(this.isCourses) {
@@ -167,7 +163,6 @@ export class uiCoursesComponent{
                             "COUNT": "courses_uuid"
                         }
                     }
-
                 ]
             };
 
@@ -204,5 +199,81 @@ export class uiCoursesComponent{
     get ret_str(){
         return JSON.stringify(this.result);
     }
+
+    send(){
+
+        let query:any = {};
+
+        if(this.filters.length == 0) {
+            query["WHERE"] = {};
+        }else if(this.filters.length == 1) {
+            query["WHERE"] = JSON.parse(this.filters[0]);
+        }else {
+            let temp = [];
+            for (let i = 0;i< this.filters.length;i++){
+                temp.push(JSON.parse(this.filters[i]));
+            }
+            temp.push({"EQ":{"courses_year":2014}});
+            query["WHERE"] = {};
+            if(this.logicConnection=="AND"){
+                query.WHERE["AND"] = temp;
+            }else {
+                query.WHERE["OR"] = temp;
+            }
+        }
+
+        query["OPTIONS"] = {
+            "COLUMNS": this.orderKeyList,
+            "FORM": "TABLE"};
+
+        query["TRANSFORMATIONS"] = {
+            "GROUP": ["courses_dept","courses_id","courses_title"],
+            "APPLY": [
+                {
+                    "MostFailingStudents": {
+                        "MAX": "courses_fail"
+                    }
+                },
+                {
+                    "MostPassingStudents": {
+                        "MAX": "courses_pass"
+                    }
+                },
+                {
+                    "AvgGrade": {
+                        "AVG": "courses_avg"
+                    }
+                },
+                {
+                    "maxSize":{
+                        "MAX":"courses_size"
+                    }
+                },
+                {
+                    "countSection": {
+                        "COUNT": "courses_uuid"
+                    }
+                }
+            ]
+        };
+
+        console.log(JSON.stringify(query));
+
+        this.UiService.performquery(query).then((ret:any)=>{
+            for(let i of ret){
+                i.countSection = i.countSection/3;
+
+                i.countSection  = Math.floor(i.countSection)+1;
+            }
+
+            //console.log(JSON.stringify(ret));
+            this.updateCoursesI.emit(ret);
+            this.result = ret;
+        })
+
+        this.updateCoursesI.emit("wait for courses");
+    }
+
+
 
 }

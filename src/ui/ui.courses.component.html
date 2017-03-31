@@ -91,7 +91,7 @@
         <p>{{ret_str}}</p>
     </div>
     <div *ngIf="result != 'wait...'&&result!=400&&result!=424">
-        <button type="button" class="btn btn-primary" (click)="updateCoursesI.emit(this.result)" [disabled]="!isCourses">send the result to schedule ui</button>
+        <button type="button" class="btn btn-primary" (click)="send()" [disabled]="!isCourses">send the result to schedule ui</button>
         <table style="width:100%">
             <tr>
                 <th *ngFor="let tab of col">{{tab}}</th>

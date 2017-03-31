@@ -109,7 +109,7 @@ export class uiRoomsComponent{
 
         query["OPTIONS"] = {
             "COLUMNS": [
-                "rooms_shortname",
+                "rooms_name",
                 "rooms_number",
                 "rooms_seats",
                 "rooms_type",

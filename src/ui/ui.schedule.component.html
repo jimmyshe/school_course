@@ -1,4 +1,77 @@
 <h2>Schedule</h2>
 
-{{rooms_str}}
-{{courses_str}}
+<p *ngIf="rooms==null">please choose rooms using rooms_ui</p>
+<p *ngIf="courses==null">please choose courses using courses_ui</p>
+<p *ngIf="courses=='wait'">wait for courses</p>
+
+<button [disabled]="courses==null||rooms==null" (click)="schedule()">schedule</button>
+
+<h3>Result: quality = {{quality}}</h3>
+
+
+<div *ngIf="result">
+<div *ngFor="let table of result">
+    <h3>{{table.room}}</h3>
+<table  style="width:100%">
+    <tr>
+        <th *ngFor="let tab of col">{{tab}}</th>
+    </tr>
+    <tr *ngFor="let row of longer(table.mwf,table.tt);let row_index = index ">
+        <th >
+            <div *ngIf="table.mwf.length>row_index">
+                {{table.mwf[row_index].name}}
+                {{table.mwf[row_index].time}}
+            </div>
+            <div *ngIf="table.mwf.length<=row_index">
+                {{""}}
+            </div>
+        </th>
+
+        <th >
+            <div *ngIf="table.tt.length>row_index">
+                {{table.tt[row_index].name}}
+                {{table.tt[row_index].time}}
+            </div>
+            <div *ngIf="table.tt.length<=row_index">
+                {{""}}
+            </div>
+        </th>
+        <th >
+            <div *ngIf="table.mwf.length>row_index">
+                {{table.mwf[row_index].name}}
+                {{table.mwf[row_index].time}}
+            </div>
+            <div *ngIf="table.mwf.length<=row_index">
+                {{""}}
+            </div>
+        </th>
+
+        <th >
+            <div *ngIf="table.tt.length>row_index">
+                {{table.tt[row_index].name}}
+                {{table.tt[row_index].time}}
+            </div>
+            <div *ngIf="table.tt.length<=row_index">
+                {{""}}
+            </div>
+        </th>
+
+        <th >
+            <div *ngIf="table.mwf.length>row_index">
+                {{table.mwf[row_index].name}}
+                {{table.mwf[row_index].time}}
+            </div>
+            <div *ngIf="table.mwf.length<=row_index">
+                {{""}}
+            </div>
+        </th>
+
+    </tr>
+
+</table>
+</div>
+</div>
+
+<!--{{ret_str}}-->
+<!--{{rooms_str}}-->
+<!--{{courses_str}}-->
