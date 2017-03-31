@@ -22,7 +22,7 @@ export class uiFeedComponent{
 
 
     get resultFeedMe_str{
-        return JSON.stringify(this.result)
+        return JSON.stringify(this.result);
     }
 
     submitFeedRequest(){
